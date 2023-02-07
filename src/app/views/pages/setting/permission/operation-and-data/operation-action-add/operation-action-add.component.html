@@ -1,0 +1,192 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          (onShow)="onShow()"
+          [modal]="true"
+          [baseZIndex]="10000"
+          appendTo="body"
+          [style]=" {width: '60%'} "
+          [draggable]="true"
+          [maximizable]="true"
+          [closable]="false">
+    <p-header>
+        <i [ngClass]="stepModel[stepModel.currentStep].icon"></i> {{ stepModel[stepModel.currentStep].header | translate
+        }}
+    </p-header>
+
+    <!-- STEP 1 -->
+    <div *ngIf="stepModel.currentStep === 1">
+        <p-table [value]="dataSource.items"
+                 selectionMode="single"
+                 [(selection)]="selectedAction"
+                 dataKey="id"
+                 [autoLayout]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>No.</th>
+                    <th>Tag</th>
+                    <th>Route Path</th>
+                    <th>Method</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th><span class="p-input-icon-right"
+                              style="width:100%">
+                            <i class="pi pi-filter"></i>
+                            <input type="text"
+                                   pInputText
+                                   placeholder="Filter"
+                                   (keydown.enter)="initData()"
+                                   name="tag"
+                                   style="padding-left: 0.7rem; width:100%"
+                                   [(ngModel)]="request.tag" />
+                        </span></th>
+                    <th><span class="p-input-icon-right"
+                              style="width:100%">
+
+                            <i class="pi pi-filter"></i>
+                            <input type="text"
+                                   pInputText
+                                   placeholder="Filter"
+                                   (keydown.enter)="initData()"
+                                   name="routePath"
+                                   style="padding-left: 0.7rem;width:100%"
+                                   [(ngModel)]="request.routePath" />
+                        </span></th>
+                    <th><span class="p-input-icon-right"
+                              style="width:100%">
+                            <i class="pi pi-filter"></i>
+                            <input type="text"
+                                   pInputText
+                                   placeholder="Filter"
+                                   (keydown.enter)="initData()"
+                                   name="method"
+                                   style="padding-left: 0.7rem;width:100%"
+                                   [(ngModel)]="request.method" />
+                        </span></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-action
+                         let-rowIndex="rowIndex">
+                <tr [pSelectableRow]="action"
+                    [pSelectableRowIndex]="rowIndex">
+                    <td>{{ rowIndex + 1 }}</td>
+                    <td>{{ action.tag }}</td>
+                    <td>{{ action.routePath }}</td>
+                    <td>{{ action.method }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <mat-paginator [pageSize]="10"
+                       [pageSizeOptions]="[10, 30, 50]"
+                       [length]="dataSource.paginatorTotal"
+                       [showFirstLastButtons]="true"
+                       (page)="onPageChange($event)"></mat-paginator>
+    </div>
+
+    <!-- STEP 2 -->
+    <div *ngIf="stepModel.currentStep === 2">
+        <form autocomplete="off"
+              #formCustom="ngForm"
+              id="action-custom">
+            <div class="form-row mb-3">
+                <div class="col-md-6">
+                    <label>Action name</label>
+                    <input name="name"
+                           class="form-control"
+                           placeholder="Action name"
+                           [(ngModel)]="stepModel.actionData.name">
+                </div>
+                <div class="col-md-6">
+                    <label>API</label>
+                    <span class="form-control">
+                        <span class="api-method">{{ stepModel.actionData.api?.method | uppercase }}</span>
+                        {{ stepModel.actionData.api?.routePath }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-row mb-3">
+                <div class="col-md-12">
+                    <label>Note</label>
+                    <textarea name="note"
+                              class="form-control"
+                              placeholder="Note"
+                              [(ngModel)]="stepModel.actionData.note"></textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Properties</label>
+                <table class="table table-bordered">
+                    <thead>
+                        <th [style.minWidth]="'100px'">I/O</th>
+                        <th [style.minWidth]="'100px'">Type</th>
+                        <th [style.minWidth]="'100px'">Property name</th>
+                        <th [style.minWidth]="'200px'">Default value</th>
+                        <th [style.minWidth]="'350px'">Scope value</th>
+                        <th [style.minWidth]="'80px'">Restrict</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let rowData of actionDataSource">
+                            <td [title]="rowData.inOutType">{{ rowData.inOutType | label:inOutType }}</td>
+                            <td [title]="rowData.inOutTypeName">{{ rowData.inOutTypeName }}</td>
+                            <td [title]="rowData.name">{{ rowData.name }}</td>
+                            <td>
+                                <input name="a{{rowData.id}}"
+                                       placeholder="Default value"
+                                       [(ngModel)]="rowData.defaultValue"
+                                       class="form-control">
+                            </td>
+                            <td>
+                                <ng-select name="b{{rowData.id}}"
+                                           [items]="rowData.scopeValuesItems"
+                                           [addTag]="addTagFn"
+                                           placeholder="Scope value"
+                                           multiple="true"
+                                           (ngModelChange)="onScopeValueChange($event, rowData)"
+                                           [(ngModel)]="rowData.scopeValues">
+                                    <ng-template ng-multi-label-tmp
+                                                 let-items="items"
+                                                 let-clear="clear">
+                                        <div class="ng-value"
+                                             *ngFor="let item of items | slice:0:2">
+                                            <span class="ng-value-label">{{ item }}</span>
+                                            <span class="ng-value-icon right"
+                                                  (click)="clear(item)"
+                                                  aria-hidden="true">×</span>
+                                        </div>
+                                        <div class="ng-value"
+                                             *ngIf="items.length > 2">
+                                            <span class="ng-value-label">{{items.length - 2}} more...</span>
+                                        </div>
+                                    </ng-template>
+                                </ng-select>
+                            </td>
+                            <td><input name="c{{rowData.id}}"
+                                       type="checkbox"
+                                       [(ngModel)]="rowData.restricted"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button *ngIf="stepModel.currentStep > 1"
+                class="btn btn-secondary"
+                title="{{ ('COMMON.BACK') | translate }}"
+                (click)="onBtnBackClick()">
+            {{ 'COMMON.BACK' | translate }}
+        </button>
+        <button class="btn btn-primary"
+                title="{{ ('COMMON.NEXT') | translate }}(Enter)"
+                (click)="onBtnNextClick()">
+            {{ 'COMMON.NEXT' | translate }}
+        </button>
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+                (click)="onBtnCancel()">{{
+            'COMMON.CANCEL' | translate }}</button>
+    </ng-template>
+</p-dialog>

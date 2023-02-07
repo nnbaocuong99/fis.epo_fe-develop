@@ -1,0 +1,21 @@
+<div class="input-group">
+    <input type="text"
+           class="form-control"
+           placeholder="{{'MENU.CATEGORY.EXCHANGE_RATE' | translate}}"
+           [(ngModel)]="value"
+           placement="bottom-right"
+           ngbTooltip="{{ value }}"
+           (change)="onChange($event)"
+           [disabled]="disabled"
+           readonly>
+    <div class="input-group-append">
+        <button class="input-group-text input-group-right attach-button"
+                (click)="onBtnShowDialogListClick()"
+                tabindex="-1"
+                [disabled]="disabled"><i class="fal fa-ellipsis-v"></i></button>
+        <app-exchange-rate-control-dialog class="{{class}}"
+                                          [dialogRef]="dialogRef"
+                                          *ngIf="isShowDialog"
+                                          (select)="onSelectRow($event)"></app-exchange-rate-control-dialog>
+    </div>
+</div>

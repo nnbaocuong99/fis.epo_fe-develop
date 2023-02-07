@@ -1,0 +1,194 @@
+<form-dynamic [formData]="formData"
+              [form]="form"
+              (cancel)="onBtnCancelClick()"
+              (save)="onBtnSaveClick()">
+    <div class="row">
+        <div class="col-md-12"
+             style="position: relative; padding: 15px;">
+            <h5 class="kt-margin-b-15">
+                <i class="fal fa-list-ul"></i> {{ 'Thông tin Tax Invoice'| translate }}
+            </h5>
+        </div>
+    </div>
+    <form autocomplete="off"
+          #form="ngForm"
+          id="{{formData.formId}}">
+        <div class="form-row">
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.SUPPLIER_NAME' | translate }}</label>
+                <ng-select-async name="vendorId"
+                                 bindLabel="name"
+                                 suffixLabel="code"
+                                 searchField="generalFilter"
+                                 placeholder="{{ 'TAX_INVOICE.SUPPLIER_NAME' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="supplierService"
+                                 (change)="onChangeSupplier($event)"
+                                 (focusout)="focusOutCheckExists()"
+                                 [(ngModel)]="taxInvoiceData.vendorIdDto"
+                                 validateTooltip
+                                 [validateForm]="form"
+                                 required>
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'TAX_INVOICE.PO_CODE' | translate }}</label>
+                <select-sync-source placeholder="{{ 'TAX_INVOICE.PO_CODE' | translate }}"
+                                    header="PO/Hợp đồng"
+                                    bindValue="code"
+                                    name="poCode"
+                                    [columns]="headerPo"
+                                    [service]="purchaseOrderService"
+                                    (change)="onChangePoCode($event)"
+                                    [requestPayload]="purchaseOrderRequestPayload"
+                                    [(ngModel)]="taxInvoiceData.poCodeDto">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.TAX_INVOICE_NUMBER' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="code"
+                       placeholder="{{ 'TAX_INVOICE.TAX_INVOICE_NUMBER' | translate }}"
+                       [(ngModel)]="taxInvoiceData.code"
+                       validateTooltip
+                       (focusout)="focusOutCheckExists()"
+                       [validateForm]="form"
+                       required>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.TAX_INVOICE_DATE' | translate }}</label>
+                <input-date name="date"
+                            required
+                            validateTooltip
+                            [validateForm]="form"
+                            [(ngModel)]="taxInvoiceData.date"></input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.TAX_INVOICE_VALUE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="value"
+                       min="0"
+                       currencyMask
+                       [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+                       validateTooltip
+                       [validateForm]="form"
+                       (ngModelChange)="onChangeTaxValue($event)"
+                       [(ngModel)]="taxInvoiceData.value"
+                       placeholder="{{ 'TAX_INVOICE.TAX_INVOICE_VALUE' | translate }}"
+                       required>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.STATUS' | translate }}</label>
+                <select class="form-control"
+                        name="status"
+                        [(ngModel)]="taxInvoiceData.status"
+                        validateTooltip
+                        [validateForm]="form"
+                        required>
+                    <option [ngValue]="undefined"
+                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                    <option *ngFor="let item of statusTaxInvoice"
+                            [value]="item.value">{{item.label | translate }}</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.DUE_DATE' | translate }}</label>
+                <input-date name="maturityDate"
+                            required
+                            validateTooltip
+                            [validateForm]="form"
+                            (ngModelChange)="onChangeMaturityDate($event)"
+                            [(ngModel)]="taxInvoiceData.maturityDate"></input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'TAX_INVOICE.DUE_WEEK' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="maturityWeek"
+                       placeholder="{{ 'TAX_INVOICE.DUE_WEEK' | translate }}"
+                       [(ngModel)]="taxInvoiceData.maturityWeek">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'TAX_INVOICE.PAID_VALUE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="valuePaid"
+                       min="0"
+                       currencyMask
+                       [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+                       validateTooltip
+                       [validateForm]="form"
+                       (ngModelChange)="onChangeValuePaid($event)"
+                       [(ngModel)]="taxInvoiceData.valuePaid"
+                       placeholder="{{ 'TAX_INVOICE.PAID_VALUE' | translate }}">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'TAX_INVOICE.UNPAID_VALUE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="valueUnpaid"
+                       min="0"
+                       currencyMask
+                       [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+                       validateTooltip
+                       [validateForm]="form"
+                       [(ngModel)]="taxInvoiceData.valueUnpaid"
+                       placeholder="{{ 'TAX_INVOICE.UNPAID_VALUE' | translate }}">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'TAX_INVOICE.CURRENCY' | translate }}</label>
+                <ng-select-async name="currency"
+                                 bindLabel="name"
+                                 placeholder="Loại tiền"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="currencyService"
+                                 (change)="onChangeCurrency()"
+                                 [(ngModel)]="taxInvoiceData.currencyDto"
+                                 required>
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'TAX_INVOICE.EXCHANGE_RATE' | translate }}</label>
+                <exchange-rate name="exchangeRateType"
+                               bindValue="conversionRate"
+                               [(ngModel)]="taxInvoiceData.conversionRate"
+                               [exchangeRateData]="exchangeRateData"
+                               (change)="onChangeExchangeRate($event)">
+                </exchange-rate>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'TAX_INVOICE.CREATE_BY' | translate }}</label>
+                <select-sync-source name="creatorId"
+                                    header="Người tạo"
+                                    [width]="'50vw'"
+                                    placeholder="{{'Người tạo' | translate}}"
+                                    [columns]="headerUser"
+                                    bindValue="fullName"
+                                    [service]="userService"
+                                    [requestPayload]="userRequestPayLoad"
+                                    (change)="taxInvoiceData.creatorId = taxInvoiceData.createdByTaxInvoiceDto?.id"
+                                    [(ngModel)]="taxInvoiceData.createdByTaxInvoiceDto">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3"
+                 *ngIf="currentTaxInvoiceId">
+                <label>{{ 'TAX_INVOICE.ATTACHED_FILES' | translate }}</label>
+                <single-attach-file module="Attachment\TaxInvoice\{{currentTaxInvoiceId}}">
+                </single-attach-file>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>{{ 'TAX_INVOICE.NOTE' | translate }}</label>
+                <textarea type="text"
+                          class="form-control"
+                          name="note"
+                          placeholder="{{'TAX_INVOICE.NOTE' | translate}}"
+                          [(ngModel)]="taxInvoiceData.note"></textarea>
+            </div>
+        </div>
+    </form>
+</form-dynamic>

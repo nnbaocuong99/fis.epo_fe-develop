@@ -1,0 +1,386 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '90%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+    </p-header>
+
+    <h5 class="kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{ 'PURCHASE_REQUEST.GENERAL_INFO'| translate }}
+    </h5>
+    <table class="table table-no-wrap">
+        <tbody>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.PR_CODE'| translate }}:
+                    <b>{{ purchaseRequestHistory?.prNo }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.PR_TYPE' | translate }}:
+                    <b>{{ purchaseRequestHistory?.prTypeName }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_STATUS' | translate }}:
+                    <b>{{ (purchaseRequestHistory?.prType | label:prContractInfo) | translate }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.PROJECT_CODE' | translate }}:
+                    <b>{{ purchaseRequestHistory?.projectCode }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.ORG_APPLY'| translate }}:
+                    <b>{{ purchaseRequestHistory?.orgApplyName }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.ORG_CODE' | translate }}:
+                    <b>{{ purchaseRequestHistory?.orgCode }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.LEGAL' | translate }}:
+                    <b>{{ purchaseRequestHistory?.legalName }}</b>
+                </td>
+                <td style="width: 25%">{{ 'COMMON.NOTE' | translate }}:
+                    <b>{{ purchaseRequestHistory?.note }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%"
+                    title="{{purchaseRequestHistory?.hasCo ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}">
+                    {{ 'CO' | translate }}: <b>{{ purchaseRequestHistory?.hasCo ?
+                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                    </b>
+                </td>
+                <td style="width: 25%"
+                    title="{{purchaseRequestHistory?.hasCq ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}">
+                    {{ 'CQ' | translate }}: <b>{{ purchaseRequestHistory?.hasCq ?
+                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                    </b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CODE' | translate }}:
+                    <a class="header-link"
+                       [routerLink]="['../../../../purchase-plan/list/view/', purchaseRequestHistory?.ppId]"
+                       target="_blank">
+                        <b>{{ purchaseRequestHistory?.code }}</b>
+                    </a>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CREATOR' | translate }}:
+                    <b>{{ purchaseRequestHistory?.createdByName }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.PEOPLE_INVOLVEL' | translate }}:
+                    <b>{{ purchaseRequestHistory?.peopleInvolved }}</b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+
+    <h5 class="kt-margin-b-15">
+        <i class="fal fa-list-ul"></i> {{ 'PURCHASE_REQUEST.PR_CONTRACT_INFO'| translate }}
+    </h5>
+    <table class="table table-no-wrap">
+        <tbody>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_NO'| translate }}:
+                    <b>{{ purchaseRequestHistory?.contractNo }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_TYPE' | translate }}:
+                    <b>{{ purchaseRequestHistory?.contractType }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_DESCRIPTION' | translate }}:
+                    <b>{{ purchaseRequestHistory?.contractDescription }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CUSTOMER' | translate }}:
+                    <b>{{ purchaseRequestHistory?.customer }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.AM'| translate }}:
+                    <b>{{ purchaseRequestHistory?.amAccount }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.PM' | translate }}:
+                    <b>{{ purchaseRequestHistory?.pmAccount }}</b>
+                </td>
+                <td style="width: 25%">{{ 'CEO/COO' | translate }}:
+                    <b>{{ purchaseRequestHistory?.ceoCoo }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.SIGN_DATE' | translate }}:
+                    <b>{{ purchaseRequestHistory?.signDate | date: mainConfig.formatDateList }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.END_DATE'| translate }}:
+                    <b>{{ purchaseRequestHistory?.endDate | date: mainConfig.formatDateList }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CURRENCY' | translate }}:
+                    <b>{{ purchaseRequestHistory?.currency }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_TOTAL_AMOUNT' | translate }}:
+                    <b>{{ purchaseRequestHistory?.contractTotalAmount }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_REQUEST.OVER_SIX_WEEKS' | translate }}:
+                    <b>{{ purchaseRequestHistory?.overSixWeeks ?
+                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                    </b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <h5 class="kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{ 'PURCHASE_REQUEST.ITEM.ITEM_INFO'| translate }}
+    </h5>
+
+    <!-- <div class="col-md-12">
+        <div class="kt-margin-b-15 float-right">
+            <button class="btn btn-sm btn-label-brand mr-2"
+                    title="{{ 'Export Excel Thông tin line hàng' | translate }}"
+                    (click)="checkLicensedExport()">
+                {{ 'Export Excel' | translate }}
+            </button>
+        </div>
+    </div> -->
+    <div class="mat-table__wrapper">
+        <p-table [value]="purchaseRequestItemHistory"
+                 tableStyleClass="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr class="background-table-header">
+                    <th *ngFor="let col of headeritems"
+                        [width]="col.width"
+                        class="table-no-wrap align-center header-height">
+                        {{ col.title | translate }}<span class="lbl-required"
+                              *ngIf="col.isRequired"></span>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <div class="wrap-text-grid-item align-center"
+                             [title]="rowData.indexNo">
+                            <p>{{rowData.indexNo}}</p>
+                            <p>
+                                <a href="javascript:;"
+                                   (click)="onBtnViewClassifyHistoryClick(rowData)"> <i class="fas fa-eye"
+                                       style="cursor: pointer;"
+                                       [title]="'Lịch sử phân loại YCMH' | translate"></i></a>
+                            </p>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.itemCode">{{rowData.itemCode}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.partNo">{{rowData.partNo}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.itemName">{{rowData.itemName}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.itemType">{{rowData.itemType}}
+                            <!-- Loại hàng hoá SRV thêm checkbox -->
+                            <mat-checkbox name="{{ rowData.indexNo + 'srv' }}"
+                                          *ngIf="rowData.itemType === 'SRV'"
+                                          class="example-margin"
+                                          [(ngModel)]="rowData.isUpdateSrv"
+                                          [color]="'primary'"
+                                          disabled>
+                            </mat-checkbox>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.unit">{{rowData.unit}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.currency">{{rowData.currency}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.quantity">{{rowData.quantity}}</div>
+                    </td>
+                    <td>
+                        <div *ngIf="allowViewPrice"
+                             class="wrap-text-grid-item"
+                             [title]="rowData.expectedPrice | currencyMask"
+                             class="align-right">{{rowData.expectedPrice | currencyMask}}
+                        </div>
+                    </td>
+                    <td>
+                        <div *ngIf="allowViewPrice"
+                             class="wrap-text-grid-item"
+                             [title]="(rowData.expectedPrice * rowData.quantity) | currencyMask"
+                             class="align-right">
+                            {{(rowData.expectedPrice * rowData.quantity) | currencyMask}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]=" rowData.expectedDate | date: mainConfig.formatDateList ">
+                            {{ rowData.expectedDate | date: mainConfig.formatDateList }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.supplierName">{{rowData.supplierName}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.producerName">{{rowData.producerName}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.guarantee">{{rowData.guarantee}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.deliveryLocation">{{rowData.deliveryLocation}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.note">{{rowData.note}}</div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]="rowData.conversionRate"
+                             class="align-right">{{rowData.conversionRate | currencyMask}}</div>
+                    </td>
+                    <td>
+                        <div *ngIf="allowViewPrice"
+                             class="wrap-text-grid-item"
+                             [title]="rowData.priceBp"
+                             class="align-right">
+                            {{rowData.priceBp | currencyMask}}
+                        </div>
+                    </td>
+                    <td>
+                        <div *ngIf="allowViewPrice"
+                             class="wrap-text-grid-item align-right"
+                             [title]="rowData.priceBp ? ((rowData.priceBp* rowData.quantity) | currencyMask) : null">
+                            {{rowData.priceBp ?
+                            ((rowData.priceBp*rowData.quantity) | currencyMask) : null}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="wrap-text-grid-item"
+                             [title]=" rowData.responseDate | date: mainConfig.formatDateList ">
+                            {{ rowData.responseDate | date: mainConfig.formatDateList }}
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <div *ngIf="purchaseRequestItemHistory && purchaseRequestItemHistory.length === 0">
+            <view-empty></view-empty>
+        </div>
+    </div>
+    <label *ngIf="allowViewPrice">{{ 'Tổng tiền' | translate }}</label>
+    <div *ngIf="allowViewPrice"
+         class="table-responsive">
+        <table class="table table-auto-width">
+            <tr *ngFor="let item of totalBom; let i = index">
+                <td class="transparent align-right">{{ item.key }}:</td>
+                <td class="align-right"
+                    [title]="item.count | currencyMask">
+                    <b>{{ item.count | currencyMask }}</b>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">{{
+            'COMMON.CLOSE' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>
+
+
+<!-- Dialog confirm xem lịch sử phân loại, phê duyệt YCMH -->
+<p-dialog [(visible)]="isShowDialogClassifyHistory"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '70%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="onBtnHideClassifyHistoryClick()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Lịch sử phân loại, phê duyệt YCMH'| translate }}
+    </p-header>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row kt-margin-b-15">
+                <div class="col-md-6">
+                </div>
+                <div class="col-md-6">
+                    <div class="mat-table__bottom">
+                        <mat-spinner [diameter]="20"
+                                     *ngIf="purchaseRequestClassifyHistoryService.isLoading$ | async"></mat-spinner>
+                        <mat-paginator #paginator
+                                       [pageSize]="10"
+                                       [length]="purchaseRequestClassifyHistory.paginatorTotal"
+                                       [showFirstLastButtons]="true"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+            <div class="mat-table__wrapper">
+                <p-table [value]="purchaseRequestClassifyHistory.items"
+                         tableStyleClass="table-no-wrap">
+                    <ng-template pTemplate="header">
+                        <tr class="background-table-header">
+                            <th *ngFor="let header of headersPurchaseRequestClassifyHistory"
+                                [width]="header.width"
+                                class="align-center header-height">{{ header.title | translate }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex">
+                        <tr>
+                            <td [title]="requestPurchaseRequestClassifyHistory.pageSize * requestPurchaseRequestClassifyHistory.pageIndex + rowIndex + 1">
+                                {{ requestPurchaseRequestClassifyHistory.pageSize * requestPurchaseRequestClassifyHistory.pageIndex + rowIndex + 1 }}
+                            </td>
+                            <td [title]="rowData.type">
+                                {{ rowData.type}}
+                            </td>
+                            <td [title]="rowData.note">
+                                {{ rowData.note }}
+                            </td>
+                            <td [title]="rowData.createdByName">
+                                {{ rowData.createdByName }}
+                            </td>
+                            <td [title]="rowData.createdAt | date: mainConfig.formatFullDate">
+                                {{ rowData.createdAt | date: mainConfig.formatFullDate }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="purchaseRequestClassifyHistory.items && purchaseRequestClassifyHistory.items.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>

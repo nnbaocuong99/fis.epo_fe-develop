@@ -1,0 +1,92 @@
+<div class="mat-table__bottom"
+     style="margin-bottom: 15px;">
+    <button class="btn btn-sm btn-label-brand"
+            title="{{ 'COMMON.CRUD.ADD' | translate }}"
+            (click)="onBtnAddClick()">
+        <i class="fal fa-plus"></i> {{ 'COMMON.CRUD.ADD' | translate }}
+    </button>
+</div>
+<div>
+    <div class="mat-table__bottom">
+        <mat-spinner [diameter]="20"
+                     *ngIf="baseService.isLoading$ | async"></mat-spinner>
+        <mat-paginator [pageSize]="10"
+                       [pageSizeOptions]="[10, 30, 50]"
+                       [length]="dataSource.paginatorTotal"
+                       [showFirstLastButtons]="true"></mat-paginator>
+    </div>
+    <div class="mat-table__wrapper">
+        <p-table [value]="dataSource.items"
+                 tableStyleClass="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th *ngFor="let col of headers"
+                        [width]="col.width"
+                        [ngClass]="col.class">{{ col.header | translate }}
+                        <span class="lbl-required"
+                              *ngIf="col.isRequired">
+                        </span>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td [title]="request.pageSize * request.pageIndex + rowIndex + 1">
+                        {{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+                    </td>
+                    <td [title]="(rowData.type | label: elimTypeLabel) | translate"> {{ (rowData.type | label:
+                        elimTypeLabel) | translate }}</td>
+                    <td [title]="rowData.date | date: mainConfig.formatDateList">
+                        <span class="background-word">{{ rowData.date | date: mainConfig.formatDateList }}</span>
+                    </td>
+                    <td [title]="(rowData.syncStatus | label:labelSyncStatus) | translate">
+                        {{ (rowData.syncStatus | label:labelSyncStatus) | translate }}
+                    </td>
+                    <td [title]="rowData.strErpId"> {{ rowData.strErpId }}</td>
+                    <td class="action">
+                        <button mat-icon-button
+                                [matMenuTriggerFor]="menu"
+                                matTooltip="More actions">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item
+                                    (click)="onBtnEditClick(rowData)">
+                                <span>{{ 'COMMON.DETAILS' | translate}}</span>
+                            </button>
+                            <button *ngIf="(!rowData.syncStatus || rowData.syncStatus < 2) && rowData.syncStatus !== -1"
+                                    mat-menu-item
+                                    (click)="onBtnDeleteClick(rowData)">
+                                <span>{{ 'COMMON.DELETE' | translate}}</span>
+                            </button>
+                            <button user-role="SUPER_ADMIN"
+                                    mat-menu-item
+                                    (click)="returnUpdateCost(rowData)">
+                                <span>{{ 'Return' | translate}}</span>
+                            </button>
+                            <button user-role="SUPER_ADMIN"
+                                    mat-menu-item
+                                    (click)="viewLogUpdateCost(rowData)">
+                                <span>{{ 'View log' | translate}}</span>
+                            </button>
+                        </mat-menu>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div *ngIf="dataSource.items && dataSource.items.length === 0">
+        <view-empty></view-empty>
+    </div>
+</div>
+
+<app-import-goods-elimination-invoice-add #importGoodsEliminationInvoiceAdd
+                                          [dialogRef]="dialogRefAdd"
+                                          [itemList]="itemList"
+                                          (success)="onSuccess($event)"></app-import-goods-elimination-invoice-add>
+
+<app-import-goods-elimination-invoice-edit #importGoodsEliminationInvoiceEdit
+                                           [dialogRef]="dialogRefEdit"
+                                           (success)="onSuccess($event)"></app-import-goods-elimination-invoice-edit>

@@ -1,0 +1,21 @@
+<div class="border-p-tree">
+        <div class="padding-search">
+                <span class="p-input-icon-right">
+                        <i class="pi pi-search"></i>
+                        <input type="text"
+                               pInputText
+                               placeholder="Tìm kiếm đơn vị sử dụng"
+                               [(ngModel)]="keyword"
+                               (keydown.enter)="search()" />
+                </span>
+        </div>
+        <p-tree #tree
+                [value]="treeData"
+                [(selection)]="selected"
+                selectionMode="checkbox"
+                styleClass="p-treenode-non-highlighted"
+                (onNodeSelect)="onSelectionChange($event)"
+                (onNodeUnselect)="onSelectionChange($event)"
+                scrollHeight="200px">
+        </p-tree>
+</div>

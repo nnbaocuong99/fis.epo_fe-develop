@@ -1,0 +1,381 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'PURCHASE_ORDER.ORDER_INFORMATION' | translate"
+                       [viewLoading$]="purchaseOrderService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <a *ngIf="purchaseOrder?.status === 4 || (!purchaseOrder?.sproTicketId && purchaseOrder?.status !== poStatus[6].value)"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               title="{{ 'COMMON.SUBMIT_APPROVAL' | translate }}"
+               (click)="onBtnCreateTicket()">
+                <i class="fal fa-paper-plane"></i> {{ 'COMMON.SUBMIT_APPROVAL' | translate }}</a>
+
+            <a *ngIf="purchaseOrder?.status !== poStatus[5].value"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               *ngIf="purchaseOrder.areaType === 1 || purchaseOrder.areaType === 2"
+               (click)="onBtnExportExcelPO()">
+                <i class="pi pi-download"></i>
+                <span class="kt-hidden-mobile">{{ 'Export PO' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               *ngIf="purchaseOrder.areaType === 1 || purchaseOrder.areaType === 2"
+               (click)="onBtnExportContract()">
+                <i class="pi pi-download"></i>
+                <span class="kt-hidden-mobile">{{ 'Export hợp đồng' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goPaymentTracking()">
+                <i class="far fa-money-check-alt"></i>
+                <span class="kt-hidden-mobile">{{ 'Theo dõi thanh toán' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="viewHistory()">
+                <i class="fas fa-history"></i>
+                <span class="kt-hidden-mobile">{{ 'PURCHASE_ORDER.VIEW_HISTORY' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <business-process-management *ngIf="purchaseOrder.id"
+                                     #bpm
+                                     titleOptionProcess="{{ 'Hợp đồng Mua hàng hóa/dịch vụ và phụ lục đi kèm' | translate }}"
+                                     module="PURCHASE_ORDER"
+                                     [objectData]="purchaseOrder"
+                                     (createTicketSuccess)="createTicketSuccess($event)"
+                                     (cancelTicketSuccess)="updateStatus(poStatus[3].value)"
+                                     [file]="file">
+        </business-process-management>
+
+        <ngb-tabset>
+            <!-- Danh sách HH/DV  -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{'PURCHASE_ORDER.ORDER_INFORMATION'| translate}}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <h5 class="kt-margin-t-15 kt-margin-b-15"
+                        style="position: relative; padding: 15px;">
+                        <i class="fab fa-envira"></i> {{'PURCHASE_ORDER.ORDER_INFORMATION'| translate}}
+                    </h5>
+                    <!-- Thông tin chung -->
+                    <table class="table table-no-wrap">
+                        <tbody>
+                            <tr>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.PO_HD_NO'| translate }}:
+                                    <b>{{ purchaseOrder?.code }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.FORM_PURCHASE' | translate }}:
+                                    <b>{{(purchaseOrder?.areaType |label:areaTypes) | translate}}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.SIGNING_DATE' | translate }}:
+                                    <b>{{ purchaseOrder?.signDate | date:mainConfig.formatDateList }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.SUPPLIER' | translate }}:
+                                    <b>{{ purchaseOrder?.supplierName }}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.SUPPLIER_SITE' | translate }}:
+                                    <b>{{ purchaseOrder?.supplierSiteName }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.PROJECT_CODE' | translate }}:
+                                    <b>{{ purchaseOrder?.projectCode }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.ORG_APPLY' | translate }}:
+                                    <b>{{ purchaseOrder?.orgApplyName }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.CURRENCY' | translate }}:
+                                    <b>{{ purchaseOrder?.currency }}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal">{{ 'PURCHASE_ORDER.PAYMENT_TERMS' | translate }}:
+                                    <b>{{ purchaseOrder?.paymentTerm }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal">{{ 'PURCHASE_ORDER.PO_CONTRACT_TYPE' | translate }}:
+                                    <b>{{ purchaseOrder?.productType | label:productTypes }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="!isInternal">{{ 'PURCHASE_ORDER.COMMERCE_TERMS' | translate }}:
+                                    <b>{{purchaseOrder?.freightTerm }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="!isInternal">{{ 'PURCHASE_ORDER.MODE_TRANSPORTATION' | translate }}:
+                                    <b>{{ purchaseOrder?.delivery }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.ORG_CODE' | translate }}:
+                                    <b>{{ purchaseOrder?.orgCode }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.LEGAL' | translate }}:
+                                    <b>{{ purchaseOrder?.ouName }}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.CONTRACTORS_TAX' | translate }}:
+                                    <b>{{ (purchaseOrder?.taxpayer | label: taxPayers) | translate }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal">{{ 'PURCHASE_ORDER.PO_CONTRACT' | translate }}:
+                                    <b>{{(purchaseOrder?.valueType | label: valueTypes) | translate }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'CO' | translate }}:
+                                    <b>{{ purchaseOrder?.hasCo ?
+                                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'CQ' | translate }}:
+                                    <b>{{ purchaseOrder?.hasCq ?
+                                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate) }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="!isInternal">
+                                    {{ 'PURCHASE_ORDER.SO_REF_NO' | translate }}:
+                                    <b>{{ purchaseOrder?.refNo }}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 25%"
+                                    *ngIf="!isInternal">{{ 'PURCHASE_ORDER.BILL_FROM' | translate }}:
+                                    <b>{{ purchaseOrder?.deliveryLocationGoOut }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="!isInternal">{{ 'PURCHASE_ORDER.BILL_TO' | translate }}:
+                                    <b>{{ purchaseOrder?.deliveryLocationComeIn }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="!isInternal">{{ 'PURCHASE_ORDER.ROOT_PO' | translate }}:
+                                    <b>{{ purchaseOrder?.rootPoId }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal">{{ 'Rebate' |translate}}:
+                                    <b>{{ purchaseOrder?.hasRebate ?
+                                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal && purchaseOrder?.hasRebate">
+                                    {{ 'PURCHASE_ORDER.REBATE_INFO' |translate}}:
+                                    <b>{{ purchaseOrder?.rebateInfo }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.NOTE' | translate }}:
+                                    <b>{{ purchaseOrder?.note }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal">{{ 'PURCHASE_ORDER.PEOPLE_INVOLVEL' | translate }}:
+                                    <b>{{ purchaseOrder?.peopleInvolved }}</b>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal">
+                                    {{ 'PURCHASE_ORDER.ATTACH_PURCHASE_CONTRACT'| translate }}:
+                                    <b class="btn-link"
+                                       style="cursor: pointer;"
+                                       (click)="onBtnDownloadClick()">{{ file?.name }}</b>
+                                    <app-dialog-view-pdf-file *ngIf="file"
+                                                              [file]="file">
+                                    </app-dialog-view-pdf-file>
+                                </td>
+                                <td style="width: 25%"
+                                    *ngIf="isInternal && !purchaseOrder?.hasRebate"></td>
+                            </tr>
+                            <tr>
+                                <td *ngIf="!isInternal"
+                                    style="width: 25%">{{ 'PURCHASE_ORDER.PEOPLE_INVOLVEL' | translate }}:
+                                    <b>{{ purchaseOrder?.peopleInvolved }}</b>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.BUY_INTERNAL_USE' | translate }}:
+                                    <b>{{ (purchaseOrder?.buyInternalUse | label: arrBuyInternalUse) | translate }}</b>
+                                </td>
+                                <td *ngIf="!isInternal"
+                                    style="width: 25%">
+                                    {{ 'PURCHASE_ORDER.ATTACH_PURCHASE_CONTRACT'| translate }}:
+                                    <b class="btn-link"
+                                       style="cursor: pointer;"
+                                       (click)="onBtnDownloadClick()">{{ file?.name }}</b>
+                                    <app-dialog-view-pdf-file *ngIf="file"
+                                                              [file]="file">
+                                    </app-dialog-view-pdf-file>
+                                </td>
+                                <td style="width: 25%">{{ 'PURCHASE_ORDER.CREATOR' | translate }}:
+                                    <b>{{ purchaseOrder?.createdByName }}</b>
+                                </td>
+                                <td *ngIf="isInternal"
+                                    style="width: 25%">{{ 'PURCHASE_ORDER.PREPAYMENT' | translate }}:
+                                    <b>{{ purchaseOrder?.prepayment ?
+                                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                                </td>
+                                <td *ngIf="isInternal && purchaseOrder?.prepayment"
+                                    style="width: 25%">{{ 'PURCHASE_ORDER.PREPAYMENT_RATIO' | translate }}:
+                                    <b>{{ purchaseOrder?.prepaymentRatio }}%</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td *ngIf="!isInternal"
+                                    style="width: 25%">{{ 'PURCHASE_ORDER.PREPAYMENT' | translate }}:
+                                    <b>{{ purchaseOrder?.prepayment ?
+                                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                                </td>
+                                <td *ngIf="!isInternal && purchaseOrder?.prepayment"
+                                    style="width: 25%">{{ 'PURCHASE_ORDER.PREPAYMENT_RATIO' | translate }}:
+                                    <b>{{ purchaseOrder?.prepaymentRatio }}%</b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <!-- Danh sách HH/DV -->
+                    <app-purchase-order-item #purchaseOrderItem
+                                             *ngIf="isShowTableItem"
+                                             [purchaseOrderData]="purchaseOrder"
+                                             [noEdit]="true"
+                                             [isShowContextMenu]="false"
+                                             (success)="onSuccess()"></app-purchase-order-item>
+                    <div *ngIf="!isInternal">
+                        <h5 class="kt-margin-b-15">
+                            <i class="fal fa-list-ul"></i>
+                            {{ 'PURCHASE_ORDER.ADDITIONAL_INFORMATION'| translate }}
+                        </h5>
+                        <table class="table table-no-wrap">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 25%">{{ 'PURCHASE_ORDER.DELIVERY_FORM'| translate }}:
+                                        <b>{{ purchaseOrder?.deliveryDesc }}</b>
+                                    </td>
+                                    <td style="width: 25%">{{ 'Bill to/Marking' | translate }}:
+                                        <b>{{ purchaseOrder?.billTo }}</b>
+                                    </td>
+                                    <td style="width: 25%">{{ 'Quality' | translate }}:
+                                        <b>{{ purchaseOrder?.quality }}</b>
+                                    </td>
+                                    <td style="width: 25%">{{ 'Packing' | translate }}:
+                                        <b>{{ purchaseOrder?.packing }}</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 25%">{{ 'Shipping documents'| translate }}:
+                                        <b>{{ purchaseOrder?.shippingDocument }}</b>
+                                    </td>
+                                    <td style="width: 25%">{{ 'Claim' | translate }}:
+                                        <b>{{ purchaseOrder?.claim }}</b>
+                                    </td>
+                                    <td style="width: 25%">{{ 'Warranty' | translate }}:
+                                        <b>{{ purchaseOrder?.warranty }}</b>
+                                    </td>
+                                    <td style="width: 25%">{{ 'Additional Clause' | translate }}:
+                                        <b>{{ purchaseOrder?.additionalClause }}</b>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+
+            <!-- Hồ sơ -->
+            <ngb-tab *ngIf="purchaseOrder?.id">
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_ORDER.PROFILE_APPENDIX'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <attach-document mainModule="PO_ATTACHMENT"
+                                     fileModule="Attachment\{{purchaseOrderFolder}}\{{currentPoId}}"
+                                     recordId="{{currentPoId}}"
+                                     [hideOptional]="true"
+                                     [viewMode]="true"
+                                     [multiple]="true">
+                    </attach-document>
+                    <br>
+                    <div *ngIf="listPrHasFile && listPrHasFile.length > 0">
+                        <h5>- {{ 'Yêu cầu mua hàng' | translate }}</h5>
+                        <div *ngFor="let item of listPrHasFile; let i = index">
+                            <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                                {{ item.objectName }}
+                            </p>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                                    <single-attach-file *ngIf="item.objectId"
+                                                        [edit]="false"
+                                                        module="Attachment\PurchaseRequest\{{item.objectId}}">
+                                    </single-attach-file>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-3">
+                                    <label>{{ 'Hồ sơ'| translate }}</label>
+                                </div>
+                            </div>
+                            <attach-document mainModule="PR_ATTACHMENT"
+                                             fileModule="Attachment\PurchaseRequest\{{item.objectId}}"
+                                             recordId="{{item.objectId}}"
+                                             [viewMode]="true"
+                                             [hideOptional]="true"
+                                             [formTitle]="null"
+                                             [multiple]="true">
+                            </attach-document>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="listPpHasFile && listPpHasFile.length > 0">
+                        <h5>- {{ 'Kế hoạch mua hàng' | translate }}</h5>
+                        <div *ngFor="let item of listPpHasFile; let i = index">
+                            <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                                {{ item.objectName }}
+                            </p>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                                    <single-attach-file *ngIf="item.objectId"
+                                                        [edit]="false"
+                                                        module="Attachment\PurchasePlan\{{item.objectId}}">
+                                    </single-attach-file>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <app-appendix-add #appendix
+                                      *ngIf="purchaseOrder?.status === poStatus[5].value"></app-appendix-add>
+                </ng-template>
+            </ngb-tab>
+            <!-- Thông tin thanh toán -->
+            <ngb-tab *ngIf="purchaseOrder?.id">
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_ORDER.PAYMENT_INFO'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <app-purchase-order-payment [purchaseOrderData]="purchaseOrder"
+                                                [viewMode]="true"></app-purchase-order-payment>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-purchase-order-history #purchaseOrderHistory></app-purchase-order-history>

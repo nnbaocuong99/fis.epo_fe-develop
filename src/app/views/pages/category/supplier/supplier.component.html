@@ -1,0 +1,572 @@
+<kt-portlet>
+    <kt-portlet-header icon="fas fa-user-friends"
+                       [title]="'SUPPLIER.HEADER_LIST' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="purchaseOrderService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+                    <div class="form-row">
+
+                        <div class="col-md-3 mb-3">
+                            <label class="lbl-required">{{ 'SUPPLIER.TYPE' | translate }}</label>
+                            <ng-select [items]="arrType"
+                                       bindLabel="label"
+                                       bindValue="value"
+                                       name="type"
+                                       placeholder="{{ 'SUPPLIER.TYPE' | translate }}"
+                                       [(ngModel)]="request.type">
+                                <ng-template ng-label-tmp
+                                             let-item="item">
+                                    {{ item.label | translate }}
+                                </ng-template>
+                                <ng-template ng-option-tmp
+                                             let-item="item">
+                                    {{ item.label | translate }}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.NAME' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="name"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.NAME' | translate }}"
+                                   [(ngModel)]="request.name">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.CODE_TAX_CODE' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="code"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.CODE_TAX_CODE' | translate }}"
+                                   [(ngModel)]="request.code"
+                                   (ngModelChange)="request.taxCode = request.code">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.SITE_NAME' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="site"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.SITE_NAME' | translate }}"
+                                   [(ngModel)]="request.site">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.FROM_DATE' | translate }}</label>
+                            <input-date name="fromDate"
+                                        [(ngModel)]="request.fromDate">
+                            </input-date>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.TO_DATE' | translate }}</label>
+                            <input-date name="toDate"
+                                        [(ngModel)]="request.toDate">
+                            </input-date>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.INVOICE_ADDRESS' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="invoiceAddress"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.INVOICE_ADDRESS' | translate }}"
+                                   [(ngModel)]="request.invoiceAddress">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.TRADING_ADDRESS' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="tradingAddress"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.TRADING_ADDRESS' | translate }}"
+                                   [(ngModel)]="request.tradingAddress">
+                        </div>
+
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.PEOPLE_REPRESENT' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="peopleRepresent"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.PEOPLE_REPRESENT' | translate }}"
+                                   [(ngModel)]="request.peopleRepresent">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.POSITION_PEOPLE_REPRESENT' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="positionPeopleRepresent"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.POSITION_PEOPLE_REPRESENT' | translate }}"
+                                   [(ngModel)]="request.positionPeopleRepresent">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.STATUS' | translate }}</label>
+                            <ng-select [items]="arrStatus"
+                                       bindLabel="label"
+                                       bindValue="value"
+                                       name="isActive"
+                                       placeholder="{{ 'SUPPLIER.STATUS' | translate }}"
+                                       [(ngModel)]="request.isActive"
+                                       [disabled]="request.vendorId">
+                                <ng-template ng-label-tmp
+                                             let-item="item">
+                                    {{ item.label | translate }}
+                                </ng-template>
+                                <ng-template ng-option-tmp
+                                             let-item="item">
+                                    {{ item.label | translate }}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.DISTRIBUTING_GOODS' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="distributingGoods"
+                                   maxlength="255"
+                                   placeholder="{{ 'SUPPLIER.DISTRIBUTING_GOODS' | translate }}"
+                                   [(ngModel)]="request.distributingGoods">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.DEPOSIT_RATE' | translate }}</label>
+                            <input type="number"
+                                   class="form-control"
+                                   name="depositRate"
+                                   placeholder="{{ 'SUPPLIER.DEPOSIT_RATE' | translate }}"
+                                   [(ngModel)]="request.depositRate">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.QUANTITY_REST_DEPOSIT_DATE' | translate }}</label>
+                            <input type="number"
+                                   class="form-control"
+                                   name="quantityRestDepositDate"
+                                   placeholder="{{ 'SUPPLIER.QUANTITY_REST_DEPOSIT_DATE' | translate }}"
+                                   [(ngModel)]="request.quantityRestDepositDate">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.BANK' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="bank"
+                                   placeholder="{{ 'SUPPLIER.BANK' | translate }}"
+                                   [(ngModel)]="request.bank">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.BANK_INFO.ACCOUNT_NUMBER' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="accountNumber"
+                                   placeholder="{{ 'SUPPLIER.BANK_INFO.ACCOUNT_NUMBER' | translate }}"
+                                   [(ngModel)]="request.accountNumber">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.BANK_INFO.RECEIVER_NAME' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="receiverName"
+                                   placeholder="{{ 'SUPPLIER.BANK_INFO.RECEIVER_NAME' | translate }}"
+                                   [(ngModel)]="request.receiverName">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.WARRANTY_CENTER_ADDRESS' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="warrantyCenterAddress"
+                                   placeholder="{{ 'SUPPLIER.WARRANTY_CENTER_ADDRESS' | translate }}"
+                                   [(ngModel)]="request.warrantyCenterAddress">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.WARRANTY_CENTER_PHONE_NUMBER' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="warrantyCenterPhoneNumber"
+                                   placeholder="{{ 'SUPPLIER.WARRANTY_CENTER_PHONE_NUMBER' | translate }}"
+                                   [(ngModel)]="request.warrantyCenterPhoneNumber">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'SUPPLIER.COMMISSION_POLICY' | translate }}</label>
+                            <ng-select [items]="arrCommissionPolicy"
+                                       bindLabel="label"
+                                       bindValue="value"
+                                       name="commissionPolicy"
+                                       placeholder="{{ 'SUPPLIER.COMMISSION_POLICY' | translate }}"
+                                       [(ngModel)]="request.commissionPolicy">
+                                <ng-template ng-label-tmp
+                                             let-item="item">
+                                    {{ item.label | translate }}
+                                </ng-template>
+                                <ng-template ng-option-tmp
+                                             let-item="item">
+                                    {{ item.label | translate }}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+
+                        <div class="col-md-3 mb-3"
+                             *ngIf="request.commissionPolicy === 1">
+                            <label>{{ 'SUPPLIER.COMMISSION_POLICY_DESCRIPTION' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="commissionPolicyDescription"
+                                   placeholder="{{ 'SUPPLIER.COMMISSION_POLICY_DESCRIPTION' | translate }}"
+                                   [(ngModel)]="request.commissionPolicyDescription">
+                        </div>
+
+                    </div>
+
+                    <br>
+
+                    <div class="form-row">
+                        <button type="button"
+                                class="btn btn-sm btn-label-brand ml-2"
+                                (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                (click)="onBtnResetSearchClick()"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate}}</button>
+                    </div>
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="setFragmentToRoute($event)"
+                    [activeId]="activeIdTab">
+            <ngb-tab *ngFor="let tab of tabs"
+                     [id]="tab.value">
+                <ng-template ngbTabTitle>
+                    <span>
+                        {{ tab.label | translate }} <b>
+                            <span [ngClass]="'badge badge-pill ' + tab.class"
+                                  *ngIf="tab.count">{{ tab.count }}</span></b>
+                    </span>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12">
+                <button class="btn btn-sm btn-brand float-right ml-3"
+                        title="{{ 'Export excel' | translate }}"
+                        (click)="isShowExport = !isShowExport">
+                    <i *ngIf="isShowExport"
+                       class="la la-arrow-left"></i>
+                    <i *ngIf="!isShowExport"
+                       class="la la-arrow-right"></i>
+                    {{ 'Export excel' | translate }}
+                </button>
+            </div>
+        </div>
+        <ng-container *ngIf="isShowExport">
+            <div class="row kt-margin-b-15">
+                <div class="col-md-12 mb-3">
+                    <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                    <input-date name="fromDate"
+                                [(ngModel)]="requestExportInList.fromDate">
+                    </input-date>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                    <input-date name="toDate"
+                                [(ngModel)]="requestExportInList.toDate">
+                    </input-date>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'REPORT.SUPPLIER' | translate }}</label>
+                    <select-sync-source placeholder="{{ 'REPORT.SUPPLIER' | translate }}"
+                                        header="{{ 'REPORT.SUPPLIER' | translate }}"
+                                        bindValue="name"
+                                        suffixLabel="code"
+                                        searchField="generalFilter"
+                                        [width]="'60vw'"
+                                        [columns]="headerSupplier"
+                                        [service]="supplierService"
+                                        [(ngModel)]="requestExportInList.supplierDto"
+                                        (change)="onChangeSupplier()">
+                    </select-sync-source>
+                </div>
+            </div>
+            <div class="row kt-margin-b-30">
+                <div class="col-md-6">
+                    <button type="button"
+                            [title]="'Export danh sách nhà cung cấp' | translate"
+                            class="btn btn-sm btn-label-brand mr-2"
+                            (click)="exportList()">
+                        <i class="fa fa-download"></i>
+                        {{ 'Export danh sách nhà cung cấp' | translate }}
+                    </button>
+                    <button type="button"
+                            [title]="'Export đánh giá nhà cung cấp' | translate"
+                            class="btn btn-sm btn-label-brand mr-2"
+                            (click)="exportEvaluate()">
+                        <i class="fa fa-download"></i>
+                        {{ 'Export đánh giá nhà cung cấp' | translate }}
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="supplierService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator [pageSize]="10"
+                                   [pageSizeOptions]="[10,30,50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+
+        <div class="mat-table__wrapper">
+            <p-treeTable class="table-no-wrap"
+                         [value]="dataSource.items"
+                         [columns]="headers"
+                         dataKey="id"
+                         [(contextMenuSelection)]="selectedNode"
+                         [contextMenu]="btnContextMenu"
+                         [scrollable]="true"
+                         scrollHeight="1500px"
+                         (onNodeExpand)="onNodeExpand($event)"
+                         (onNodeCollapse)="onNodeCollapse($event)">
+                <ng-template pTemplate="colgroup"
+                             let-columns>
+                    <colgroup>
+                        <col *ngFor="let col of columns"
+                             [width]="col.width">
+                    </colgroup>
+                </ng-template>
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr>
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowNode
+                             let-rowData="rowData"
+                             let-columns="columns">
+                    <tr *ngIf="rowData.areaType"
+                        class="align-center">
+                        <td [title]="rowData.index"
+                            style="text-align: center;">{{ rowData.indexNo }}</td>
+                        <td [title]="rowData.projectCode">{{ rowData.projectCode }}</td>
+                        <td [title]="rowData.code">{{ rowData.code }}</td>
+                        <td [title]="rowData.supplierName">{{ rowData.supplierName }}</td>
+                        <td [title]="rowData.totalAmount">{{ rowData.totalAmount }}</td>
+                        <td [title]="rowData.orgApplyName">{{ rowData.orgApplyName }}</td>
+                        <td [title]="(rowData.areaType | label:areaTypes) | translate">
+                            {{ (rowData.areaType | label:areaTypes) | translate }}
+                        </td>
+                        <td [title]="(rowData.productType | label:productTypes) | translate">
+                            {{ (rowData.productType | label:productTypes) | translate }}
+                        </td>
+                        <td [title]="(rowData.status | label:poStatus) | translate">
+                            {{ (rowData.status | label:poStatus) | translate }}
+                        </td>
+                        <td [title]="rowData.createdAt | date:mainConfig.formatDateList">
+                            {{ rowData.createdAt | date:mainConfig.formatDateList}}
+                        </td>
+                        <td [title]="rowData.createdByName">{{ rowData.createdByName }}</td>
+                        <td [title]="rowData.note">{{ rowData.note }}</td>
+                        <td [title]="rowData.allIpoNumber"
+                            colspan="2">{{ rowData.allIpoNumber }}</td>
+                    </tr>
+                    <tr *ngIf="!rowData.areaType && !rowData.isHeaderRow && !rowData.isPagingRow"
+                        [ttContextMenuRow]="rowNode">
+                        <td>
+                            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                            <i class="fas fa-folder folder-explorer"></i>
+                            {{ rowData.indexNo }}
+                            <span class="total-item">({{ rowData.countPo }} PO(s))</span>
+                        </td>
+                        <td [title]="rowData.vendorId">{{ rowData.vendorId }}</td>
+                        <td [title]="(rowData.type | label:arrType) | translate">
+                            {{(rowData.type | label:arrType) | translate}}
+                        </td>
+                        <td [title]="rowData.code">{{ rowData.code }}</td>
+                        <td [title]="rowData.taxCode">{{ rowData.taxCode }}</td>
+                        <td [title]="rowData.name">{{ rowData.name }}</td>
+                        <td [title]="rowData.invoiceAddress">{{ rowData.invoiceAddress }}</td>
+                        <td [title]="rowData.tradingAddress">{{ rowData.tradingAddress }}</td>
+                        <td [title]="rowData.createdByName">{{ rowData.createdByName }}</td>
+                        <td [title]="(rowData.isActive | label:arrStatus) | translate">
+                            {{(rowData.isActive | label:arrStatus) | translate}}</td>
+                        <td [title]="rowData.evaluate">{{rowData.evaluate}}</td>
+                        <td [title]="rowData.syncSource">{{ rowData.syncSource }}</td>
+                        <td [title]="rowData.syncAt | date: mainConfig.formatFullDate">
+                            {{ rowData.syncAt | date: mainConfig.formatFullDate }}
+                        </td>
+                        <td>
+                            <div class="action align-center">
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        matTooltip="More actions">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item
+                                            (click)="onBtnViewClick(rowData.id)">
+                                        <span>{{'COMMON.VIEW'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnEditClick(rowData.id)">
+                                        <span>{{'COMMON.EDIT'| translate}}</span>
+                                    </button>
+                                    <button *ngIf="!rowData.vendorId"
+                                            mat-menu-item
+                                            (click)="onBtnDeleteClick(rowData.id)">
+                                        <span>{{'COMMON.DELETE'| translate}}</span>
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr *ngIf="rowData.isHeaderRow"
+                        style="background: #f8f9fa;">
+                        <th *ngFor="let col of headersPo"
+                            style="border: 1px solid #e9ecef;"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            <div style="height: 35px; padding-top: 9px;">
+                                {{col.title | translate}}
+                            </div>
+                        </th>
+                    </tr>
+
+                    <tr *ngIf="rowData.isPagingRow">
+                        <td colspan="6"
+                            style="padding: 0; border-right: none;">
+                            <mat-spinner [diameter]="20"
+                                         *ngIf="supplierService.isLoading$ | async"></mat-spinner>
+                            <mat-paginator [pageSize]="10"
+                                           [pageSizeOptions]="[10]"
+                                           [length]="rowNode.node.parent.data.countPo"
+                                           [pageIndex]="rowData.pageIndex"
+                                           [showFirstLastButtons]="true"
+                                           (page)="onItemPagingChange($event, rowNode, rowData)">
+                            </mat-paginator>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-treeTable>
+
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>
+
+<!-- Download template file -->
+<download-file style="display: none;"
+               label="Template file"
+               module="Template\Supplier"
+               #downloadFileTemplateComponent></download-file>
+
+<!-- Upload file template -->
+<upload-file #importFile
+             [multiple]="false"
+             [accept]="'.xlsx'"
+             (onupload)="onBtnUploadClick()"></upload-file>
+
+<!-- Dialog export-->
+<p-dialog header="Export data"
+          [(visible)]="exportDialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [maximizable]="true"
+          [modal]="true"
+          [maximizable]="true"
+          [style]="{width: '42vw'}"
+          [baseZIndex]="1000"
+          [draggable]="false"
+          [resizable]="true"
+          appendTo="body">
+
+    <div class="row kt-margin-b-15">
+        <div class="col-md-6">
+            <label>{{ 'Nhà cung cấp' | translate }}</label>
+            <!-- <select class="form-control"
+                    name="brandYear"
+                    [(ngModel)]="exportRequest.brandYear">
+                <option [ngValue]="undefined"
+                        selected>{{ 'COMMON.SELECT' | translate }}</option>
+                <option *ngFor="let item of brandListYear"
+                        [value]="item.label">{{item.label | translate }}</option>
+            </select> -->
+        </div>
+    </div>
+    <br>
+    <div class="row kt-margin-b-30">
+        <button class="btn btn-sm btn-label-brand mr-2"
+                title="{{ 'Export thông tin nhà cung cấp' | translate }}"
+                (click)="exportSupplierInfo()">
+            {{ 'Export thông tin nhà cung cấp' | translate }}
+        </button>
+
+        <!-- <button class="btn btn-sm btn-label-brand mr-2"
+                title="{{ 'Export marketingFund' | translate }}"
+                (click)="exportBrandMarketingFund()">
+            {{ 'Export marketing fund' | translate }}
+        </button> -->
+    </div>
+
+</p-dialog>

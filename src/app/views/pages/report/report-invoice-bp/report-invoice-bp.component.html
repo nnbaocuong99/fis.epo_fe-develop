@@ -1,0 +1,117 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.INVOICE_BP.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.SUPPLIER' | translate }}</label>
+                <select-sync-source placeholder="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    header="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    bindValue="name"
+                                    suffixLabel="code"
+                                    searchField="generalFilter"
+                                    [width]="'60vw'"
+                                    [columns]="headerSupplier"
+                                    [service]="supplierService"
+                                    [(ngModel)]="request.supplierDto"
+                                    (change)="onChangeSupplier()">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_ORDER.ITEM.ITEM_CODE' | translate }}</label>
+                <input name="itemCode"
+                       type="text"
+                       class="form-control"
+                       maxlength="255"
+                       placeholder="{{ 'PURCHASE_ORDER.ITEM.ITEM_CODE' | translate }}"
+                       [(ngModel)]="request.itemCode">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_ORDER.ITEM.PART_NO' | translate }}</label>
+                <input name="partNo"
+                       type="text"
+                       class="form-control"
+                       maxlength="255"
+                       placeholder="{{ 'PURCHASE_ORDER.ITEM.PART_NO' | translate }}"
+                       [(ngModel)]="request.partNo">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_ORDER.ITEM.ITEM_NAME' | translate }}</label>
+                <input name="itemName"
+                       type="text"
+                       class="form-control"
+                       maxlength="255"
+                       placeholder="{{ 'PURCHASE_ORDER.ITEM.ITEM_NAME' | translate }}"
+                       [(ngModel)]="request.itemName">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_ORDER.ITEM.ITEM_TYPE' | translate }}</label>
+                <ng-select [items]="arrItemType"
+                           bindLabel="label"
+                           bindValue="value"
+                           name="itemType"
+                           placeholder="{{ 'PURCHASE_ORDER.ITEM.ITEM_TYPE' | translate }}"
+                           [(ngModel)]="request.itemType">
+                    <ng-template ng-label-tmp
+                                 let-item="item">
+                        {{ item | translate }}
+                    </ng-template>
+                    <ng-template ng-option-tmp
+                                 let-item="item">
+                        {{ item | translate }}
+                    </ng-template>
+                </ng-select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_ORDER.ITEM.BRAND' | translate }}</label>
+                <input name="producerName"
+                       type="text"
+                       class="form-control"
+                       maxlength="255"
+                       placeholder="{{ 'PURCHASE_ORDER.ITEM.BRAND' | translate }}"
+                       [(ngModel)]="request.producerName">
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportInvoiceBp()">
+                    {{ 'REPORT.INVOICE_BP.EXPORT_INVOICE_BP' | translate }}
+                </button>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

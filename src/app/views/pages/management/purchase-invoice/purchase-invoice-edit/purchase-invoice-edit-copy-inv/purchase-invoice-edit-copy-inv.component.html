@@ -1,0 +1,279 @@
+<crud-dialog [dialogRef]="dialogRef"
+             appendTo="body"
+             (save)="onBtnSaveClick()"
+             (cancel)="onBtnCancelClick()">
+    <p-fieldset legend="{{ 'COMMON.FILTER' | translate }}"
+                [toggleable]="true"
+                [collapsed]="true">
+        <form autocomplete="off"
+              #form="ngForm">
+            <h5 style="font-size: 15px !important;"><i class="fab fa-envira"></i> {{ 'Thông tin hóa đơn' | translate }}
+            </h5>
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'PURCHASE_INVOICE.INVOICE_TYPE' | translate }}</label>
+                    <ng-select-async name="invoiceType"
+                                     bindLabel="name"
+                                     suffixLabel="description"
+                                     placeholder="{{'PURCHASE_INVOICE.INVOICE_TYPE'| translate}}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="invoiceTypeService"
+                                     (change)="request.invoiceType = request.invoiceTypeDto?.name"
+                                     [(ngModel)]="request.invoiceTypeDto">
+                    </ng-select-async>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Số hóa đơn' | translate }}</label>
+                    <ng-select-async name="code"
+                                     bindLabel="code"
+                                     suffixLabel=""
+                                     placeholder="{{'Số hóa đơn'| translate}}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="purchaseInvoiceService"
+                                     (change)="request.code = request.codeDto?.code"
+                                     [(ngModel)]="request.codeDto">
+                    </ng-select-async>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Loại chi phí' | translate }}</label>
+                    <ng-select [items]="arrCostTypes"
+                               bindLabel="name"
+                               bindValue="name"
+                               name="costType"
+                               placeholder="{{ 'Loại chi phí' | translate }}"
+                               [(ngModel)]="request.costType">
+                    </ng-select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Từ ngày' | translate }}</label>
+                    <input-date name="fromDate"
+                                [(ngModel)]="request.fromDate"></input-date>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Đến ngày' | translate }}</label>
+                    <input-date name="toDate"
+                                [(ngModel)]="request.toDate"></input-date>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Người tạo' | translate }}</label>
+                    <ng-select-async name="createdBy"
+                                     bindLabel="fullName"
+                                     suffixLabel="userName"
+                                     placeholder="{{ 'Người tạo' | translate }}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="userService"
+                                     (change)="request.createdBy = request.createdByDto?.name"
+                                     [(ngModel)]="request.createdByDto">
+                    </ng-select-async>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Nhà cung cấp' | translate }}</label>
+                    <ng-select-async name="vendorId"
+                                     bindLabel="name"
+                                     suffixLabel="code"
+                                     searchField="generalFilter"
+                                     placeholder="{{ 'Nhà cung cấp' | translate }}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="supplierService"
+                                     (change)="request.vendorId = request.vendorIdDto?.code"
+                                     [(ngModel)]="request.vendorIdDto">
+                    </ng-select-async>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Mã số thuế NCC' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="supplierTax"
+                           placeholder="{{ 'Mã số thuế NCC' | translate }}"
+                           [(ngModel)]="request.supplierTax">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Loại tiền' | translate }}</label>
+                    <ng-select-async name="currency"
+                                     bindLabel="code"
+                                     placeholder="{{ 'Loại tiền' | translate}}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="currencyService"
+                                     (change)="request.currency = request.currencyDto?.code"
+                                     [(ngModel)]="request.currencyDto">
+                    </ng-select-async>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Trạng thái hóa đơn' | translate }}</label>
+                    <ng-select [items]="statusInvoices"
+                               bindLabel="label"
+                               bindValue="value"
+                               name="status"
+                               placeholder="{{ 'Trạng thái hóa đơn' | translate }}"
+                               [(ngModel)]="request.status">
+                    </ng-select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Trạng thái đồng bộ ERP' | translate }}</label>
+                    <ng-select [items]="statusErps"
+                               bindLabel="label"
+                               bindValue="value"
+                               name="syncStatus"
+                               placeholder="{{ 'Trạng thái đồng bộ ERP' | translate }}"
+                               [(ngModel)]="request.syncStatus">
+                    </ng-select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Trạng thái tính thuế' | translate }}</label>
+                    <ng-select [items]="statusTaxs"
+                               bindLabel="label"
+                               bindValue="value"
+                               name="statusTax"
+                               placeholder="{{ 'Trạng thái tính thuế' | translate }}"
+                               [(ngModel)]="request.statusTax">
+                    </ng-select>
+                </div>
+            </div>
+
+            <h5 style="font-size: 15px !important;"><i class="fab fa-envira"></i>
+                {{ 'Thông tin hàng hóa' | translate }}
+            </h5>
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Loại HH/DV' | translate }}</label>
+                    <ng-select [items]="itemTypes"
+                               bindLabel="label"
+                               bindValue="label"
+                               name="itemType"
+                               placeholder="{{ 'Loại HH/DV' | translate }}"
+                               [(ngModel)]="request.itemType">
+                    </ng-select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Part number' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="partNumber"
+                           placeholder="{{ 'Part number' | translate }}"
+                           [(ngModel)]="request.partNo">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Mã hàng hóa/ dịch vụ' | translate }}</label>
+                    <ng-select-async name="itemCode"
+                                     categoryType="item"
+                                     bindLabel="code"
+                                     suffixLabel="name"
+                                     placeholder="{{ 'Mã hàng hóa/ dịch vụ' | translate }}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="itemService"
+                                     (change)="onChangeItemCode($event)"
+                                     [(ngModel)]="request.itemCodeDto">
+                    </ng-select-async>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>{{ 'Tên hàng hóa/ dịch vụ' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="itemName"
+                           placeholder="{{ 'Tên hàng hóa/ dịch vụ' | translate }}"
+                           [(ngModel)]="request.itemName">
+                </div>
+            </div>
+            <div class="form-row">
+                <button type="submit"
+                        class="btn btn-sm btn-label-brand ml-2"
+                        (click)="onBtnLoadNodeSearchClick()">{{ 'COMMON.GO' | translate }}</button>
+                <button type="reset"
+                        (click)="onBtnResetSearchClick()"
+                        class="btn btn-sm btn-label-brand ml-2">Reset</button>
+            </div>
+        </form>
+    </p-fieldset>
+
+    <br>
+
+    <h5 class="kt-margin-b-15">
+        <i class="fab fa-envira"></i> Danh sách hoá đơn
+    </h5>
+    <div class="row kt-margin-b-15">
+        <div class="col-md-6">
+            <mat-form-field class="input-general-filter">
+                <input matInput
+                       #searchInput
+                       (keydown.enter)="request.codeDto = {code: request.code}; onBtnLoadNodeSearchClick()"
+                       (change)="request.codeDto = {code: request.code}"
+                       [(ngModel)]="request.code"
+                       placeholder="Search ..."
+                       class="mat-form-field mat-form-field-fluid">
+                <mat-hint align="start">
+                </mat-hint>
+            </mat-form-field>
+        </div>
+        <div class="col-md-6">
+            <div class="mat-table__bottom">
+                <mat-spinner [diameter]="20"
+                             *ngIf="purchaseInvoiceService.isLoading$ | async"></mat-spinner>
+                <mat-paginator [pageSize]="10"
+                               [pageSizeOptions]="[10, 30, 50]"
+                               [length]="dataSource.paginatorTotal"
+                               [showFirstLastButtons]="true"></mat-paginator>
+            </div>
+        </div>
+    </div>
+    <div class="mat-table__wrapper">
+        <p-table [value]="dataSource.items"
+                 tableStyleClass="table-no-wrap"
+                 [(selection)]="selectedPurchaseInvoice"
+                 dataKey="id"
+                 (onRowSelect)="onChangeCheckbox($event)">
+            <ng-template pTemplate="header">
+                <tr class="background-table-header">
+                    <th [width]="'39px'"></th>
+                    <th *ngFor="let col of headers;"
+                        [width]="col.width"
+                        [ngClass]="col.class">
+                        {{ col.header | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td>
+                        <p-tableRadioButton [value]="rowData"></p-tableRadioButton>
+                    </td>
+                    <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                        {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                    </td>
+                    <td [title]="rowData.invoiceType">
+                        {{ rowData.invoiceType }}
+                    </td>
+                    <td [title]="rowData.costType">{{ rowData.costType }}</td>
+                    <td [title]="rowData.code">{{ rowData.code }}</td>
+                    <td [title]="rowData.createdAt | date: mainConfig.formatDateList">
+                        {{ rowData.createdAt | date: mainConfig.formatDateList }}</td>
+                    <td class="align-right"
+                        [title]="rowData.totalAmount">{{ rowData.totalAmount | currencyMask }}</td>
+                    <td class="align-right"
+                        [title]="rowData.totalActual">{{ rowData.totalActual | currencyMask }}</td>
+                    <!-- <td [title]="">{{ 'Giá trị hóa đơn' }}</td>
+                    <td [title]="">{{ 'Giá trị hóa đơn TT thực tế' }}</td> -->
+                    <td [title]="rowData.invoiceDesc">{{ rowData.invoiceDesc }}</td>
+                    <td [title]="(rowData.status | label:statusInvoices) | translate">
+                        {{ (rowData.status | label:statusInvoices) | translate }}</td>
+                    <td [title]="(rowData.syncStatus | label:statusErps) | translate">
+                        {{ (rowData.syncStatus | label:statusErps) | translate }}</td>
+                    <td [title]="rowData.supplierName">{{ rowData.supplierName }}</td>
+                    <td [title]="rowData.waybillNumber">{{ rowData.waybillNumber }}</td>
+                    <td [title]="rowData.poCode">{{ rowData.poCode }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</crud-dialog>

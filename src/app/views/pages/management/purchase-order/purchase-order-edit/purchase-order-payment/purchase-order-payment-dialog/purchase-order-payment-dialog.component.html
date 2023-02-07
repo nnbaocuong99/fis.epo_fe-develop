@@ -1,0 +1,107 @@
+<crud-dialog [dialogRef]="dialogRef"
+			 [form]="form"
+			 (save)="onBtnSaveClick()"
+			 (cancel)="onBtnCancelClick()">
+	<form autocomplete="off"
+		  #form="ngForm"
+		  id="role-edit">
+		<div class="form-row">
+			<div class="col-md-4 mb-3">
+				<label class="lbl-required">
+					{{ 'PAYMENT.PAYMENT_METHODS' | translate}}</label>
+				<select class="form-control"
+						name="type"
+						[(ngModel)]="dialogRef.input.rowData.type"
+						required>
+					<option [ngValue]="undefined"
+							selected>{{ 'COMMON.ALL' | translate }}</option>
+					<option *ngFor="let item of paymentType"
+							[value]="item.label">{{item.label | translate }}</option>
+				</select>
+				<validate-message [form]="form"
+								  controlName="type"></validate-message>
+			</div>
+			<div class="col-md-4 mb-3">
+				<label>{{ 'PAYMENT.PAYMENT_MILESTONE' | translate}}</label>
+				<input-date name="milestoneDate"
+							(ngModelChange)="onChangeMilestoneDate($event)"
+							[(ngModel)]="dialogRef.input.rowData.milestoneDate">
+				</input-date>
+			</div>
+			<div class="col-md-4 mb-3">
+				<label class="lbl-required">{{ 'PAYMENT.TERMS_PAYMENT' | translate}}</label>
+				<select-sync-source name="paymentTerm"
+									placeholder="{{ 'PAYMENT.TERMS_PAYMENT' | translate}}"
+									header="{{ 'PAYMENT.TERMS_PAYMENT' | translate}}"
+									bindValue="name"
+									[columns]="headerPaymentTerm"
+									[service]="paymentTermService"
+									(change)="onChangePaymentTerm($event)"
+									[requestPayload]="paymentTermRequestPayload"
+									[(ngModel)]="dialogRef.input.rowData.paymentTermDto"
+									required>
+				</select-sync-source>
+				<validate-message [form]="form"
+								  controlName="paymentTerm"></validate-message>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-4 mb-3">
+				<label>{{ 'PAYMENT.PAYMENT_DATE' | translate}}</label>
+				<input-date name="paymentDate"
+							[(ngModel)]="dialogRef.input.rowData.paymentDate"
+							[disabled]="true">
+				</input-date>
+			</div>
+			<div class="col-md-4 mb-3">
+				<label>{{ 'PAYMENT.RATIO' | translate}}</label>
+				<input type="number"
+					   min="0"
+					   max="100"
+					   class="form-control"
+					   name="ratio"
+					   placeholder="{{ 'PAYMENT.RATIO' | translate}}"
+					   (change)="onChangeRatio($event)"
+					   [(ngModel)]="dialogRef.input.rowData.ratio">
+				<validate-message [form]="form"
+								  controlName="ratio"></validate-message>
+			</div>
+			<div class="col-md-4 mb-3">
+				<label>{{ 'PAYMENT.AMOUNT_MONEY' | translate}}</label>
+				<input type="text"
+					   class="form-control"
+					   name="amount"
+					   min="0"
+					   currencyMask
+					   [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 2, nullable: true }"
+					   validateTooltip
+					   [validateForm]="form"
+					   (ngModelChange)="onChangeAmount($event)"
+					   [(ngModel)]="dialogRef.input.rowData.amount"
+					   placeholder="{{ 'PAYMENT.AMOUNT_MONEY' | translate}}">
+
+				<!-- <input type="number"
+					   min="0"
+					   class="form-control"
+					   name="amount"
+					   (change)="onChangeAmount($event)"
+					   placeholder="Số tiền"
+					   [(ngModel)]="dialogRef.input.rowData.amount">
+				<validate-message [form]="form"
+								  controlName="amount"></validate-message> -->
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-4 mb-3">
+				<label>{{ 'PAYMENT.DESCRIPTION' | translate}}</label>
+				<textarea type="text"
+						  class="form-control"
+						  name="note"
+						  placeholder="{{ 'PAYMENT.DESCRIPTION' | translate}}"
+						  [(ngModel)]="dialogRef.input.rowData.note"></textarea>
+				<validate-message [form]="form"
+								  controlName="note"></validate-message>
+			</div>
+		</div>
+	</form>
+</crud-dialog>

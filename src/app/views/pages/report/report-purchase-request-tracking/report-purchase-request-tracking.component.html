@@ -1,0 +1,126 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.PURCHASE_REQUEST_TRACKING.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <!-- <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.LEGAL' | translate }}</label>
+                <ng-select-async name="legal"
+                                 bindLabel="code"
+                                 placeholder="{{'REPORT.LEGAL'| translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="operatingUnitService"
+                                 (change)="request.legal = request.legalDto?.ouId"
+                                 [(ngModel)]="request.legalDto">
+                </ng-select-async>
+            </div> -->
+            <div class="col-md-2 mb-3">
+                <label>{{ 'FISx' | translate }}</label>
+                <select class="form-control"
+                        name="fISx"
+                        [(ngModel)]="request.fISx">
+                    <option [ngValue]="undefined"
+                            selected>{{ 'Chọn' | translate }}</option>
+                    <option *ngFor="let item of listFisX"
+                            [value]="item.label">{{item.label | translate }}</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Poman' | translate }}</label>
+                <ng-select-async name="poman"
+                                 bindLabel="userName"
+                                 suffixLabel="fullName"
+                                 placeholder="{{ 'poman' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="userService"
+                                 (change)="request.poman = request.pomanDto?.userName"
+                                 [(ngModel)]="request.pomanDto">
+                </ng-select-async>
+            </div>
+            
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Bộ phận phòng ban' | translate }}</label>
+                <ng-select-async name="subDepartment"
+                                 bindLabel="orgCode"
+                                 suffixLabel="orgName"
+                                 placeholder="{{ 'USER.GROUP'| translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="orgService"
+                                 (change)="request.subDepartment = request.subDepartmentDto?.orgName"
+                                 [(ngModel)]="request.subDepartmentDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{'Mã dự án'| translate}}</label>
+                <ng-select-async name="projectCode"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{'Mã dự án'| translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="projectService"
+                                 (change)="request.projectCode = request.projectCodeDto?.code"
+                                 [(ngModel)]="request.projectCodeDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Người tạo YCMH' | translate }}</label>
+                <ng-select-async name="createdByName"
+                                 bindLabel="fullName"
+                                 placeholder="{{'Người tạo YCMH' | translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="userService"
+                                 (change)="request.createdByName = request.createdByNameDto?.userName"
+                                 [(ngModel)]="request.createdByNameDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="btnExportPurchaseRequestTracking()">
+                    {{ 'REPORT.PURCHASE_REQUEST_TRACKING.EXPORT_PURCHASE_REQUEST_TRACKING' | translate }}
+                </button>
+                <br>
+                <small>Note: Xuất báo cáo không search theo bộ phận phòng ban, mặc định xuất all YCMH người tạo phòng ban HCM</small>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

@@ -1,0 +1,264 @@
+<div class="input-group">
+    <input type="search"
+           class="form-control"
+           placeholder="{{ placeholder | translate }}"
+           [(ngModel)]="value"
+           [title]="value"
+           placement="bottom-right"
+           ngbTooltip="{{ value }}"
+           (ngModelChange)="onModelChangeInput($event)"
+           (keydown)="$event.preventDefault()"
+           (paste)="$event.preventDefault()"
+           [disabled]="disabled"
+           [required]="required">
+    <div class="input-group-append">
+        <button class="input-group-text input-group-right attach-button"
+                (click)="onBtnShowDialogListClick()"
+                tabindex="-1"
+                [disabled]="disabled"><i class="fal fa-ellipsis-v"></i></button>
+    </div>
+</div>
+
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '1000px', minWidth: '200px'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Cập nhật thông tin tài khoản định khoản'}}
+    </p-header>
+    <form autocomplete="off"
+          #form="ngForm"
+          id="id-edit-term-account">
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Công ty/ chi nhánh' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="company"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Công ty/ chi nhánh' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="companyService"
+                                 [requestPayload]="companyRequestPayload"
+                                 (change)="arr[0] = obj.companyDto?.code"
+                                 [(ngModel)]="obj.companyDto"
+                                 (change)="onChangeValueControl($event,'company')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="company"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.companyDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Vùng miền' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="regions"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Vùng miền' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="regionsService"
+                                 [requestPayload]="regionsRequestPayload"
+                                 (change)="arr[1] = obj.regionsDto?.code"
+                                 [(ngModel)]="obj.regionsDto"
+                                 (change)="onChangeValueControl($event,'regions')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="regions"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.regionsDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Trung tâm/ Phòng ban' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="subDepartment"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Trung tâm/ Phòng ban' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="subDepartmentService"
+                                 [requestPayload]="subDepartmentRequestPayload"
+                                 (change)="arr[2] = obj.subDepartmentDto?.code"
+                                 [(ngModel)]="obj.subDepartmentDto"
+                                 (change)="onChangeValueControl($event,'subDepartment')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="subDepartment"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.subDepartmentDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Tài khoản' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="account"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Tài khoản' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="accountSyncService"
+                                 [requestPayload]="accountRequestPayload"
+                                 (change)="arr[3] = obj.accountDto?.code"
+                                 [(ngModel)]="obj.accountDto"
+                                 (change)="onChangeValueControl($event,'account')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="account"></validate-message>
+
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.accountDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Lĩnh vực kinh doanh' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="businessField"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Lĩnh vực kinh doanh' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="businessFieldService"
+                                 [requestPayload]="businessFieldRequestPayload"
+                                 (change)="arr[4] = obj.businessFieldDto?.code"
+                                 [(ngModel)]="obj.businessFieldDto"
+                                 (change)="onChangeValueControl($event,'businessField')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="businessField"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.businessFieldDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Loại hình kinh doanh' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="businessType"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Loại hình kinh doanh' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="businessTypeService"
+                                 [requestPayload]="businessTypeRequestPayload"
+                                 (change)="arr[5] = obj.businessTypeDto?.code"
+                                 [(ngModel)]="obj.businessTypeDto"
+                                 (change)="onChangeValueControl($event,'businessType')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="businessType"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.businessTypeDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Liên công ty' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="intercompany"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Liên công ty' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="intercompanyService"
+                                 [requestPayload]="intercompanyRequestPayload"
+                                 (change)="arr[6] = obj.intercompanyDto?.code"
+                                 [(ngModel)]="obj.intercompanyDto"
+                                 (change)="onChangeValueControl($event,'intercompany')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="intercompany"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.intercompanyDto?.name }}</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3 mb-4"
+                 style="text-align: right; vertical-align: middle;">
+                <label class="lbl-required">{{ 'Dự phòng' | translate }}</label>
+            </div>
+            <div class="col-md-5 mb-4">
+                <ng-select-async name="preventive"
+                                 bindLabel="code"
+                                 suffixLabel="name"
+                                 placeholder="{{ 'Dự phòng' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="preventiveService"
+                                 [requestPayload]="preventiveRequestPayload"
+                                 (change)="arr[7] = obj.preventiveDto?.code"
+                                 [(ngModel)]="obj.preventiveDto"
+                                 (change)="onChangeValueControl($event,'preventive')"
+                                 required>
+                </ng-select-async>
+                <validate-message [form]="form"
+                                  controlName="preventive"></validate-message>
+            </div>
+            <div class="col-md-4 mb-4">
+                <label>{{ obj.preventiveDto?.name }}</label>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <div class="mt-3">
+            <button class="btn btn-primary ml-3"
+                    title="{{ 'COMMON.CHOOSE' | translate }}"
+                    (click)="onBtnSaveClick()">
+                {{ 'COMMON.CHOOSE' | translate }}
+            </button>
+            <button class="btn btn-secondary ml-3"
+                    title="{{ 'COMMON.CLOSE' | translate }}"
+                    (click)="onBtnCancelClick()">
+                {{ 'COMMON.CLOSE' | translate }}
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

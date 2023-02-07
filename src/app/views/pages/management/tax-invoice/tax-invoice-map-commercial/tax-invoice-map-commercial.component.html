@@ -1,0 +1,159 @@
+<crud-dialog [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()">
+  <h5 (click)="isHideTaxInvoice = !isHideTaxInvoice"
+      class="header-link"><i class="fas fa-angle-right"
+       [ngClass]="{'hide': !isHideTaxInvoice}"></i><i [ngClass]="{'hide': isHideTaxInvoice}"
+       class="fas fa-angle-down"></i>
+    {{ 'Thông tin Tax-Invoice' | translate}}
+  </h5><br>
+  <div [ngClass]="{'hide': isHideTaxInvoice}">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th *ngFor="let col of headerTable"
+              [width]="col.width">{{ col.title | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td [title]="dialogRef.input.rowData.supplierName">{{ dialogRef.input.rowData.supplierName }}</td>
+          <td [title]="dialogRef.input.rowData.poCode">{{ dialogRef.input.rowData.poCode }}</td>
+          <td [title]="dialogRef.input.rowData.code">
+            <b>{{ dialogRef.input.rowData.code }}</b>
+          </td>
+          <td [title]="dialogRef.input.rowData.date | date: mainConfig.formatDateList">
+            {{ dialogRef.input.rowData.date | date: mainConfig.formatDateList }}</td>
+          <td [title]="dialogRef.input.rowData.currency">{{ dialogRef.input.rowData.currency }}</td>
+          <td class="align-right"
+              [title]="dialogRef.input.rowData.value | currencyMask">{{ dialogRef.input.rowData.value | currencyMask }}
+          </td>
+          <td [title]="dialogRef.input.rowData.maturityDate | date: mainConfig.formatDateList">
+            {{ dialogRef.input.rowData.maturityDate | date: mainConfig.formatDateList }}</td>
+          <td [title]="dialogRef.input.rowData.maturityWeek">{{ dialogRef.input.rowData.maturityWeek }}</td>
+          <td [title]="(dialogRef.input.rowData.status | label: statusTaxInvoice) | translate">
+            {{ (dialogRef.input.rowData.status | label: statusTaxInvoice) | translate }}</td>
+          <td class="align-right"
+              [title]="dialogRef.input.rowData.valuePaid | currencyMask">{{ dialogRef.input.rowData.valuePaid |
+            currencyMask }}</td>
+          <td class="align-right"
+              [title]="dialogRef.input.rowData.valueUnpaid | currencyMask">{{ dialogRef.input.rowData.valueUnpaid |
+            currencyMask }}</td>
+          <td [title]="dialogRef.input.rowData.creatorName">{{ dialogRef.input.rowData.creatorName }}</td>
+          <td [title]="dialogRef.input.rowData.note">{{ dialogRef.input.rowData.note }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-12"
+         style="position: relative;">
+      <div style="position: absolute; right: 15px;">
+        <button class="btn btn-sm btn-label-brand"
+                style="margin-right: 5px;"
+                (click)="initData(1)"
+                title="{{ 'Map theo số Tax - Com' | translate }}">
+          {{ 'Map theo số Tax - Com' | translate }}
+        </button>
+        <button class="btn btn-sm btn-label-brand"
+                style="margin-right: 5px;"
+                (click)="initData(2)"
+                title="{{ 'Map theo giá trị Hóa đơn' | translate }}">
+          {{ 'Map theo giá trị Hóa đơn' | translate }}
+        </button>
+        <button class="btn btn-sm btn-label-brand"
+                style="margin-right: 5px;"
+                (click)="initData(3)"
+                title="{{ 'Map theo giá trị PO' | translate }}">
+          {{ 'Map theo giá trị PO' | translate }}
+        </button>
+        <button class="btn btn-sm btn-label-brand"
+                style="margin-right: 5px;"
+                (click)="initData(4)"
+                title="{{ 'Map theo số PO'| translate }}">
+          {{ 'Map theo số PO' | translate }}
+        </button>
+        <button class="btn btn-sm btn-label-brand"
+                (click)="initData(5)"
+                title="{{ 'Map theo NCC' | translate }}">
+          {{ 'Map theo NCC' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <br />
+  <h5 (click)="isHideCom = !isHideCom"
+      class="header-link"><i class="fas fa-angle-right"
+       [ngClass]="{'hide': !isHideCom}"></i><i [ngClass]="{'hide': isHideCom}"
+       class="fas fa-angle-down"></i>
+    Thông tin COM
+  </h5>
+  <br>
+  <div [ngClass]="{'hide': isHideCom}">
+    <div class="row kt-margin-b-15">
+      <div class="col-md-12">
+        <div class="mat-table__bottom">
+          <mat-spinner [diameter]="20"
+                       *ngIf="purchaseInvoiceService.isLoading$ | async"></mat-spinner>
+          <mat-paginator #paginator
+                         [pageSize]="10"
+                         [pageSizeOptions]="[10, 30, 50]"
+                         [length]="dataSource.paginatorTotal"
+                         [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+      </div>
+    </div>
+    <div class="mat-table__wrapper">
+      <p-table [value]="dataSource.items"
+               tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+          <tr>
+            <th [width]="'30px'"></th>
+            <th *ngFor="let col of headerTablePurchase"
+                [width]="col.width"
+                class="table-no-wrap">
+              {{ col.title | translate }}
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+          <tr>
+            <td style="text-align: center;">
+              <mat-checkbox name="itemType"
+                            class="example-margin"
+                            (change)="onSelectCom(rowData, $event)"
+                            [checked]="rowData.checked && rowData.checked === true"
+                            [color]="'primary'">
+              </mat-checkbox>
+            </td>
+            <td [title]="paginator.pageIndex * paginator.pageSize + rowIndex + 1">
+              {{ paginator.pageIndex * paginator.pageSize + rowIndex + 1 }}
+            </td>
+            <td [title]="rowData.supplierName">{{ rowData.supplierName }}</td>
+            <td [title]="rowData.poCode">{{ rowData.poCode }}</td>
+            <td [title]="rowData.code"
+                class="header-link">
+              <a [routerLink]="[ '../../purchase-invoice/list/view/', rowData.id]"
+                 target="_blank">
+                {{ rowData.code }}</a>
+            </td>
+            <td [title]="rowData.date | date: mainConfig.formatDateList">
+              {{rowData.date | date:mainConfig.formatDateList}}</td>
+            <td [title]="rowData.currency">{{ rowData.currency }}</td>
+            <td [title]="rowData.amount | currencyMask">{{ rowData.amount | currencyMask }}</td>
+            <td [title]="rowData.dueDate | date: mainConfig.formatDateList">
+              {{rowData.dueDate | date: mainConfig.formatDateList}}
+            </td>
+            <td [title]="rowData.dueWeek">{{rowData.dueWeek }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div *ngIf="dataSource.items && dataSource.items.length === 0">
+        <view-empty></view-empty>
+      </div>
+    </div>
+  </div>
+</crud-dialog>

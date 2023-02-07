@@ -1,0 +1,556 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'PURCHASE_INVOICE.HEADER_LIST' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="purchaseInvoiceService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+                <div style="margin-bottom: 15px; text-align: center;">
+                    <mat-checkbox class="example-margin"
+                                  (change)="changeShowFilterInvoice()"
+                                  [checked]="isShowFilterInvoice"
+                                  [color]="'primary'"
+                                  style="margin-right: 80px; margin-left: 5px;">
+                        {{ 'MENU.PURCHASE_INVOICE' | translate }}
+                    </mat-checkbox>
+                    <mat-checkbox class="example-margin"
+                                  (change)="changeShowFilterMerchandise()"
+                                  [checked]="isShowFilterMerchandise"
+                                  [color]="'primary'">{{ 'PURCHASE_INVOICE.MERCHANDISE' | translate }}</mat-checkbox>
+                </div>
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+                    <div id="filter-invoice"
+                         *ngIf="isShowFilterInvoice">
+                        <h5 style="font-size: 15px !important;"> {{ 'MENU.PURCHASE_INVOICE' | translate }} </h5>
+                        <div class="form-row">
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.INVOICE_TYPE' | translate }}</label>
+                                <ng-select-async name="invoiceTypes"
+                                                 bindLabel="name"
+                                                 suffixLabel="description"
+                                                 placeholder="{{'PURCHASE_INVOICE.INVOICE_TYPE'| translate}}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="invoiceTypeService"
+                                                 (change)="requestPurchaseInvoice.invoiceType = requestPurchaseInvoice.invoiceTypeDto?.name"
+                                                 [(ngModel)]="requestPurchaseInvoice.invoiceTypeDto">
+                                </ng-select-async>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="code"
+                                       placeholder="{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.code">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.INVOICE_NUMBER_TOTAL' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="codeTotal"
+                                       placeholder="{{ 'PURCHASE_INVOICE.INVOICE_NUMBER_TOTAL' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.codeTotal">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{'PURCHASE_ORDER.ORG_APPLY'| translate}}</label>
+                                <ng-select-async name="orgApply"
+                                                 bindLabel="name"
+                                                 suffixLabel=""
+                                                 placeholder="{{'PURCHASE_ORDER.ORG_APPLY'| translate}}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="departmentService"
+                                                 (change)="requestPurchaseInvoice.subDepartmentId = requestPurchaseInvoice.orgApplyDto?.subDepartmentId"
+                                                 [(ngModel)]="requestPurchaseInvoice.orgApplyDto">
+                                </ng-select-async>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'FISx' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="fisx"
+                                       placeholder="{{ 'FISx' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.fisx">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.CREATOR' | translate }}</label>
+                                <ng-select-async name="createdBy"
+                                                 bindLabel="userName"
+                                                 suffixLabel="fullName"
+                                                 placeholder="{{ 'PURCHASE_INVOICE.CREATOR' | translate }}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="userService"
+                                                 (change)="requestPurchaseInvoice.createdBy = requestPurchaseInvoice.createdByDto?.id"
+                                                 [(ngModel)]="requestPurchaseInvoice.createdByDto">
+                                </ng-select-async>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.SUPPLIER' | translate }}</label>
+                                <ng-select-async name="vendorId"
+                                                 bindLabel="name"
+                                                 suffixLabel="code"
+                                                 searchField="generalFilter"
+                                                 placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER' | translate }}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="supplierService"
+                                                 (change)="requestPurchaseInvoice.supplierName = requestPurchaseInvoice.vendorIdDto?.name && requestPurchaseInvoice.vendorId = requestPurchaseInvoice.vendorIdDto?.vendorId"
+                                                 [(ngModel)]="requestPurchaseInvoice.vendorIdDto">
+                                </ng-select-async>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.SUPPLIER_SITE' | translate }}</label>
+                                <select class="form-control"
+                                        name="supplierSite"
+                                        [(ngModel)]="requestPurchaseInvoice.supplierSite">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option *ngFor="let item of arrSupplierSite"
+                                            [value]="item.code">{{item.code | translate }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.SUPPLIER_TAX_CODE' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="supplierTax"
+                                       placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER_TAX_CODE' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.supplierTax">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.FROM_DATE' | translate }}</label>
+                                <input-date name="fromDate"
+                                            [(ngModel)]="requestPurchaseInvoice.fromDate"></input-date>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.TO_DATE' | translate }}</label>
+                                <input-date name="toDate"
+                                            [(ngModel)]="requestPurchaseInvoice.toDate"></input-date>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.COST_TYPE' | translate }}</label>
+                                <select class="form-control"
+                                        name="costType"
+                                        [(ngModel)]="requestPurchaseInvoice.costType">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option *ngFor="let item of arrCostTypes"
+                                            [value]="item.name">{{item.name | translate }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.INVOICE_STATUS' | translate }}</label>
+                                <select class="form-control"
+                                        name="status"
+                                        [(ngModel)]="requestPurchaseInvoice.status">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option *ngFor="let item of statusInvoices"
+                                            [value]="item.value">{{item.label | translate }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.ERP_SYNC_STATUS' | translate }}</label>
+                                <select class="form-control"
+                                        name="syncStatus"
+                                        [(ngModel)]="requestPurchaseInvoice.syncStatus"
+                                        required>
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option *ngFor="let item of syncErp"
+                                            [value]="item.value">{{item.label | translate }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.TAX_CALCULATION_STATUS' | translate }}</label>
+                                <select class="form-control"
+                                        name="taxStatus"
+                                        [(ngModel)]="requestPurchaseInvoice.taxStatus">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option *ngFor="let item of statusTaxs"
+                                            [value]="item.value">{{item.label | translate }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{'SYNC_ERP.RECEIPT_NUMBER'| translate}}</label>
+                                <ng-select-async name="receiptNumber"
+                                                 actionGet="selectViewData"
+                                                 actionCount="countViewData"
+                                                 bindLabel="receiptNumber"
+                                                 suffixLabel=""
+                                                 placeholder="{{'SYNC_ERP.RECEIPT_NUMBER'| translate}}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="receiptService"
+                                                 (change)="requestPurchaseInvoice.receiptNumber = requestPurchaseInvoice.receiptNumberDto?.receiptNumber"
+                                                 [(ngModel)]="requestPurchaseInvoice.receiptNumberDto">
+                                </ng-select-async>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{'SYNC_ERP.PO_CODE_ERP'| translate}}</label>
+                                <ng-select-async name="poCodePushErp"
+                                                 actionGet="selectViewData"
+                                                 actionCount="countViewData"
+                                                 bindLabel="poCodePushErp"
+                                                 suffixLabel=""
+                                                 placeholder="{{'SYNC_ERP.PO_CODE_ERP'| translate}}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="receiptService"
+                                                 (change)="requestPurchaseInvoice.poCodePushErp = requestPurchaseInvoice.poCodePushErpDto?.poCodePushErp"
+                                                 [(ngModel)]="requestPurchaseInvoice.poCodePushErpDto">
+                                </ng-select-async>
+                            </div>
+                            <!-- <div class="col-md-3 mb-3">
+                                <label>{{'Group tree'| translate}}</label>
+                                <app-user-org name="listGroupId"
+                                              [choose]="true"
+                                              placeholder="{{'Group tree'| translate}}"
+                                              [(ngModel)]="requestPurchaseInvoice.listGroupId">
+                                </app-user-org>
+                            </div> -->
+                            <div class="col-md-3 mb-3">
+                                <label>{{'AF group tree'| translate}}</label>
+                                <app-user-af-group name="listSubDepartmentId"
+                                                   [choose]="true"
+                                                   placeholder="{{'AF group tree'| translate}}"
+                                                   [(ngModel)]="request.listSubDepartmentId">
+                                </app-user-af-group>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="filter-merchandise"
+                         *ngIf="isShowFilterMerchandise"
+                         style="margin-top: 15px;">
+                        <h5 style="font-size: 15px !important;"> {{ 'PURCHASE_INVOICE.MERCHANDISE' | translate }}
+                        </h5>
+                        <div class="form-row">
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.ITEM.ITEM_CODE' | translate }}</label>
+                                <ng-select-async name="itemCode"
+                                                 categoryType="item"
+                                                 bindLabel="code"
+                                                 suffixLabel="name"
+                                                 placeholder="{{ 'PURCHASE_INVOICE.ITEM.ITEM_CODE' | translate }}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="itemService"
+                                                 (change)="requestPurchaseInvoice.itemCode = requestPurchaseInvoice.itemCodeDto?.code"
+                                                 [(ngModel)]="requestPurchaseInvoice.itemCodeDto">
+                                </ng-select-async>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.ITEM.PART_NO' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="partNumber"
+                                       placeholder="{{ 'PURCHASE_INVOICE.ITEM.PART_NO' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.partNo">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.ITEM.ITEM_NAME' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="itemName"
+                                       placeholder="{{ 'PURCHASE_INVOICE.ITEM.ITEM_NAME' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.itemName">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.ITEM.ITEM_TYPE' | translate }}</label>
+                                <select class="form-control"
+                                        name="itemType"
+                                        [(ngModel)]="requestPurchaseInvoice.itemType">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option value="HW">HW</option>
+                                    <option value="SW">SW</option>
+                                    <option value="SRV">SRV</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.PO_CODE' | translate }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="poCode"
+                                       placeholder="{{ 'PURCHASE_INVOICE.PO_CODE' | translate }}"
+                                       [(ngModel)]="requestPurchaseInvoice.poCode">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.WAYBILL_NUMBER' | translate }}</label>
+                                <ng-select-async name="waybillNumber"
+                                                 bindLabel="waybillNumber"
+                                                 placeholder="{{ 'PURCHASE_INVOICE.WAYBILL_NUMBER' | translate }}"
+                                                 [multiple]="false"
+                                                 [closeOnSelect]="true"
+                                                 [service]="shipmentService"
+                                                 (change)="requestPurchaseInvoice.waybillNumber = requestPurchaseInvoice.waybillNumberDto?.waybillNumber"
+                                                 [(ngModel)]="requestPurchaseInvoice.waybillNumberDto">
+                                </ng-select-async>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>{{ 'PURCHASE_INVOICE.ITEM.TERM_ACCOUNT_STATUS' | translate }}</label>
+                                <select class="form-control"
+                                        name="hasTermAccount"
+                                        [(ngModel)]="requestPurchaseInvoice.hasTermAccount">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.ALL' | translate }}</option>
+                                    <option [value]="true">Có</option>
+                                    <option [value]="false">Không</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <br>
+                        <button type="submit"
+                                class="btn btn-sm btn-label-brand ml-2"
+                                (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                (click)="onBtnResetSearchClick()"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate }}</button>
+                    </div>
+                </form>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6 mb-3">
+                <app-select-subdepartment-tree [(ngModel)]="requestPurchaseInvoice.listSubDepartmentId"
+                                               (selectionChange)="onSearch()">
+                </app-select-subdepartment-tree>
+            </div>
+            <div class="col-md-6 mb-3">
+
+            </div>
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="onSearch()"
+                           [(ngModel)]="requestPurchaseInvoice.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                        <!-- <strong>Search in {{ 'Loại hóa đơn' | translate }}</strong> -->
+                    </mat-hint>
+                </mat-form-field>
+                <br>
+                <small>Ex: Số hóa đơn, số hóa đơn tổng, loại hóa đơn, nhà cung cấp, mã dự án,.....</small>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="purchaseInvoiceService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator #paginator
+                                   [pageSize]="5"
+                                   [pageSizeOptions]="[5,10,30,50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     tableStyleClass="table-no-wrap"
+                     [(contextMenuSelection)]="selectedRowData"
+                     [contextMenu]="btnContextMenu"
+                     dataKey="id"
+                     [columns]="cols"
+                     [frozenColumns]="frozenCols"
+                     [scrollable]="true"
+                     scrollHeight="600px"
+                     frozenWidth="350px">
+                <ng-template pTemplate="colgroup"
+                             let-columns>
+                    <colgroup>
+                        <ng-container *ngFor="let col of columns">
+                            <col [ngStyle]="{width: col.width}"
+                                 class="align-center">
+                        </ng-container>
+                    </colgroup>
+                </ng-template>
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr>
+                        <th *ngFor="let header of columns"
+                            [width]="header.width"
+                            [ngClass]="header.class"
+                            class="align-center">
+                            <div class="header-height"
+                                 *ngIf="header.field !== 'action'">
+                                {{ header.title | translate }}
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-columns="columns"
+                             let-rowIndex="rowIndex">
+                    <tr [pContextMenuRow]="rowData">
+                        <td *ngFor="let col of columns">
+                            <div *ngIf="col.field === 'indexNo'"
+                                 class="wrap-text-grid align-center">
+                                {{ paginator.pageIndex * paginator.pageSize + rowIndex + 1}}
+                            </div>
+
+                            <div *ngIf="col.field === 'code'"
+                                 class="wrap-text-grid header-link"
+                                 title="{{ rowData.code }}">
+                                <a (click)="goToView(rowData)">{{ rowData.code }}</a>
+                            </div>
+
+                            <div *ngIf="col.field === 'codeTotal'"
+                                 class="wrap-text-grid header-link"
+                                 title="{{ rowData.codeTotal }}">
+                                {{ rowData.codeTotal }}
+                            </div>
+
+                            <div *ngIf="col.field === 'invoiceType'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.invoiceType }}">
+                                {{ rowData.invoiceType }}
+                            </div>
+
+                            <div *ngIf="col.field === 'costType'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.costType }}">
+                                {{ rowData.costType }}
+                            </div>
+
+                            <div *ngIf="col.field === 'date'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.date | date: mainConfig.formatDateList }}">
+                                {{ rowData.date | date:mainConfig.formatDateList}}
+                            </div>
+
+                            <div *ngIf="col.field === 'totalAmount'"
+                                 class="wrap-text-grid align-right"
+                                 title="{{ rowData.totalAmount | currencyMask }}">
+                                {{ rowData.totalAmount | currencyMask}}
+                            </div>
+
+                            <div *ngIf="col.field === 'totalActual'"
+                                 class="wrap-text-grid align-right"
+                                 title="{{ rowData.totalActual | currencyMask }}">
+                                {{ rowData.totalActual | currencyMask}}
+                            </div>
+
+                            <div *ngIf="col.field === 'invoiceDesc'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.invoiceDesc }}">
+                                {{ rowData.invoiceDesc }}
+                            </div>
+
+                            <div *ngIf="col.field === 'status'"
+                                 class="wrap-text-grid"
+                                 [title]="(rowData.status| label:statusInvoices) | translate">
+                                {{(rowData.status | label:statusInvoices) | translate}}
+                                <p
+                                   *ngIf="rowData.costType === getCostTypeName(this.arrCostTypes, '1') && (!rowData.countPoXNK || rowData.countPoXNK === 0)">
+                                    ({{(rowData.importStatus | label:checkImportGoods) | translate}})
+                                </p>
+                            </div>
+
+                            <div *ngIf="col.field === 'syncStatus'"
+                                 class="wrap-text-grid"
+                                 [title]="(rowData.syncStatus| label:syncErpList) | translate">
+                                {{(rowData.syncStatus | label:syncErpList) | translate}}
+                            </div>
+
+                            <div *ngIf="col.field === 'supplierName'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.supplierName }}">
+                                {{ rowData.supplierName }}
+                            </div>
+
+                            <div *ngIf="col.field === 'waybillNumber'"
+                                 class="wrap-text-grid header-link"
+                                 title="{{ rowData.waybillNumber }}">
+                                <a [routerLink]="['../../shipment/list/view/', rowData.shipmentId]"
+                                   target="_blank">
+                                    {{ rowData.waybillNumber }}</a>
+                            </div>
+
+                            <div *ngIf="col.field === 'erpInvoiceId'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.erpInvoiceId && rowData.erpInvoiceId != 0 ? rowData.erpInvoiceId : null }}">
+                                {{ rowData.erpInvoiceId && rowData.erpInvoiceId != 0 ? rowData.erpInvoiceId : null }}
+                            </div>
+
+                            <div *ngIf="col.field === 'CreatorName'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.creatorByName }}">
+                                {{ rowData.creatorByName }}
+                            </div>
+
+                            <div *ngIf="col.field === 'syncSource'"
+                                 class="wrap-text-grid"
+                                 title="{{ rowData.syncSource }}">
+                                {{ rowData.syncSource }}
+                            </div>
+
+                            <div class="action align-center"
+                                 *ngIf="col.field === 'action'">
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        matTooltip="More actions">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item
+                                            (click)="goToView(rowData)">
+                                        <span>{{'COMMON.VIEW'| translate}}</span>
+                                    </button>
+                                    <!-- Đã đồng bộ không cho sửa -->
+                                    <button *ngIf="!rowData.syncStatus || rowData.syncStatus < syncErp[1].value"
+                                            mat-menu-item
+                                            (click)="onBtnEditClick(rowData.id)">
+                                        <span>{{'COMMON.EDIT'| translate}}</span>
+                                    </button>
+                                    <!-- Đã đồng bộ không cho huỷ -->
+                                    <button *ngIf="!rowData.syncStatus || rowData.syncStatus < syncErp[1].value"
+                                            mat-menu-item
+                                            (click)="onBtnCancelClick(rowData)">
+                                        <span>{{ 'COMMON.CANCEL' | translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnShipmentClick(rowData)">
+                                        <span>{{'Lô hàng'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnPaymentTracking(rowData.id)">
+                                        <span>{{'Theo dõi thanh toán'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnPaymentOrder(rowData)">
+                                        <span>{{'Đề nghị thanh toán'| translate}}</span>
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

@@ -1,0 +1,254 @@
+<div class="mat-table__wrapper">
+    <p-treeTable class="table-no-wrap"
+                 [value]="dataSource.items"
+                 [columns]="headers"
+                 [paginator]="false"
+                 [rows]="10"
+                 [totalRecords]="dataSource.paginatorTotal"
+                 [frozenColumns]="frozenCols"
+                 [scrollable]="true"
+                 scrollHeight="500px"
+                 frozenWidth="800px">
+        <ng-template pTemplate="colgroup"
+                     let-columns>
+            <colgroup>
+                <ng-container *ngFor="let col of columns">
+                    <col [ngStyle]="{width: col.width}"
+                         class="align-center">
+                </ng-container>
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header"
+                     let-columns>
+            <tr>
+                <th *ngFor="let col of columns; let i = index"
+                    [width]="col.width"
+                    class="table-no-wrap align-center header-height"
+                    [ngClass]="col.class">
+                    <span *ngIf="col.field !== 'action'">
+                        {{ col.title | translate }}
+                    </span>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowNode
+                     let-rowData="rowData">
+            <tr>
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.itemType">
+                        {{rowData.itemType}}
+                        <mat-checkbox *ngIf="rowData.itemType === 'SRV'"
+                                      class="example-margin"
+                                      [(ngModel)]="rowData.isUpdateSrv"
+                                      [disabled]="true"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         title="{{ rowData.unit }}">{{ rowData.unit }}
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         title="{{ rowData.quantity }}">
+                        {{ rowData.quantity }}
+                    </div>
+                </td>
+
+                <td>
+                    <div [title]="rowData.price | currencyMask"
+                         class="align-right wrap-text-grid-item">
+                        {{rowData.price | currencyMask}}
+                    </div>
+                </td>
+                <td>
+                    <div title="{{ rounding(rowData.quantity * rowData.price) ? rounding(rowData.quantity * rowData.price) : 0 }}"
+                         class="align-right wrap-text-grid-item">
+                        {{ rounding(rowData.quantity * rowData.price) ?
+                        (rowData.quantity * rowData.price | currencyMask): 0}}
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         title="{{ rowData.expectedDate | date: mainConfig.formatDateList }}">
+                        {{ rowData.expectedDate | date: mainConfig.formatDateList }}
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         title="{{ rowData.responseDate | date: mainConfig.formatDateList }}">
+                        {{ rowData.responseDate | date: mainConfig.formatDateList }}
+                    </div>
+                </td>
+                <td *ngIf="isInternal && purchaseOrderHistory.areaType !== 2">
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.tax">
+                        {{ rowData.tax }}
+                    </div>
+                </td>
+                <td *ngIf="isInternal && purchaseOrderHistory.areaType !== 2">
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.taxAmount">
+                        {{ rowData.taxAmount }}
+                    </div>
+                </td>
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.producerName">
+                        {{rowData.producerName}}
+                    </div>
+                </td>
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.guarantee">
+                        {{rowData.guarantee}}
+                    </div>
+                </td>
+                <td *ngIf="isInternal">
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.deliveryLocation">
+                        {{rowData.deliveryLocation}}
+                    </div>
+                </td>
+
+                <!-- Trường hợp purchaseOrderData.areaType === 3 || purchaseOrderData.areaType === 4 là đơn hàng ngoại -->
+                <td *ngIf="!isInternal">
+                    <div class="wrap-text-grid-item"
+                         style="text-align: center;">
+                        <mat-checkbox *ngIf="!rowData.isSubItem"
+                                      class="example-margin"
+                                      [(ngModel)]="rowData.hasImportLicense"
+                                      [disabled]="true"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </div>
+                </td>
+
+                <td *ngIf="!isInternal">
+                    <div class="wrap-text-grid-item"
+                         style="text-align: center;">
+                        <mat-checkbox *ngIf="!rowData.isSubItem"
+                                      class="example-margin"
+                                      [(ngModel)]="rowData.isConformity"
+                                      [disabled]="true"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </div>
+                </td>
+
+                <td *ngIf="!isInternal">
+                    <div class="wrap-text-grid-item"
+                         style="text-align: center;">
+                        <mat-checkbox *ngIf="!rowData.isSubItem"
+                                      class="example-margin"
+                                      [disabled]="true"
+                                      [(ngModel)]="rowData.hasEnergyEfficiency"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </div>
+                </td>
+
+                <td *ngIf="!isInternal">
+                    <div class="wrap-text-grid-item"
+                         title="{{ rowData.itemOrigin }}">
+                        {{ rowData.itemOrigin }}
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.termAccount">{{ rowData.termAccount }}
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.projectMilestone">{{ rowData.projectMilestone }}
+                    </div>
+                </td>
+
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.note">
+                        {{rowData.note}}
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="frozenbody"
+                     let-rowNode
+                     let-rowData="rowData">
+            <tr style="height: 57px">
+                <td>
+                    <div class="wrap-text-grid-item">
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                        {{rowData.indexNo}}
+                    </div>
+                </td>
+                <td>
+                    <div [title]="rowData.prNo"
+                         class="wrap-text-grid-item header-link">
+                        <a [routerLink]="['../../../../purchase-request/list/view/', rowData.prId]"
+                           target="_blank">
+                            {{ rowData.prNo }}</a>
+                    </div>
+                </td>
+                <td>
+                    <div [title]="rowData.itemCode"
+                         class="wrap-text-grid-item">
+                        {{ rowData.itemCode }}
+                    </div>
+                </td>
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.partNo">
+                        {{rowData.partNo}}
+                    </div>
+                </td>
+                <td>
+                    <div class="wrap-text-grid-item"
+                         [title]="rowData.itemName">
+                        {{rowData.itemName}}
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-treeTable>
+
+    <div *ngIf="dataSource.items && dataSource.items.length === 0">
+        <view-empty></view-empty>
+    </div>
+
+    <br>
+    <!-- form thêm không hiển thị tính tổng -->
+    <div *ngIf="dataSource.items.length !== 0">
+        <div *ngIf="purchaseOrderHistory.areaType === 3 || purchaseOrderHistory.areaType === 4">
+            <label>{{ 'PURCHASE_ORDER.TOTAL_AMOUNT' | translate}}</label>: <span class="align-right"><b>{{
+                    totalWithoutTax | currencyMask }}</b></span>
+        </div>
+        <div *ngIf="purchaseOrderHistory.areaType === 1 || purchaseOrderHistory.areaType === 2">
+            <table class="table table-auto-width">
+                <tbody>
+                    <tr>
+                        <td>{{ 'PURCHASE_ORDER.TOTAL_AMOUNT_NOT_INCLUDED_TAX' | translate}}:</td>
+                        <td class="align-right"><b>{{ totalWithoutTax | currencyMask }}</b></td>
+                    </tr>
+                    <tr *ngIf="this.totalAmountTax !== 0">
+                        <td>{{ 'PURCHASE_ORDER.TOTAL_AMOUNT_INCLUDED_TAX' | translate}}:</td>
+                        <td class="align-right"><b>{{ totalWithTax | currencyMask }}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br>
+
+</div>

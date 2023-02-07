@@ -1,0 +1,54 @@
+<crud-dialog [dialogRef]="dialogRef"
+             (save)="onBtnSaveClick()"
+             (delete)="onBtnDeleteClick()"
+             (cancel)="onBtnCancelClick()">
+
+    <p-table tableStyleClass="table-no-wrap"
+             [value]="dataSource.items"
+             editMode="row"
+             dataKey="id">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let header of headers"
+                    [width]="header.width"
+                    [ngClass]="header.class">{{ header.title | translate }}</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr [pEditableRow]="rowData">
+                <td [title]="rowData.accountingDate | date: mainConfig.formatDate">
+                    <input type="date"
+                           class="form-control background-word"
+                           [value]="rowData.accountingDate | date: mainConfig.formatDate"
+                           (input)="rowData.accountingDate=parseDate($event.target.value)"
+                           [ngClass]="{'invalid': rowData.isAccountingDateValid}"
+                           (focusout)="checkValidate()">
+                </td>
+                <td [title]="purchaseInvoiceData.currency"> {{ purchaseInvoiceData.currency }} </td>
+                <td [title]="rowData.exchangeRateType">
+                    <exchange-rate bindValue="conversionRate"
+                                   [(ngModel)]="rowData.exchangeRateType"
+                                   [exchangeRateData]="rowData.exchangeRateData"
+                                   (change)="onChangeExchangeRate($event, rowData)"
+                                   [disabled]="purchaseInvoiceData.currency === 'VND'">
+                    </exchange-rate>
+                </td>
+                <td [title]="rowData.conversionRate">
+                    <input type="text"
+                           class="form-control"
+                           min="0"
+                           currencyMask
+                           [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+                           placeholder="{{ 'Tỷ giá' | translate }}"
+                           [(ngModel)]="rowData.conversionRate"
+                           [ngClass]="{'invalid': rowData.isConversionRateValid}"
+                           (focusout)="checkValidate()"
+                           [disabled]="true">
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</crud-dialog>

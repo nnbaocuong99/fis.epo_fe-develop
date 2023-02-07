@@ -1,0 +1,93 @@
+<div class="row">
+    <div class="col-md-12"
+         style="position: relative; padding: 15px;">
+        <h5 class="kt-margin-b-15">
+            <i class="fal fa-list-ul"></i> {{ 'Danh sách yêu cầu HSNL'| translate }}
+        </h5>
+    </div>
+</div>
+
+<div class="row kt-margin-b-15">
+    <div class="col-md-6">
+        <mat-form-field class="input-general-filter">
+            <input matInput
+                   #searchInput
+                   (keydown.enter)="initData()"
+                   [(ngModel)]="request.generalFilter"
+                   placeholder="Search ..."
+                   class="mat-form-field mat-form-field-fluid">
+            <mat-hint align="start">
+                <strong>Search in {{ '' | translate }}</strong>
+            </mat-hint>
+        </mat-form-field>
+    </div>
+    <div class="col-md-6">
+        <div class="mat-table__bottom">
+            <mat-spinner [diameter]="20"
+                         *ngIf="licenseConformityService.isLoading$ | async"></mat-spinner>
+            <mat-paginator [pageSize]="10"
+                           [pageSizeOptions]="[10, 30, 50]"
+                           [length]="dataSource.paginatorTotal"
+                           [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+    </div>
+</div>
+<div class="mat-table__wrapper">
+    <p-table [value]="dataSource.items"
+             scrollHeight="600px"
+             tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of cols"
+                    [width]="col.width"
+                    [ngClass]="col.class">{{ col.title | translate }}
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr>
+                <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                    {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                </td>
+                <td [title]="rowData.waybillNumber"
+                    class="header-link">
+                    <a [routerLink]="['../../shipment/list/view/', rowData.id]"
+                       target="_blank">
+                        {{ rowData.waybillNumber }}</a>
+                </td>
+                <td [title]="rowData.hasEnergyEfficiency ? 'YES': 'NO'">{{ rowData.hasEnergyEfficiency ? 'YES': 'NO'}}
+                </td>
+                <td [title]="(rowData.status | label: executionStatus) | translate">{{ (rowData.status | label:
+                    executionStatus) | translate}}</td>
+                <td [title]="rowData.note">
+                    <pre class="font-normal">{{ rowData.note }}</pre>
+                </td>
+                <td style="text-align: center;">
+                    <button *ngIf="rowData.status !== 2"
+                            class="btn btn-label-success btn-sm mt-2"
+                            title="{{ 'Đăng ký'| translate }}"
+                            (click)="onBtnRegisteredClick(rowData)">
+                        {{ 'Đăng ký'| translate }}
+                    </button>
+                    <button *ngIf="rowData.status === 2"
+                            class="btn btn-label-dark btn-sm mt-2 mr-3"
+                            title="{{ 'Xem'| translate }}"
+                            (click)="onBtnViewClick(rowData)">
+                        {{ 'Xem'| translate }}
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<br>
+<div class="mat-table__bottom"
+     style="text-align:left; margin-top: 15px;">
+    <button class="btn btn-primary mr-2"
+            title="{{ 'Xuất dữ liệu'| translate }}"
+            (click)="onBtnExportAllDataClick()">
+        <i class="fal fa-file-export"></i>{{ 'Xuất dữ liệu'| translate }}
+    </button>
+</div>

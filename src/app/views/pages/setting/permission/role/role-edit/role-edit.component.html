@@ -1,0 +1,136 @@
+<crud-dialog [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()"
+             (delete)="onBtnDeleteClick()">
+    <form autocomplete="off"
+          #form="ngForm"
+          id="role-edit">
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="lbl-required">{{ 'COMMON.CODE' | translate }}</label>
+                    <validate-message [form]="form"
+                                      controlName="code"></validate-message>
+                    <input type="text"
+                           class="form-control"
+                           name="code"
+                           [(ngModel)]="dialogRef.input.code"
+                           placeholder="{{ 'COMMON.CODE' | translate }}"
+                           required
+                           autofocus>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="lbl-required">{{ 'COMMON.NAME' | translate }}</label>
+                    <validate-message [form]="form"
+                                      controlName="name"></validate-message>
+                    <input type="text"
+                           class="form-control"
+                           name="name"
+                           [(ngModel)]="dialogRef.input.name"
+                           placeholder="{{ 'COMMON.NAME' | translate }}"
+                           required>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="lbl-required">{{ 'ROLE.MODULES' | translate }}</label>
+                    <app-role-operation [dialogRef]="operationDialogRef"></app-role-operation>
+                </div>
+            </div>
+        </div>
+    </form>
+    <label>{{ 'MENU.SETTING.USER' | translate }}</label>
+
+    <div class="form-row">
+        <div class="col-md-4">
+            <mat-form-field class="input-general-filter">
+                <input matInput
+                       #searchInput
+                       (keydown.enter)="initData()"
+                       [(ngModel)]="request.email"
+                       name="Users"
+                       placeholder="Search by email..."
+                       class="mat-form-field mat-form-field-fluid">
+                <mat-hint align="start">
+                </mat-hint>
+                {{email}}
+            </mat-form-field>
+        </div>
+        <div class="col-md-8">
+            <mat-paginator [pageSize]="10"
+                           [hidePageSize]="true"
+                           [length]="userDialogRef.input.paginatorTotal"
+                           [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+    </div>
+    <div class="form-row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th *ngFor="let header of headers"
+                        [width]="header.width">{{ header.title | translate }}
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let rowData of userDialogRef.input.items; index as i;">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ rowData.email }}</td>
+                    <td>{{ rowData.userName }}</td>
+                    <td>{{ rowData.fullName }}</td>
+                    <td><button class="btn btn-sm btn-link"
+                                (click)="onBtnDelUserClick(rowData)">{{"COMMON.DELETE" |
+                            translate}}</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <button class="btn btn-sm btn-link"
+            (click)="onBtnAddUserClick()">
+        Add user
+    </button>
+</crud-dialog>
+<p-dialog [(visible)]="isShowAddUser"
+          [modal]="true"
+          [baseZIndex]="10000"
+          appendTo="body"
+          [style]=" {width: '40%'} "
+          [draggable]="true"
+          [maximizable]="true"
+          [closable]="false">
+    <p-header>
+        <i class="fal fa-user-edit"></i> {{"MENU.SETTING.USER" | translate}}
+    </p-header>
+    <form #popupForm="ngForm">
+        <div class="col-md-12">
+            <div class="form-group">
+                <ng-select-async name="user"
+                                 bindLabel="userName"
+                                 placeholder="{{ 'MENU.SETTING.USER' | translate }}"
+                                 [multiple]="true"
+                                 [service]="userService"
+                                 [closeOnSelect]="false"
+                                 [requestPayload]="userRequest"
+                                 [(ngModel)]="userList">
+                </ng-select-async>
+            </div>
+        </div>
+    </form>
+    <br><br><br><br><br><br><br><br>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-primary"
+                title="{{ ('COMMON.SAVE') | translate }}(Enter)"
+                (click)="onBtnSaveUsers()">
+            {{ (dialogRef.config.btnTitle ? dialogRef.config.btnTitle : 'COMMON.SAVE') | translate }}
+        </button>
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+                (click)="onBtnCancelUsers()">{{
+            'COMMON.CANCEL' | translate }}</button>
+    </ng-template>
+</p-dialog>

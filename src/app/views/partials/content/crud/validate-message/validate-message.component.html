@@ -1,0 +1,5 @@
+<span *ngIf="isShowError(form, controlName)">
+    <span *ngFor="let error of getShowError(form, controlName)">
+        <small class="text-validate"> {{ ('VALIDATION.' + error?.toUpperCase()) | translate }} </small><br>
+    </span>
+</span>

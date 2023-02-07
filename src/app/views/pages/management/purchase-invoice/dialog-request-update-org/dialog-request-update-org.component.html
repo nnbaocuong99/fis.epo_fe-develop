@@ -1,0 +1,52 @@
+<!-- Dialog confirm từ chối phê duyệt -->
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [style]="{width: '40vw'}"
+          [modal]="true"
+          [baseZIndex]="10000"
+          appendTo="body"
+          (onHide)="onHide()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Request update ORG code'| translate }}
+    </p-header>
+
+    <h5 class="kt-margin-b-15">Nhập thông tin đơn hàng cần yêu cầu update ORG code:</h5>
+    <p class="font-italic">Yêu cầu cập nhật sẽ gửi thông tin cho người tạo đơn hàng</p>
+
+    <form #form="ngForm"
+          id="request-update-dlg"
+          autocomplete="false">
+        <div class="form-group">
+            <label class="lbl-required">{{ 'Số đơn hàng' | translate }}</label>
+            <ng-select [items]="listPo"
+                       bindLabel="code"
+                       bindValue="id"
+                       name="status"
+                       validateTooltip
+                       [validateForm]="form"
+                       required
+                       [multiple]="true"
+                       placeholder="{{ 'Trạng thái hóa đơn' | translate }}"
+                       [(ngModel)]="request.selectedPo">
+            </ng-select>
+        </div>
+        <div class="form-group">
+            <label class="lbl-required">{{ 'PURCHASE_REQUEST.ITEM.NOTE' | translate }}</label>
+            <textarea type="text"
+                      class="form-control"
+                      validateTooltip
+                      [validateForm]="form"
+                      required
+                      name="confirmNote"
+                      placeholder="{{ 'PURCHASE_REQUEST.ITEM.NOTE' | translate }}"
+                      [(ngModel)]="request.note"></textarea>
+        </div>
+    </form>
+    <p-footer>
+        <button class="btn btn-label-success btn-sm mr-3"
+                title="Xác nhận"
+                (click)="onBtnSaveChangeClick('request-update-dlg')">Xác nhận</button>
+        <button class="btn btn-label-dark btn-sm"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="this.dialogRef.hide()">{{ 'COMMON.CANCEL' | translate }}</button>
+    </p-footer>
+</p-dialog>

@@ -1,0 +1,457 @@
+<div *ngIf="!isImport?.data && editTable"
+	 class="col-md-12">
+	<div class="kt-margin-b-15">
+		<div class="btn-group">
+			<button type="button"
+					class="btn btn-sm btn-label-brand"
+					(click)="onBtnAddClick()"><i class="fal fa-plus"></i>{{ 'COMMON.CRUD.ADD' | translate }}</button>
+			<button type="button"
+					class="btn btn-sm btn-label-brand"
+					(click)="validateShowImportFile()">Import</button>
+		</div>
+		<upload-file #importFile
+					 [multiple]="false"
+					 [accept]="'.xlsx'"
+					 (onupload)="onBtnUploadClick()"></upload-file>
+		<div class="float-right">
+			<download-file module="Template\PurchasePlan"
+						   label="Template file"></download-file>
+		</div>
+	</div>
+</div>
+
+<div class="table-responsive kt-margin-b-15">
+	<p-treeTable #treeTable
+				 class="table-no-wrap"
+				 [value]="dataSource.treeNodes"
+				 [columns]="cols"
+				 [lazy]="true"
+				 (onLazyLoad)="loadNodes($event)"
+				 selectionMode="checkbox"
+				 dataKey="id"
+				 [frozenColumns]="frozenCols"
+				 [scrollable]="true"
+				 scrollHeight="700px"
+				 frozenWidth="750px"
+				 [(selection)]="selectedPurchasePlanItems"
+				 [(contextMenuSelection)]="selectedNode"
+				 [contextMenu]="btnContextMenu">
+		<ng-template pTemplate="colgroup"
+					 let-columns>
+			<colgroup>
+				<ng-container *ngFor="let col of columns">
+					<col *ngIf="col.field !== 'action'"
+						 [ngStyle]="{width: col.width}"
+						 class="align-center">
+					<col *ngIf="editTable && col.field === 'action'"
+						 [ngStyle]="{width: col.width}"
+						 class="align-center">
+				</ng-container>
+			</colgroup>
+		</ng-template>
+		<ng-template pTemplate="header"
+					 let-columns>
+			<tr>
+				<th *ngIf="checkCreatePurchaseRequest"
+					[width]="'34px'">
+					<p-treeTableHeaderCheckbox></p-treeTableHeaderCheckbox>
+				</th>
+				<th *ngFor="let col of columns; let i = index"
+					[width]="col.width"
+					class="align-center header-height"
+					[ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+					{{ col.title | translate }}
+				</th>
+			</tr>
+		</ng-template>
+		<ng-template pTemplate="body"
+					 let-rowNode
+					 let-rowData="rowData"
+					 let-columns="columns">
+			<tr [ttContextMenuRow]="rowNode"
+				[ttContextMenuRowDisabled]="!editTable"
+				[ngClass]="rowData.status !== 0 && checkCreatePurchaseRequest ? 'font-disabled' : ''"
+				(click)="clickTrTable(rowData)">
+
+				<td [title]="rowData.unit">
+					<div class="wrap-text-grid-item align-center">
+						<input *ngIf="editTable && rowData.isShowEditRow"
+							   name="{{ 'unit' + rowData.indexNo}}"
+							   pInputText
+							   type="text"
+							   [(ngModel)]="rowData.unit"
+							   [disabled]="rowData.itemId"
+							   (change)="onRowEditInit()">
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.unit}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.currency"
+						 class="wrap-text-grid-item align-center">
+						<select-sync-source *ngIf="editTable && rowData.isShowEditRow"
+											name="{{ 'currency' + rowData.indexNo}}"
+											placeholder="{{ 'PURCHASE_PLAN.ITEM.CURRENCY' | translate }}"
+											header="PURCHASE_PLAN.ITEM.CURRENCY"
+											bindValue="code"
+											[columns]="headerCurrency"
+											[service]="currencyService"
+											[requestPayload]="currencyRequestPayload"
+											(change)="onChangeCurrency($event, rowData)"
+											[width]="'40vw'"
+											[(ngModel)]="rowData.currency"
+											[isOnTable]="true">
+						</select-sync-source>
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.currency}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.quantity"
+						 class="wrap-text-grid-item align-center">
+						<input type="number"
+							   *ngIf="editTable && rowData.isShowEditRow"
+							   min="0"
+							   class="form-control"
+							   name="{{ 'quantity' + rowData.indexNo}}"
+							   placeholder="{{ 'PURCHASE_PLAN.ITEM.QUANTITY' | translate }}"
+							   [(ngModel)]="rowData.quantity"
+							   (change)="onRowEditInit()">
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.quantity}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div *ngIf="allowViewPrice"
+						 [title]="rowData.expectedPrice | number:'1.0-4':'en-US'"
+						 class="wrap-text-grid-item align-right">
+						<input type="text"
+							   *ngIf="editTable && rowData.isShowEditRow"
+							   class="form-control"
+							   name="{{ 'expectedPrice' + rowData.indexNo}}"
+							   numberMask
+							   (change)="onChangeExpectedPrice(rowData)"
+							   [(ngModel)]="rowData.expectedPrice"
+							   placeholder="{{ 'PURCHASE_PLAN.ITEM.EXPECTED_PRICE' | translate }}">
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.expectedPrice | number:'1.0-4':'en-US'}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div *ngIf="allowViewPrice"
+						 [title]="(rowData.expectedPrice * rowData.quantity) | number:'1.0-2':'en-US'"
+						 class="wrap-text-grid-item align-right">
+						{{(rowData.expectedPrice * rowData.quantity) | number:'1.0-2':'en-US'}}
+					</div>
+				</td>
+
+				<td>
+					<div [title]=" rowData.expectedDate | date: mainConfig.formatDateList "
+						 class="wrap-text-grid-item align-center">
+						<input-date *ngIf="editTable && rowData.isShowEditRow"
+									name="{{ 'expectedDate' + rowData.indexNo}}"
+									[(ngModel)]="rowData.expectedDate"
+									(change)="onRowEditInit()">
+						</input-date>
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{ rowData.expectedDate | date: mainConfig.formatDateList }}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.supplierName"
+						 class="wrap-text-grid-item">
+						<select-sync-source *ngIf="editTable && rowData.isShowEditRow"
+											name="{{ 'supplierName' + rowData.indexNo}}"
+											placeholder="Nhà cung cấp"
+											header="MENU.CATEGORY.SUPPLIER"
+											bindValue="name"
+											suffixLabel="code"
+											searchField="generalFilter"
+											[columns]="headerSuppliers"
+											[width]="'70vw'"
+											[service]="supplierService"
+											[requestPayload]="supplierRequestPayload"
+											(change)="onChangeSupplier($event, rowData)"
+											[(ngModel)]="rowData.supplierName"
+											[isOnTable]="true">
+						</select-sync-source>
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{ rowData.supplierName }}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.producerName"
+						 class="wrap-text-grid-item align-center">
+						<ng-select [items]="producerNameData"
+								   name="{{ 'producerName' + rowData.indexNo }}"
+								   *ngIf="editTable && rowData.isShowEditRow"
+								   bindLabel="acronymName"
+								   bindValue="acronymName"
+								   appendTo="body"
+								   (change)="onChangeProductName($event, rowData)"
+								   placeholder="{{ 'Hãng sản xuất' | translate }}"
+								   [ngModel]="rowData.producerName">
+						</ng-select>
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.producerName}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.guarantee"
+						 class="wrap-text-grid-item align-center">
+						<input type="number"
+							   *ngIf="editTable && rowData.isShowEditRow"
+							   class="form-control"
+							   name="{{ 'guarantee' + rowData.indexNo}}"
+							   min="0"
+							   (change)="onRowEditInit()"
+							   placeholder="{{ 'PURCHASE_PLAN.ITEM.GUARANTEE' | translate }}"
+							   [(ngModel)]="rowData.guarantee"
+							   required>
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.guarantee}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.deliveryLocation"
+						 class="wrap-text-grid-item">
+						<config-list-control *ngIf="editTable && rowData.isShowEditRow"
+											 name="{{ 'deliveryLocation' + rowData.indexNo}}"
+											 type="DELIVERY_LOCATION"
+											 (change)="onRowEditInit()"
+											 header="{{ 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' | translate }}"
+											 bindValue="code"
+											 [(ngModel)]="rowData.deliveryLocation">
+						</config-list-control>
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.deliveryLocation}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.note"
+						 class="wrap-text-grid-item">
+						<input type="text"
+							   class="form-control"
+							   (change)="onRowEditInit()"
+							   *ngIf="editTable && rowData.isShowEditRow"
+							   name="{{ 'note' + rowData.indexNo}}"
+							   placeholder="{{ 'PURCHASE_PLAN.ITEM.NOTE' | translate }}"
+							   [(ngModel)]="rowData.note">
+
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{rowData.note}}
+						</span>
+					</div>
+				</td>
+
+				<td>
+					<div *ngIf="editTable"
+						 class="wrap-text-grid-item align-center action">
+						<button mat-icon-button
+								[matMenuTriggerFor]="menu"
+								matTooltip="More actions">
+							<mat-icon>more_vert</mat-icon>
+						</button>
+						<mat-menu #menu="matMenu">
+							<button mat-menu-item
+									*ngIf="!rowData.isSubItem"
+									(click)="onBtnAddClick(rowData)">
+								<span>{{ 'COMMON.ADD_TO' | translate}}</span>
+							</button>
+							<button mat-menu-item
+									(click)="onBtnEditClick(rowData, rowNode)">
+								<span>{{ 'COMMON.EDIT' | translate}}</span>
+							</button>
+							<button *ngIf="!purchasePlanData.id || (purchasePlanData.id && rowData.quantityRemain == rowData.quantity)"
+									mat-menu-item
+									(click)="onBtnDeleteClick(rowNode)">
+								<span>{{ 'COMMON.DELETE' | translate}}</span>
+							</button>
+						</mat-menu>
+					</div>
+				</td>
+
+			</tr>
+		</ng-template>
+		<ng-template pTemplate="frozenbody"
+					 let-rowNode
+					 let-rowData="rowData">
+			<tr [ttContextMenuRow]="rowNode"
+				[ttContextMenuRowDisabled]="!editTable"
+				[ngClass]="rowData.status !== 0 && checkCreatePurchaseRequest ? 'font-disabled' : ''"
+				(click)="clickTrTable(rowData)">
+
+				<td *ngIf="checkCreatePurchaseRequest">
+					<div class="wrap-text-grid-item align-center">
+						<p-treeTableCheckbox *ngIf="!rowNode.parent && checkCreatePurchaseRequest"
+											 [value]="rowNode"
+											 [disabled]="rowData.status !== 0 && checkCreatePurchaseRequest">
+						</p-treeTableCheckbox>
+					</div>
+				</td>
+
+				<td>
+					<div [title]="rowData.indexNo"
+						 class="wrap-text-grid-item align-center">
+						<p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+						{{ rowData.indexNo }}
+					</div>
+				</td>
+
+				<td [title]="rowData.itemCode">
+					<div class="wrap-text-grid-item align-center">
+						<select-sync-source *ngIf="editTable && rowData.isShowEditRow"
+											name="{{ 'itemCode' + rowData.indexNo}}"
+											categoryType="item"
+											placeholder="PURCHASE_PLAN.ITEM.ITEM_CODE"
+											header="MENU.CATEGORY.ITEM"
+											bindValue="code"
+											categoryType="item"
+											[columns]="headerItems"
+											[width]="'70vw'"
+											[service]="itemService"
+											[requestPayload]="itemRequestPayload"
+											(change)="onChangeItemCode($event, rowData)"
+											[(ngModel)]="rowData.itemCode"
+											[disabled]="!editTable"
+											[isOnTable]="true">
+						</select-sync-source>
+						<span *ngIf="!editTable || !rowData.isShowEditRow">{{rowData.itemCode}}</span>
+					</div>
+				</td>
+
+				<td [title]="rowData.partNo">
+					<div class="wrap-text-grid-item">
+						<input *ngIf="editTable && rowData.isShowEditRow"
+							   pInputText
+							   type="text"
+							   name="{{ 'partNo' + rowData.indexNo}}"
+							   [(ngModel)]="rowData.partNo"
+							   (change)="onRowEditInit()">
+						<span *ngIf="!editTable || !rowData.isShowEditRow">{{rowData.partNo}}</span>
+					</div>
+				</td>
+
+				<td [title]="rowData.itemName">
+					<div class="wrap-text-grid-item">
+						<input *ngIf="editTable && rowData.isShowEditRow"
+							   pInputText
+							   name="{{ 'itemName' + rowData.indexNo}}"
+							   type="text"
+							   [(ngModel)]="rowData.itemName"
+							   (change)="onRowEditInit()"
+							   required>
+						<validate-message [form]="form"
+										  controlName="{{ 'itemName' + rowData.indexNo }}">
+						</validate-message>
+						<span *ngIf="!editTable || !rowData.isShowEditRow">{{rowData.itemName}}</span>
+					</div>
+				</td>
+
+				<td [title]="rowData.itemType">
+					<div class="wrap-text-grid-item align-center">
+						<select *ngIf="editTable && rowData.isShowEditRow"
+								class="form-control"
+								name="{{ 'itemType' + rowData.indexNo}}"
+								[(ngModel)]="rowData.itemType"
+								(change)="onRowEditInit()">
+							<option *ngFor="let item of itemTypes"
+									[value]="item.label">{{item.label | translate }}</option>
+						</select>
+						<span *ngIf="!editTable || !rowData.isShowEditRow">
+							{{ rowData.itemType }}
+						</span>
+						<!-- Loại hàng hoá SRV thêm checkbox -->
+						<mat-checkbox name="{{ rowData.indexNo + 'srv' }}"
+									  *ngIf="rowData.itemType === 'SRV'"
+									  class="example-margin"
+									  [(ngModel)]="rowData.isUpdateSrv"
+									  (change)="ongChangeIsUpdateSrv(rowData, $event)"
+									  [disabled]="!(editTable && rowData.isShowEditRow)"
+									  [color]="'primary'">
+						</mat-checkbox>
+					</div>
+				</td>
+
+			</tr>
+		</ng-template>
+	</p-treeTable>
+	<br>
+	<div *ngIf="dataSource.treeNodes && dataSource.treeNodes.length === 0">
+		<view-empty></view-empty>
+	</div>
+</div>
+<label *ngIf="allowViewPrice">{{ 'PURCHASE_PLAN.ITEM.SUM_EXPECTED_AMOUNT' | translate }}</label>
+<div *ngIf="allowViewPrice"
+	 class="table-responsive">
+	<table class="table table-auto-width">
+		<tr *ngFor="let item of totalBom; let i = index">
+			<td class="transparent align-right">{{ item.key }}:</td>
+			<td class="align-right"
+				[title]="item.Count | currencyMask"><b>{{ item.count | currencyMask }}</b></td>
+		</tr>
+	</table>
+</div>
+
+<!-- Tạm thời ẩn chức năng tạo YCMH từ purchase-plan -->
+<div style="margin-bottom: 15px; text-align: right;"
+	 *ngIf="false">
+	<button *ngIf="this.request.ppId != '0' && !checkCreatePurchaseRequest"
+			class="btn btn-sm btn-label-brand mr-2"
+			title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+			(click)="setCreatePurchaseRequest(true)">
+		Tạo yêu cầu mua hàng
+	</button>
+	<button *ngIf="this.request.ppId != '0' && checkCreatePurchaseRequest"
+			class="btn btn-secondary kt-margin-r-15"
+			title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+			mat-raised-button
+			(click)="setCreatePurchaseRequest(false)">
+		<i class="la la-arrow-left"></i>
+		<span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+	</button>
+	<button *ngIf="this.request.ppId != '0' && checkCreatePurchaseRequest"
+			class="btn btn-primary kt-margin-r-15"
+			title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+			(click)="continueCreatePurchaseRequest()"
+			mat-raised-button
+			color="primary">
+		<i class="la la-arrow-right"></i>
+		<span class="kt-hidden-mobile">{{ 'COMMON.NEXT' | translate }}</span>
+	</button>
+</div>
+
+<app-purchase-plan-item-dialog *ngIf="isShowDialogRef"
+							   [dialogRef]="dialogRef"
+							   [allowViewPrice]="allowViewPrice"
+							   (save)="onSave()"></app-purchase-plan-item-dialog>
+
+<p-contextMenu #btnContextMenu
+			   appendTo="body"
+			   [model]="btnItems"
+			   (onShow)="onShowContextMenu()"></p-contextMenu>

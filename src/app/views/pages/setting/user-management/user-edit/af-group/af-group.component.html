@@ -1,0 +1,228 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'AF group' | translate"
+                       [viewLoading$]="afGroupService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="kt-grid__item">
+
+            <div class="row mb-3">
+                <div class="col-md-5 mb-3">
+                    <div class="header">
+                        <div class="header_text">
+                            <h5> <i class="fal fa-sitemap"></i>
+                                {{ 'AF group tree' | translate }} (Kéo thả để sắp xếp)
+                            </h5>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-label btn-secondary float-right"
+                                    (click)="onBtnAddCLick()">
+                                <i class="fal fa-plus"></i>
+                                {{'COMMON.CRUD.ADD'| translate}}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="border-p-tree">
+                        <p-tree [value]="treeData"
+                                selectionMode="single"
+                                [(selection)]="selectedItem"
+                                [metaKeySelection]="false"
+                                [contextMenu]="btnContextMenu"
+                                (onNodeDrop)="onNodeDrop($event)"
+                                (onNodeSelect)="onNodeSelect($event)"
+                                (onNodeUnselect)="onNodeUnselect($event)"
+                                [draggableNodes]="true"
+                                [droppableNodes]="true"
+                                draggableScope="self"
+                                droppableScope="self"
+                                scrollHeight="500px">
+                            <ng-template let-node
+                                         pTemplate="default">
+                                {{ node.data.name }}
+                            </ng-template>
+                        </p-tree>
+                    </div>
+                </div>
+                <div class="col-md-7 mb-3">
+                    <div class="header">
+                        <div class="header_text">
+                            <h5>
+                                <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="table-responsive"
+                         *ngIf="selectedItem && selectedItem.data">
+                        <table class="table">
+                            <tr style="visibility: collapse;">
+                                <th [style.width]="'200px'"></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">{{ 'Parent' | translate }}:</td>
+                                <td>{{ selectedItem?.data?.parentName }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">{{ 'Code' | translate }}:</td>
+                                <td>{{ selectedItem?.data?.code }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">{{ 'Name' | translate }}:</td>
+                                <td>{{ selectedItem?.data?.name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">{{ 'Pháp nhân' | translate }}:</td>
+                                <td>{{ selectedItem?.data?.ouCode }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">{{ 'Đơn vị sử dụng' | translate }}:</td>
+                                <td>{{ selectedItem?.data?.subDepartmentName }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div *ngIf="!(selectedItem && selectedItem.data)">
+                        <h6 style="padding-top: 0.75rem; font-size: 1.25rem; font-weight: 200;">
+                            <i class="fal fa-exclamation-triangle"></i>
+                            {{ 'Please select an node to view details' | translate }}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>
+
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '50%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-edit"></i> {{ 'COMMON.CRUD.EDIT' | translate }}
+    </p-header>
+
+    <form autocomplete="off"
+          #form="ngForm"
+          id="id-form-af-group">
+        <div class="form-row">
+            <div class="col-md-12 mb-3">
+                <label>{{ 'Parent' | translate }}</label>
+                <select-sync-source [ngClass]="{'hide': actionType === 'add' || (actionType === 'edit' && !selectedItem.parent)}"
+                                    name="parentId"
+                                    placeholder="{{ 'Parent' | translate }}"
+                                    header="{{ 'Parent' | translate }}"
+                                    bindValue="name"
+                                    [columns]="headerAfGroup"
+                                    [width]="'35vw'"
+                                    [service]="afGroupService"
+                                    [requestPayload]="{ouId : afGroupData.ouId}"
+                                    (change)="onChangeParent($event)"
+                                    [(ngModel)]="afGroupData.parentDto">
+                </select-sync-source>
+                <span class="form-control"
+                      [ngClass]="{'hide': !(actionType === 'add' || (actionType === 'edit' && !selectedItem.parent))}">
+                    {{ afGroupData.parentDto?.name }}
+                </span>
+            </div>
+            <div class="col-md-12 mb-3">
+                <label class="lbl-required">{{ 'Code' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="code"
+                       maxlength="255"
+                       placeholder="{{ 'Code' | translate }}"
+                       [(ngModel)]="afGroupData.code"
+                       required>
+                <validate-message [form]="form"
+                                  controlName="code"></validate-message>
+            </div>
+            <div class="col-md-12 mb-3">
+                <label class="lbl-required">{{ 'Name' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="name"
+                       maxlength="255"
+                       placeholder="{{ 'Name' | translate }}"
+                       [(ngModel)]="afGroupData.name"
+                       required>
+                <validate-message [form]="form"
+                                  controlName="name"></validate-message>
+            </div>
+            <div class="col-md-12 mb-3"
+                 [ngClass]="{'hide': actionType === 'edit' || (actionType === 'add' && afGroupData.parentId)}">
+                <label class="lbl-required">{{ 'Pháp nhân' | translate }}</label>
+                <select-sync-source name="ouId"
+                                    placeholder="{{ 'Pháp nhân' | translate }}"
+                                    header="{{ 'Pháp nhân' | translate }}"
+                                    bindValue="code"
+                                    [columns]="headerOperatingUnit"
+                                    [width]="'50vw'"
+                                    [service]="operatingUnitService"
+                                    (change)="onChangeLegal($event)"
+                                    (ngModelChange)="onModelChangeLegal($event)"
+                                    [(ngModel)]="afGroupData.ouDto"
+                                    required>
+                </select-sync-source>
+                <validate-message [form]="form"
+                                  controlName="ouId"></validate-message>
+            </div>
+            <div class="col-md-12 mb-3"
+                 [ngClass]="{'hide': !afGroupData.parentId}">
+                <label [ngClass]="{'lbl-required': afGroupData.parentId}">{{ 'Đơn vị sử dụng' | translate }}</label>
+                <select-sync-source name="subDepartmentId"
+                                    placeholder="{{ 'Đơn vị sử dụng' | translate }}"
+                                    header="{{ 'Đơn vị sử dụng' | translate }}"
+                                    bindValue="name"
+                                    [columns]="headerDepartment"
+                                    [width]="'60vw'"
+                                    [service]="departmentService"
+                                    [requestPayload]="departmentRequestPayload"
+                                    (change)="onChangeOrgApply($event)"
+                                    [(ngModel)]="afGroupData.subDepartmentDto"
+                                    [required]="afGroupData.parentId">
+                </select-sync-source>
+                <validate-message [form]="form"
+                                  controlName="subDepartmentId">
+                </validate-message>
+            </div>
+        </div>
+    </form>
+
+    <p-footer>
+        <div class="mt-3">
+            <button class="btn btn-sm btn-primary mr-2"
+                    title="{{ 'COMMON.SELECT' | translate }}"
+                    (click)="onBtnSaveClick()">
+                <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                {{ this.form.dirty ? '(*)' : '' }}
+            </button>
+            <button class="btn btn-sm btn-default mr-2"
+                    title="{{ 'COMMON.CANCEL' | translate }}"
+                    (click)="close()">
+                <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+            </button>
+        </div>
+    </p-footer>
+</p-dialog>

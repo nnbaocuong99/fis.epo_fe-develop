@@ -1,0 +1,297 @@
+<crud-dialog [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()"
+             (delete)="onBtnDeleteClick()"
+             (cancel)="onBtnCancelClick()">
+
+    <form autocomplete="off"
+          #form="ngForm"
+          id="role-edit">
+        <!-- 1. Thông tin chung -->
+        <ngb-tabset>
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_REQUEST.GENERAL_INFO'| translate }}</h5>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+        <!-- 1.1. Yêu cầu mua hàng -->
+        <label>- Yêu cầu mua hàng</label>
+        <div class="form-row kt-margin-b-15">
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.PR_CODE' | translate}}</label>
+                <input type="text"
+                       class="form-control"
+                       name="prNo"
+                       placeholder="{{ 'PURCHASE_REQUEST.PR_CODE' | translate}}"
+                       [(ngModel)]="purchaseRequestData.prNoTemp"
+                       disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.PR_TYPE' | translate }}</label>
+                <select name="prTypeTemp"
+                        class="form-control"
+                        [(ngModel)]="purchaseRequestData.prTypeTemp"
+                        (change)="onChangeSelectPrType($event.target.value)"
+                        required>
+                    <option *ngFor="let item of prTypeTemp"
+                            [value]="item.value">{{item.label | translate }}</option>
+                </select>
+                <validate-message [form]="form"
+                                  controlName="prTypeTemp"></validate-message>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.CONTRACT_STATUS' | translate }}</label>
+                <select name="prType"
+                        class="form-control"
+                        [(ngModel)]="purchaseRequestData.prType"
+                        required>
+                    <option *ngFor="let item of prContractInfo"
+                            [value]="item.value">{{item.label | translate }}</option>
+                </select>
+                <validate-message [form]="form"
+                                  controlName="prType"></validate-message>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.PROJECT_CODE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="projectCode"
+                       placeholder="{{ 'PURCHASE_REQUEST.PROJECT_CODE' | translate }}"
+                       [(ngModel)]="purchaseRequestData.projectCode"
+                       disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.ORG_APPLY' | translate }}</label>
+                <select-sync-source name="orgApply"
+                                    placeholder="PURCHASE_REQUEST.ORG_APPLY"
+                                    header="Đơn vị sử dụng"
+                                    bindValue="name"
+                                    [columns]="headerDepartment"
+                                    [width]="'60vw'"
+                                    [service]="departmentService"
+                                    (change)="onChangeOrgApply($event)"
+                                    [requestPayload]="departmentRequestPayload"
+                                    [(ngModel)]="purchaseRequestData.orgApplyName"
+                                    required>
+                </select-sync-source>
+                <validate-message [form]="form"
+                                  controlName="orgApply"></validate-message>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.LEGAL' | translate }}</label>
+                <select-sync-source name="legal"
+                                    placeholder="{{ 'PURCHASE_REQUEST.LEGAL' | translate }}"
+                                    header="MENU.CATEGORY.COMPANY"
+                                    bindValue="code"
+                                    [columns]="headerOperatingUnit"
+                                    [width]="'70vw'"
+                                    [service]="operatingUnitService"
+                                    (change)="onChangeLegal($event)"
+                                    [requestPayload]="operatingUnitRequestPayload"
+                                    [(ngModel)]="purchaseRequestData.legalName">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.ORG_CODE' | translate }}</label>
+                <select-sync-source name="orgCode"
+                                    placeholder="PURCHASE_REQUEST.ORG_CODE"
+                                    header="MENU.CATEGORY.ORGANIZATION"
+                                    bindValue="code"
+                                    [columns]="headerOrg"
+                                    [width]="'50vw'"
+                                    [service]="organizationService"
+                                    [requestPayload]="organizationRequestPayload"
+                                    [(ngModel)]="purchaseRequestData.orgCode">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'COMMON.NOTE' | translate }}</label>
+                <textarea type="text"
+                          class="form-control"
+                          name="note"
+                          placeholder="{{ 'COMMON.NOTE' | translate }}"
+                          [(ngModel)]="purchaseRequestData.note"></textarea>
+            </div>
+        </div>
+        <!-- 1.2. Thông tin hợp đồng -->
+        <label>- {{ 'PURCHASE_REQUEST.PR_CONTRACT_INFO'| translate }}</label>
+        <div class="form-row kt-margin-b-15">
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}</label>
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           name="contractNo"
+                           placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}"
+                           [(ngModel)]="purchaseRequestData.contractNo"
+                           placement="bottom-right"
+                           ngbTooltip="{{ purchaseRequestData.contractNo }}"
+                           disabled>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.CONTRACT_TYPE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="contractType"
+                       placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_TYPE' | translate }}"
+                       [(ngModel)]="purchaseRequestData.contractType"
+                       disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="lbl-required">{{ 'PURCHASE_REQUEST.CONTRACT_DESCRIPTION' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="contractDescription"
+                       placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_DESCRIPTION' | translate }}"
+                       [(ngModel)]="purchaseRequestData.contractDescription"
+                       disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.CUSTOMER' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="customer"
+                       placeholder="{{ 'PURCHASE_REQUEST.CUSTOMER' | translate }}"
+                       [(ngModel)]="purchaseRequestData.customer"
+                       disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.AM' | translate }}</label>
+                <ng-select name="amAccount"
+                           [items]="purchaseRequestData.amAccountItems"
+                           [hideSelected]="true"
+                           multiple="true"
+                           [addTag]="addTagFn"
+                           placeholder="{{ 'PURCHASE_REQUEST.AM' | translate }}"
+                           [ngModel]="purchaseRequestData.amAccountItems"
+                           (ngModelChange)="changeAmAccount($event)">
+                </ng-select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.PM' | translate }}</label>
+                <ng-select name="pmAccount"
+                           [items]="purchaseRequestData.pmAccountItems"
+                           [hideSelected]="true"
+                           multiple="true"
+                           [addTag]="addTagFn"
+                           placeholder="{{ 'PURCHASE_REQUEST.PM' | translate }}"
+                           [ngModel]="purchaseRequestData.pmAccountItems"
+                           (ngModelChange)="changePmAccount($event)">
+                </ng-select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>CEO/COO</label>
+                <input type="text"
+                       class="form-control"
+                       name="ceo"
+                       placeholder="CEO/COO"
+                       [(ngModel)]="purchaseRequestData.ceoCoo"
+                       disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.SIGN_DATE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="contractStartDate"
+                       disabled
+                       placeholder="{{ 'PURCHASE_REQUEST.SIGN_DATE' | translate }}"
+                       [ngModel]="purchaseRequestData.signDate | date:'dd/MM/yyyy'">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.END_DATE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="contractEndDate"
+                       disabled
+                       placeholder="{{ 'PURCHASE_REQUEST.END_DATE' | translate }}"
+                       [ngModel]="purchaseRequestData.endDate | date:'dd/MM/yyyy'">
+            </div>
+        </div>
+
+        <ngb-tabset>
+            <!-- Thông tin mặt hàng -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_REQUEST.ITEM.ITEM_INFO'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="table-responsive kt-margin-b-15">
+                        <p-treeTable class="table-no-wrap"
+                                     [value]="dataSource.items"
+                                     [columns]="header"
+                                     [paginator]="true"
+                                     [rows]="10"
+                                     [lazy]="true"
+                                     (onLazyLoad)="loadNodes($event)"
+                                     [totalRecords]="dataSource.paginatorTotal"
+                                     [loading]="false"
+                                     [(selection)]="selectedPurchaseRequestItems">
+                            <ng-template pTemplate="header"
+                                         let-columns>
+                                <tr>
+                                    <th *ngFor="let col of columns; let i = index"
+                                        [width]="col.width"
+                                        [ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+                                        {{ col.title | translate }}
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body"
+                                         let-rowNode
+                                         let-rowData="rowData">
+                                <tr>
+                                    <td [title]="rowData.indexNo">
+                                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                                        {{rowData.indexNo}}
+                                        <p-treeTableCheckbox *ngIf="!rowData.isSubItem && status == 'add'"
+                                                             [value]="rowNode"></p-treeTableCheckbox>
+                                    </td>
+                                    <td [title]="rowData.itemCode">{{rowData.itemCode}}</td>
+                                    <td [title]="rowData.partNo">{{rowData.partNo}}</td>
+                                    <td [title]="rowData.itemName">{{rowData.itemName}}</td>
+                                    <td [title]="rowData.itemType">{{rowData.itemType}}</td>
+                                    <td [title]="rowData.unit">{{rowData.unit}}</td>
+                                    <td [title]="rowData.currency">{{rowData.currency}}</td>
+                                    <td [title]="rowData.quantity">{{rowData.quantity}}</td>
+                                    <td [title]="rowData.expectedPrice | currencyMask"
+                                        class="align-right">{{rowData.expectedPrice | currencyMask}}</td>
+                                    <td [title]="(rowData.expectedPrice * rowData.quantity) | currencyMask"
+                                        class="align-right">
+                                        {{(rowData.expectedPrice * rowData.quantity) | currencyMask}}
+                                    </td>
+                                    <td [title]=" rowData.expectedDate | date: mainConfig.formatDateList ">
+                                        {{ rowData.expectedDate | date: mainConfig.formatDateList }}
+                                    </td>
+                                    <td [title]="rowData.supplierName">{{rowData.supplierName}}</td>
+                                    <td [title]="rowData.producerName">{{rowData.producerName}}</td>
+                                    <td [title]="rowData.guarantee">{{rowData.guarantee}}</td>
+                                    <td [title]="rowData.deliveryLocation">{{rowData.deliveryLocation}}</td>
+                                    <td [title]="rowData.note">{{rowData.note}}</td>
+                                    <td class="action">
+                                        <button mat-icon-button
+                                                [matMenuTriggerFor]="menu"
+                                                matTooltip="More actions">
+                                            <mat-icon>more_vert</mat-icon>
+                                        </button>
+                                        <mat-menu #menu="matMenu">
+                                            <button mat-menu-item
+                                                    (click)="onBtnEditClick(rowData, rowNode)">
+                                                <span>{{ 'COMMON.EDIT' | translate}}</span>
+                                            </button>
+                                            <button mat-menu-item
+                                                    (click)="onBtnDeleteClick(rowData, rowNode)">
+                                                <span>{{ 'COMMON.DELETE' | translate}}</span>
+                                            </button>
+                                        </mat-menu>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-treeTable>
+                    </div>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </form>
+</crud-dialog>

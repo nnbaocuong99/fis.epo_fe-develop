@@ -1,0 +1,19 @@
+.matched {
+    border-left: 2px solid green !important;
+}
+
+.un-matched {
+    border-left: 2px solid red !important;
+}
+
+// .allow-hover:hover {
+//     background: #f7f8fa !important;
+// }
+
+.not-allow-hover:hover {
+    background: none !important;
+}
+
+td .p-inputtext {
+    width: 100%;
+}

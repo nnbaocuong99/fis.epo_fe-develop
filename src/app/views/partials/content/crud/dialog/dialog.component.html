@@ -1,0 +1,39 @@
+<p-dialog #dlg
+		  [(visible)]="dialogRef.isDisplay"
+		  [modal]="true"
+		  [style]="dialogRef.config.style"
+		  [baseZIndex]="dialogRef.config.baseZIndex"
+		  [draggable]="dialogRef.config.draggable"
+		  [maximizable]="dialogRef.config.maximizable"
+		  [closable]="true"
+		  appendTo="body"
+		  (onShow)="markAsPristine(); show.emit($event)"
+		  (onHide)="form?.resetForm(); hide.emit($event)">
+	<p-header>
+		<i class="fal fa-info-circle"></i> {{ dialogRef.config.title | translate }}
+	</p-header>
+	<ng-content></ng-content>
+	<ng-template pTemplate="footer">
+		<button class="btn btn-sm btn-warning float-left"
+				title="{{ 'COMMON.DELETE' | translate }}(Delete)"
+				*ngIf="dialogRef.input.id && dialogRef.input.isShowDelete"
+				(click)="onBtnDeleteClick()">{{ 'COMMON.DELETE' | translate }}</button>
+		<button *ngIf="!hideBtnSave"
+				class="btn btn-sm btn-success"
+				title="{{ (dialogRef.config.btnTitle ? dialogRef.config.btnTitle : 'COMMON.SAVE') | translate }}(Enter)"
+				(click)="onBtnSaveClick()">{{ (dialogRef.config.btnTitle ? dialogRef.config.btnTitle : 'COMMON.SAVE') |
+			translate }}</button>
+		<button *ngIf="!dialogRef.config.hideBtnCancel"
+				class="btn btn-sm btn-secondary"
+				title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+				(click)="onBtnCancelClick()">{{ 'COMMON.CANCEL' | translate }}</button>
+	</ng-template>
+</p-dialog>
+
+<p-confirmDialog #dlgConfirm
+				 header="Confirmation"
+				 appendTo="body"
+				 [baseZIndex]="10001"
+				 [key]="key"
+				 position="top"
+				 icon="pi pi-exclamation-triangle"></p-confirmDialog>

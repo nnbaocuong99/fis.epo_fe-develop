@@ -1,0 +1,414 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'COMMON.DETAILS' | translate"
+                       [viewLoading$]="customsBranchService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="kt-grid__item">
+
+            <form autocomplete="off"
+                  #form="ngForm"
+                  id="id-form-customs-branch">
+
+                <h5 class="kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'COMMON.GENERAL_INFO'| translate}}
+                </h5>
+
+                <div class="form-row">
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'MDT' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="mdt"
+                               maxlength="255"
+                               placeholder="{{ 'MDT' | translate }}"
+                               [(ngModel)]="customsBranchData.mdt"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="mdt"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'CUSTOMS_BRANCH.CODE' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="code"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.CODE' | translate }}"
+                               [(ngModel)]="customsBranchData.code"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="code"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'CUSTOMS_BRANCH.NAME' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="name"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.NAME' | translate }}"
+                               [(ngModel)]="customsBranchData.name"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="name"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'CUSTOMS_BRANCH.ACRONYM' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="acronym"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.ACRONYM' | translate }}"
+                               [(ngModel)]="customsBranchData.acronym"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="acronym"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'CUSTOMS_BRANCH.TAX_CODE' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="taxCode"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.TAX_CODE' | translate }}"
+                               [(ngModel)]="customsBranchData.taxCode"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="taxCode"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>{{ 'CUSTOMS_BRANCH.BANK_NAME' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="bankName"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.BANK_NAME' | translate }}"
+                               [(ngModel)]="customsBranchData.bankName">
+                        <validate-message [form]="form"
+                                          controlName="bankName"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>{{ 'CUSTOMS_BRANCH.ACCOUNT_NUMBER' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="accountNumber"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.ACCOUNT_NUMBER' | translate }}"
+                               [(ngModel)]="customsBranchData.accountNumber">
+                        <validate-message [form]="form"
+                                          controlName="accountNumber"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'CUSTOMS_BRANCH.TREASURY_NAME' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="treasuryName"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.TREASURY_NAME' | translate }}"
+                               [(ngModel)]="customsBranchData.treasuryName"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="treasuryName"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>{{ 'CUSTOMS_BRANCH.ADDRESS' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="address"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.ADDRESS' | translate }}"
+                               [(ngModel)]="customsBranchData.address">
+                        <validate-message [form]="form"
+                                          controlName="address"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'CUSTOMS_BRANCH.PROVINCE' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="province"
+                               maxlength="255"
+                               placeholder="{{ 'CUSTOMS_BRANCH.PROVINCE' | translate }}"
+                               [(ngModel)]="customsBranchData.province"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="province"></validate-message>
+                    </div>
+
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'Loại hình XNK'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="customsBranchData.listCustomsType"
+                             [columns]="arrHeaderCustomsType"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td [title]="rowData.code">
+                                    <input pInputText
+                                           name="{{ 'customsTypeCode' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.code"
+                                           required>
+                                </td>
+                                <td [title]="rowData.name">
+                                    <input pInputText
+                                           name="{{ 'customsTypeName' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.name">
+                                </td>
+                                <td class="text-center">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowCustomsType(rowIndex, rowData)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="customsBranchData.listCustomsType.length + 1">
+                                    {{ customsBranchData.listCustomsType.length + 1 }}
+                                </td>
+                                <td [title]="addItemCustomsType.code">
+                                    <input pInputText
+                                           name="customsTypeCode"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsType.code">
+                                </td>
+                                <td [title]="addItemCustomsType.name">
+                                    <input pInputText
+                                           name="customsTypeName"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsType.name">
+                                </td>
+                                <td class="text-center">
+                                    <button (click)="addNewRowCustomsType()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'Các khoản phải nộp NS'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="customsBranchData.listCustomsFees"
+                             [columns]="arrHeaderCustomsFees"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td [title]="rowData.name">
+                                    <ng-container *ngIf="arrCustomsFeesName.includes(rowData.name)">
+                                        {{ rowData.name }}
+                                    </ng-container>
+                                    <ng-container *ngIf="!arrCustomsFeesName.includes(rowData.name)">
+                                        <input pInputText
+                                               name="{{ 'customsFeesName' + rowData.id }}"
+                                               type="text"
+                                               maxlength="255"
+                                               [(ngModel)]="rowData.name"
+                                               required>
+                                    </ng-container>
+                                </td>
+                                <td [title]="rowData.chapterCode">
+                                    <input pInputText
+                                           name="{{ 'customsFeesChapterCode' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.chapterCode">
+                                </td>
+                                <td [title]="rowData.economicContentCode">
+                                    <input pInputText
+                                           name="{{ 'customsFeesEconomicContentCode' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.economicContentCode">
+                                </td>
+                                <td [title]="rowData.ma">
+                                    <input pInputText
+                                           name="{{ 'customsFeesMa' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.ma">
+                                </td>
+                                <td [title]="rowData.feePaymentAccount">
+                                    <input pInputText
+                                           name="{{ 'customsFeesFeePaymentAccount' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.feePaymentAccount">
+                                </td>
+                                <td class="text-center">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowCustomsFees(rowIndex, rowData)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="customsBranchData.listCustomsFees.length + 1">
+                                    {{ customsBranchData.listCustomsFees.length + 1 }}
+                                </td>
+                                <td [title]="addItemCustomsFees.name">
+                                    <input pInputText
+                                           name="customsFeesName"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsFees.name">
+                                </td>
+                                <td [title]="addItemCustomsFees.chapterCode">
+                                    <input pInputText
+                                           name="customsFeesChapterCode"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsFees.chapterCode">
+                                </td>
+                                <td [title]="addItemCustomsFees.economicContentCode">
+                                    <input pInputText
+                                           name="customsFeesEconomicContentCode"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsFees.economicContentCode">
+                                </td>
+                                <td [title]="addItemCustomsFees.ma">
+                                    <input pInputText
+                                           name="customsFeesMa"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsFees.ma">
+                                </td>
+                                <td [title]="addItemCustomsFees.feePaymentAccount">
+                                    <input pInputText
+                                           name="customsFeesFeePaymentAccount"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemCustomsFees.feePaymentAccount">
+                                </td>
+                                <td class="text-center">
+                                    <button (click)="addNewRowCustomsFees()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+
+            </form>
+
+            <div class="mt-5">
+
+                <button class="btn btn-sm btn-success mr-2"
+                        title="{{ 'COMMON.SAVE' | translate }}"
+                        (click)="onBtnSaveClick()">
+                    <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                </button>
+
+                <button class="btn btn-sm btn-secondary mr-2"
+                        title="{{ 'COMMON.CANCEL' | translate }}"
+                        (click)="onBtnCancelClick()">
+                    <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+                </button>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>

@@ -1,0 +1,736 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'COMMON.DETAILS' | translate"
+                       [viewLoading$]="bidsService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="kt-grid__item">
+
+            <form autocomplete="off"
+                  #form="ngForm"
+                  id="id-form-bids">
+
+                <h5 class="kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'COMMON.GENERAL_INFO'| translate}}
+                </h5>
+
+                <div class="form-row">
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Tên gói thầu' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="name"
+                               maxlength="255"
+                               placeholder="{{ 'Tên gói thầu' | translate }}"
+                               [(ngModel)]="bidsData.name"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="name"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Đơn vị mời thầu' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="bidSolicitationUnit"
+                               maxlength="255"
+                               placeholder="{{ 'Đơn vị mời thầu' | translate }}"
+                               [(ngModel)]="bidsData.bidSolicitationUnit"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="bidSolicitationUnit"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Ngày mời thầu' | translate }}</label>
+                        <input-date name="bidInvitationDate"
+                                    [(ngModel)]="bidsData.bidInvitationDate"
+                                    required>
+                        </input-date>
+                        <validate-message [form]="form"
+                                          controlName="bidSolicitationUnit"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Hạn nộp hồ sơ thầu' | translate }}</label>
+                        <input-date name="deadlineForSubmission"
+                                    [(ngModel)]="bidsData.deadlineForSubmission"
+                                    (change)="checkDeadlineForSubmissionExtend()"
+                                    required>
+                        </input-date>
+                        <validate-message [form]="form"
+                                          controlName="bidSolicitationUnit"></validate-message>
+                        <validate-message [form]="form"
+                                          controlName="deadlineForSubmissionExtend"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>{{ 'Gia hạn thời gian nộp hồ sơ thầu' | translate }}</label>
+                        <input-date name="deadlineForSubmissionExtend"
+                                    [(ngModel)]="bidsData.deadlineForSubmissionExtend"
+                                    (change)="checkDeadlineForSubmissionExtend()">
+                        </input-date>
+                        <validate-message [form]="form"
+                                          controlName="deadlineForSubmissionExtend"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Ngày bắt đầu chào giá' | translate }}</label>
+                        <input-date name="bidStartDate"
+                                    [(ngModel)]="bidsData.bidStartDate"
+                                    required>
+                        </input-date>
+                        <validate-message [form]="form"
+                                          controlName="bidSolicitationUnit"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Ngày kết thúc chào giá' | translate }}</label>
+                        <input-date name="bidEndDate"
+                                    [(ngModel)]="bidsData.bidEndDate"
+                                    required>
+                        </input-date>
+                        <validate-message [form]="form"
+                                          controlName="bidSolicitationUnit"></validate-message>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="lbl-required">{{ 'Thông tin liên hệ' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="contact"
+                               maxlength="255"
+                               placeholder="{{ 'Thông tin liên hệ' | translate }}"
+                               [(ngModel)]="bidsData.contact"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="bidSolicitationUnit"></validate-message>
+                    </div>
+
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'Hồ sơ năng lực yêu cầu'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="bidsData.listBidsCapacityProfileRequest"
+                             [columns]="arrHeaderBidsCapacityProfileRequest"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.name">
+                                    <input pInputText
+                                           name="{{ 'BidsCapacityProfileRequestName' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.name"
+                                           required>
+                                </td>
+                                <td class="text-center">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowBidsCapacityProfileRequest(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="bidsData.listBidsCapacityProfileRequest.length + 1">
+                                    {{ bidsData.listBidsCapacityProfileRequest.length + 1 }}
+                                </td>
+                                <td [title]="addItemBidsCapacityProfileRequest.name">
+                                    <input pInputText
+                                           name="BidsCapacityProfileRequest"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBidsCapacityProfileRequest.name">
+                                </td>
+                                <td class="text-center">
+                                    <button (click)="addNewRowBidsCapacityProfileRequest()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'Tiêu chí đánh giá'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="bidsData.listBidsEvaluationCriteria"
+                             [columns]="arrHeaderBidsEvaluationCriteria"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.name">
+                                    <input pInputText
+                                           name="{{ 'bidsEvaluationCriteriaName' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.name"
+                                           required>
+                                </td>
+                                <td class="text-center">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowBidsEvaluationCriteria(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="bidsData.listBidsEvaluationCriteria.length + 1">
+                                    {{ bidsData.listBidsEvaluationCriteria.length + 1 }}
+                                </td>
+                                <td [title]="addItemBidsEvaluationCriteria.name">
+                                    <input pInputText
+                                           name="bidsEvaluationCriteriaName"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBidsEvaluationCriteria.name">
+                                </td>
+
+                                <td class="text-center">
+                                    <button (click)="addNewRowBidsEvaluationCriteria()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'Danh sách hồ sơ nhà cung cấp'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="bidsData.listBidsSupplierProfile"
+                             [columns]="arrHeaderSupplierProfile"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td class="text-center"
+                                    [title]="">
+                                    <select-sync-source name="{{ 'supplierProfileSupplierId' + rowData.id }}"
+                                                        placeholder="{{ 'REPORT.SYNC_ERP.SUPPLIER' | translate }}"
+                                                        header="{{ 'REPORT.SYNC_ERP.SUPPLIER' | translate }}"
+                                                        bindValue="name"
+                                                        suffixLabel="code"
+                                                        searchField="generalFilter"
+                                                        [width]="'60vw'"
+                                                        [isOnTable]="true"
+                                                        [columns]="headerSuppliers"
+                                                        [service]="supplierService"
+                                                        [(ngModel)]="rowData.supplierName"
+                                                        (change)="onChangeSupplier($event, rowData)"
+                                                        required>
+                                    </select-sync-source>
+                                </td>
+                                <td [title]="rowData.supplierTaxCode">
+                                    <input pInputText
+                                           name="{{ 'supplierProfileSupplierTaxCode' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.supplierTaxCode"
+                                           readonly>
+                                </td>
+                                <td [title]="rowData.email">
+                                    <!-- <select-sync-source name="{{ 'supplierProfileEmail' + rowData.id }}"
+                                                        placeholder="{{ 'Email' | translate }}"
+                                                        header="{{ 'Email' | translate }}"
+                                                        bindValue="email"
+                                                        [width]="'35vw'"
+                                                        [isOnTable]="true"
+                                                        [columns]="headerSupplierSales"
+                                                        [service]="supplierSalesService"
+                                                        [requestPayload]="{supplierId : rowData.supplierId}"
+                                                        [(ngModel)]="rowData.email"
+                                                        (change)="onChangeSupplierSales($event, rowData)"
+                                                        [disabled]="!rowData.supplierId"
+                                                        required>
+                                    </select-sync-source> -->
+                                    <app-bids-management-select-email name="{{ 'supplierProfileEmail' + rowData.id }}"
+                                                                      [(ngModel)]="rowData.email"
+                                                                      [supplierId]="rowData.supplierId"
+                                                                      emailTypeValidator>
+                                    </app-bids-management-select-email>
+                                    <validate-message [form]="form"
+                                                      controlName="{{ 'supplierProfileEmail' + rowData.id }}">
+                                    </validate-message>
+                                </td>
+                                <td [title]="rowData.scores">
+                                    <input pInputText
+                                           name="{{ 'supplierProfileDescription' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.description">
+                                </td>
+                                <td [title]="rowData.scores">
+                                    <input pInputText
+                                           name="{{ 'bidsSupplierProfileScores' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.scores">
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="{{ 'supplierProfileRequestForQuotation' + rowData.id }}"
+                                                  class="example-margin"
+                                                  [ngModel]="rowData.requestForQuotation"
+                                                  (ngModelChange)="rowData.requestForQuotation = $event ? 1 : 0"
+                                                  [checked]="rowData.requestForQuotation == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="{{ 'supplierProfileAuction' + rowData.id }}"
+                                                  class="example-margin"
+                                                  [ngModel]="rowData.auction"
+                                                  (ngModelChange)="rowData.auction = $event ? 1 : 0"
+                                                  [checked]="rowData.auction == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="{{ 'supplierProfileWonTheBid' + rowData.id }}"
+                                                  class="example-margin"
+                                                  [ngModel]="rowData.wonTheBid"
+                                                  (ngModelChange)="rowData.wonTheBid = $event ? 1 : 0"
+                                                  [checked]="rowData.wonTheBid == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td [title]="rowData.status === 1 ? rowData.reasonReject : ''">
+                                    <span *ngIf="!(rowData.status && rowData.status >= 3)"
+                                          [ngClass]="{'text-danger': rowData.status === 1}">
+                                        {{(rowData.status | label:arrSupplierProfileStatus) | translate}}
+                                    </span>
+                                    <a *ngIf="rowData.status && rowData.status >= 3"
+                                       href="javascript:;"
+                                       (click)="viewSupplierProfile(rowData)">
+                                        {{(rowData.status | label:arrSupplierProfileStatus) | translate}}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowBidsSupplierProfile(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="bidsData.listBidsSupplierProfile.length + 1">
+                                    {{ bidsData.listBidsSupplierProfile.length + 1 }}
+                                </td>
+                                <td [title]="">
+                                    <select-sync-source name="supplierProfileSupplierId"
+                                                        placeholder="{{ 'REPORT.SYNC_ERP.SUPPLIER' | translate }}"
+                                                        header="{{ 'REPORT.SYNC_ERP.SUPPLIER' | translate }}"
+                                                        bindValue="name"
+                                                        suffixLabel="code"
+                                                        searchField="generalFilter"
+                                                        [width]="'60vw'"
+                                                        [isOnTable]="true"
+                                                        [columns]="headerSuppliers"
+                                                        [service]="supplierService"
+                                                        [(ngModel)]="addItemBidsSupplierProfile.supplierName"
+                                                        (change)="onChangeSupplier($event, addItemBidsSupplierProfile)">
+                                    </select-sync-source>
+                                </td>
+                                <td [title]="addItemBidsSupplierProfile.supplierTaxCode">
+                                    <input pInputText
+                                           name="supplierProfileSupplierTaxCode"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBidsSupplierProfile.supplierTaxCode"
+                                           readonly>
+                                </td>
+                                <td [title]="addItemBidsSupplierProfile.email">
+                                    <!-- <select-sync-source name="supplierProfileEmail"
+                                                        placeholder="{{ 'Email' | translate }}"
+                                                        header="{{ 'Email' | translate }}"
+                                                        bindValue="email"
+                                                        [width]="'35vw'"
+                                                        [isOnTable]="true"
+                                                        [columns]="headerSupplierSales"
+                                                        [service]="supplierSalesService"
+                                                        [requestPayload]="{supplierId : addItemBidsSupplierProfile.supplierId}"
+                                                        [(ngModel)]="addItemBidsSupplierProfile.email"
+                                                        [disabled]="!addItemBidsSupplierProfile.supplierId"
+                                                        (change)="onChangeSupplierSales($event, addItemBidsSupplierProfile)">
+                                    </select-sync-source> -->
+                                    <app-bids-management-select-email name="supplierProfileEmail"
+                                                                      [(ngModel)]="addItemBidsSupplierProfile.email"
+                                                                      [supplierId]="addItemBidsSupplierProfile.supplierId"
+                                                                      emailTypeValidator>
+                                    </app-bids-management-select-email>
+                                    <validate-message [form]="form"
+                                                      controlName="supplierProfileEmail"></validate-message>
+                                </td>
+                                <td [title]="addItemBidsSupplierProfile.description">
+                                    <input pInputText
+                                           name="{{ 'supplierProfileDescription' }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBidsSupplierProfile.description">
+                                </td>
+                                <td [title]="addItemBidsSupplierProfile.scores">
+                                    <input pInputText
+                                           name="scores"
+                                           type="number"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBidsSupplierProfile.scores">
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="{{ 'supplierProfileRequestForQuotation' }}"
+                                                  class="example-margin"
+                                                  [ngModel]="addItemBidsSupplierProfile.requestForQuotation"
+                                                  (ngModelChange)="addItemBidsSupplierProfile.requestForQuotation = $event ? 1 : 0"
+                                                  [checked]="addItemBidsSupplierProfile.requestForQuotation == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="{{ 'supplierProfileAuction' }}"
+                                                  class="example-margin"
+                                                  [ngModel]="addItemBidsSupplierProfile.auction"
+                                                  (ngModelChange)="addItemBidsSupplierProfile.auction = $event ? 1 : 0"
+                                                  [checked]="addItemBidsSupplierProfile.auction == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="{{ 'supplierProfileWonTheBid' }}"
+                                                  class="example-margin"
+                                                  [ngModel]="addItemBidsSupplierProfile.wonTheBid"
+                                                  (ngModelChange)="addItemBidsSupplierProfile.wonTheBid = $event ? 1 : 0"
+                                                  [checked]="addItemBidsSupplierProfile.wonTheBid == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td
+                                    [title]="(addItemBidsSupplierProfile.status | label:arrSupplierProfileStatus) | translate">
+                                    {{(addItemBidsSupplierProfile.status | label:arrSupplierProfileStatus) | translate}}
+                                </td>
+                                <td class="text-center">
+                                    <button (click)="addNewRowBidsSupplierProfile()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+
+                    </p-table>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'Báo giá'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="bidsData.listBidsItem"
+                             [columns]="arrHeaderBidsItem"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td [title]="rowData.itemName">
+                                    <textarea name="{{ 'bidsItemItemName' + rowData.id }}"
+                                              maxlength="255"
+                                              class="form-control"
+                                              [(ngModel)]="rowData.itemName"
+                                              required></textarea>
+                                </td>
+                                <td [title]="rowData.description">
+                                    <textarea name="{{ 'bidsItemDescription' + rowData.id }}"
+                                              maxlength="255"
+                                              class="form-control"
+                                              [(ngModel)]="rowData.description"></textarea>
+                                </td>
+                                <td [title]="rowData.quantity">
+                                    <input pInputText
+                                           name="{{ 'bidsItemQuantity' + rowData.id }}"
+                                           type="number"
+                                           [(ngModel)]="rowData.quantity"
+                                           required>
+                                </td>
+                                <td [title]="rowData.unit">
+                                    <input pInputText
+                                           name="{{ 'bidsItemUnit' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.unit"
+                                           required>
+                                </td>
+                                <td [title]="rowData.otherRequest">
+                                    <textarea name="{{ 'bidsItemOtherRequest' + rowData.id }}"
+                                              maxlength="255"
+                                              class="form-control"
+                                              [(ngModel)]="rowData.otherRequest"></textarea>
+                                </td>
+                                <td>
+                                    <input-date name="{{ 'bidsItemExpirationDate' + rowData.id }}"
+                                                [(ngModel)]="rowData.expirationDate"
+                                                required>
+                                    </input-date>
+                                </td>
+                                <td class="text-center">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowBidsItem(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="bidsData.listBidsItem.length + 1">
+                                    {{ bidsData.listBidsItem.length + 1 }}
+                                </td>
+                                <td [title]="addItemBidsItem.itemName">
+                                    <textarea name="{{ 'bidsItemItemName' }}"
+                                              maxlength="255"
+                                              class="form-control"
+                                              [(ngModel)]="addItemBidsItem.itemName"></textarea>
+                                </td>
+                                <td [title]="addItemBidsItem.description">
+                                    <textarea name="{{ 'bidsItemDescription' }}"
+                                              maxlength="255"
+                                              class="form-control"
+                                              [(ngModel)]="addItemBidsItem.description"></textarea>
+                                </td>
+                                <td [title]="addItemBidsItem.quantity">
+                                    <input pInputText
+                                           name="{{ 'bidsItemQuantity' }}"
+                                           type="number"
+                                           [(ngModel)]="addItemBidsItem.quantity">
+                                </td>
+                                <td [title]="addItemBidsItem.unit">
+                                    <input pInputText
+                                           name="{{ 'bidsItemUnit' }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBidsItem.unit">
+                                </td>
+                                <td [title]="addItemBidsItem.otherRequest">
+                                    <textarea name="{{ 'bidsItemOtherRequest' }}"
+                                              maxlength="255"
+                                              class="form-control"
+                                              [(ngModel)]="addItemBidsItem.otherRequest"></textarea>
+                                </td>
+                                <td class="text-center">
+                                    <input-date name="{{ 'bidsItemExpirationDate' }}"
+                                                [(ngModel)]="addItemBidsItem.expirationDate">
+                                    </input-date>
+                                </td>
+                                <td class="text-center">
+                                    <button (click)="addNewRowBidsItem()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+
+                    </p-table>
+                </div>
+            </form>
+
+            <div class="mt-5">
+                <button *ngIf="bidsData.id && (!bidsData.status || bidsData.status < 2)"
+                        class="btn btn-sm btn-primary mr-2 float-right"
+                        title="{{ 'Mời tham gia' | translate }}"
+                        (click)="onBtnInvitationClick(2)">
+                    <i class="far fa-paper-plane"></i> {{ 'Mời tham gia' | translate }}
+                </button>
+
+                <button *ngIf="bidsData.id && bidsData.status === 2"
+                        class="btn btn-sm btn-primary mr-2 float-right"
+                        title="{{ 'Mời đấu giá' | translate }}"
+                        (click)="onBtnInvitationClick(3)">
+                    <i class="far fa-paper-plane"></i> {{ 'Mời đấu giá' | translate }}
+                </button>
+
+                <button *ngIf="bidsData.id && bidsData.status === 3"
+                        class="btn btn-sm btn-primary mr-2 float-right"
+                        title="{{ 'Kết thúc đấu giá' | translate }}"
+                        (click)="onBtnInvitationClick(4)">
+                    <i class="far fa-check-circle"></i> {{ 'Kết thúc đấu giá' | translate }}
+                </button>
+
+                <button *ngIf="bidsData.id && bidsData.status === 2"
+                        class="btn btn-sm btn-primary mr-2 float-right"
+                        title="{{ 'Thông báo gia hạn thời gian nộp hồ sơ thầu' | translate }}"
+                        (click)="onBtnNotificationDeadlineForSubmissionExtendClick()">
+                    <i class="far fa-paper-plane"></i> {{ 'Thông báo gia hạn thời gian nộp hồ sơ thầu' | translate }}
+                </button>
+
+                <button class="btn btn-sm btn-success mr-2"
+                        title="{{ 'COMMON.SAVE' | translate }}"
+                        (click)="onBtnSaveClick()">
+                    <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                </button>
+
+                <button class="btn btn-sm btn-secondary mr-2"
+                        title="{{ 'COMMON.CANCEL' | translate }}"
+                        (click)="onBtnCancelClick()">
+                    <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+                </button>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-bids-management-view-supplier-profile #bidsManagementViewSupplierProfile>
+</app-bids-management-view-supplier-profile>

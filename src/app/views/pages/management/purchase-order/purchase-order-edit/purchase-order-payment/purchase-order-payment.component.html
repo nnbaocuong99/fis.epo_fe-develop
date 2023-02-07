@@ -1,0 +1,94 @@
+<div class="row">
+	<div class="col-md-12"
+		 style="position: relative; padding: 15px;">
+		<h5 class="kt-margin-b-15">
+			<i class="fal fa-money-check-edit"></i>
+			{{ 'PAYMENT.PAYMENT_DETAILS'| translate }}
+		</h5>
+		<div style="position: absolute; right: 15px; top: 5px;"
+			 *ngIf="!viewMode">
+			<button class="btn btn-sm btn-simple"
+					title="{{ 'COMMON.CRUD.ADD' | translate }}"
+					(click)="onBtnAddClick()"><i class="fal fa-plus"></i>
+				{{ 'COMMON.CRUD.ADD' | translate }}
+			</button>
+		</div>
+	</div>
+</div>
+<div *ngIf="dataSource.items && dataSource.items.length > 0">
+	<div class="mat-table__bottom">
+		<mat-spinner [diameter]="20"
+					 *ngIf="baseService.isLoading$ | async"></mat-spinner>
+		<mat-paginator [pageSize]="10"
+					   [pageSizeOptions]="[10, 30, 50]"
+					   [length]="dataSource.paginatorTotal"
+					   [showFirstLastButtons]="true"></mat-paginator>
+	</div>
+</div>
+<div class="mat-table__wrapper">
+	<p-table [value]="dataSource.items"
+			 tableStyleClass="table-no-wrap">
+		<ng-template pTemplate="header">
+			<tr>
+				<th *ngFor="let header of headers"
+					[width]="header.width"
+					[ngClass]="header.class">{{ header.title | translate }}
+					<span class="lbl-required"
+						  *ngIf="header.isRequired">
+					</span>
+				</th>
+			</tr>
+		</ng-template>
+		<ng-template pTemplate="body"
+					 let-rowData
+					 let-rowIndex="rowIndex">
+			<tr>
+				<td [title]=" rowIndex + 1">{{ rowIndex + 1 }}</td>
+				<td [title]="rowData.type | translate">
+					{{ rowData.type | translate }} </td>
+				<td [title]="rowData.milestoneDate | date : mainConfig.formatDateList">
+					{{ rowData.milestoneDate | date : mainConfig.formatDateList }}</td>
+				<td [title]="rowData.paymentTerm">{{ rowData.paymentTerm }}</td>
+				<td [title]="rowData.paymentDate">{{ rowData.paymentDate }}</td>
+				<td [title]="rowData.ratio ? rowData.ratio + '%' : '' ">
+					{{ rowData.ratio ? rowData.ratio + '%' : '' }}</td>
+				<td class="align-right"
+					[title]="rowData.amount | currencyMask">{{ rowData.amount |currencyMask}}</td>
+				<td [title]="rowData.note">{{ rowData.note }}</td>
+				<td [title]="rowData.piCode">
+					<a [routerLink]="['../../../../purchase-invoice/list/view/', rowData.piId]"
+					   target="_blank">
+						{{ rowData.piCode }}
+					</a>
+				</td>
+				<td class="action">
+					<button mat-icon-button
+							[matMenuTriggerFor]="menu"
+							matTooltip="More actions">
+						<mat-icon>more_vert</mat-icon>
+					</button>
+					<mat-menu #menu="matMenu">
+						<button mat-menu-item
+								(click)="onBtnEditClick(rowData)"
+								[disabled]="viewMode">
+							<span>{{ 'COMMON.EDIT' | translate}}</span>
+						</button>
+						<button mat-menu-item
+								(click)="onBtnDeleteClick(rowData)"
+								[disabled]="viewMode">
+							<span>{{ 'COMMON.DELETE' | translate}}</span>
+						</button>
+					</mat-menu>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+	<div *ngIf="dataSource.items && dataSource.items.length === 0">
+		<view-empty></view-empty>
+	</div>
+</div>
+<!-- [purchaseInvoiceData]="purchaseInvoiceData" -->
+<app-purchase-order-payment-dialog *ngIf="isShowPaymentDialog"
+								   [paymentTermData]="paymentTermData"
+								   [dialogRef]="dialogRef"
+								   (success)="onSuccess($event)"></app-purchase-order-payment-dialog>

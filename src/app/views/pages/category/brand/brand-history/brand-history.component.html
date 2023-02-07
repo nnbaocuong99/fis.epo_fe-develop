@@ -1,0 +1,85 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '60%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'SUPPLIER.VIEW_HISTORY' | translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row kt-margin-b-15">
+                <div class="col-md-6">
+                </div>
+                <div class="col-md-6">
+                    <div class="mat-table__bottom">
+                        <mat-spinner [diameter]="20"
+                                     *ngIf="brandHistoryService.isLoading$ | async"></mat-spinner>
+                        <mat-paginator #paginator
+                                       [pageSize]="10"
+                                       [length]="dataSource.paginatorTotal"
+                                       [showFirstLastButtons]="true"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+            <div class="mat-table__wrapper">
+                <p-table [value]="dataSource.items"
+                         tableStyleClass="table-no-wrap">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th *ngFor="let header of headers"
+                                [width]="header.width"
+                                [ngClass]="header.class"
+                                class="align-center header-height">{{ header.title | translate }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex">
+                        <tr>
+                            <td [title]="request.pageSize * request.pageIndex + rowIndex + 1">
+                                {{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+                            </td>
+                            <td [title]="rowData.type">
+                                {{ (rowData.actionType | label:arrActionType) | translate }}
+                            </td>
+                            <td [title]="rowData.creatorName">
+                                {{ rowData.creatorName }}
+                            </td>
+                            <td [title]="rowData.createdAt | date: mainConfig.formatFullDate">
+                                {{ rowData.createdAt | date: mainConfig.formatFullDate }}
+                            </td>
+                            <td [title]="rowData.unitOrigin">
+                                <div class="action align-center">
+                                    <button [title]="'COMMON.DETAILS' | translate"
+                                            mat-icon-button
+                                            matTooltip="More actions"
+                                            (click)="onBtnShowDialogDetailsClick(rowData)">
+                                        <span class="material-icons"> remove_red_eye </span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">{{
+            'COMMON.CLOSE' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>
+<app-brand-history-view-details #appBrandHistoryViewDetails></app-brand-history-view-details>

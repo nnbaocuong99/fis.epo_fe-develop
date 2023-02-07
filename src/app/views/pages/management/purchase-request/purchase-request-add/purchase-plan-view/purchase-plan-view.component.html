@@ -1,0 +1,128 @@
+<p-dialog appendTo="body"
+          [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [maximizable]="true"
+          [style]="{width: '80vw'}"
+          [styleClass]="!dialogRef.isVisible ? 'dialog-hide': ''"
+          [baseZIndex]="1000"
+          [draggable]="false"
+          [resizable]="false"
+          (onShow)="onDlgShow()"
+          (onHide)="onDlgHide()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'PURCHASE_PLAN.HEADER_VIEW'| translate }}
+    </p-header>
+    <h5 class="kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{ 'PURCHASE_PLAN.GENERAL_INFO'| translate }}
+    </h5>
+    <table class="table table-no-wrap">
+        <tbody>
+            <tr>
+                <td [width]="100">{{ 'PURCHASE_PLAN.CODE'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.code }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.PROJECT_CODE'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.projectCode }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.CONTRACT_NO'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.contractNo }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.CONTRACT_TYPE'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.contractType }}</b></td>
+            </tr>
+            <tr>
+                <td [width]="100">{{ 'PURCHASE_PLAN.CONTRACT_DESCRIPTION'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.contractDescription }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.CUSTOMER'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.customer }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.AM_ACCOUNT'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.amAccount }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.PM_ACCOUNT'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.pmAccount }}</b></td>
+            </tr>
+            <tr>
+                <td [width]="100">{{ 'PURCHASE_PLAN.CEO_COO'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.ceoCoo }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.SIGN_DATE'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.signDate | date: mainConfig.formatDateList }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.END_DATE'| translate }}:</td>
+                <td [width]="200"><b>{{ purchasePlan?.endDate | date: mainConfig.formatDateList }}</b></td>
+                <td [width]="100">{{ 'PURCHASE_PLAN.NOTE'| translate }}:</td>
+                <td [width]="200"
+                    title="{{ purchasePlan?.note }}"><b>{{ purchasePlan?.note }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td [width]="100">{{ 'COMMON.ATTACH_FILE'| translate }}:</td>
+                <td [width]="200"
+                    class="btn-link"
+                    style="cursor: pointer;"
+                    (click)="onBtnDownloadClick()"><b>{{ fileInfo?.name }}</b></td>
+                <td [width]="100">{{ 'CO'| translate }}:</td>
+                <td [width]="200"
+                    title="{{purchasePlan?.hasCo ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}">
+                    <b>{{ purchasePlan?.hasCo ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                </td>
+                <td [width]="100">{{ 'CQ'| translate }}:</td>
+                <td [width]="200"
+                    title="{{purchasePlan?.hasCq ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}">
+                    <b>{{ purchasePlan?.hasCq ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <h5 class="kt-margin-b-15">
+        <i class="fal fa-list-ul"></i> {{ 'PURCHASE_PLAN.ITEM_INFO'| translate }}
+    </h5>
+    <div>
+        <table class="table table-bordered">
+            <thead>
+                <th *ngFor="let col of cols"
+                    [width]="col.width"
+                    class="wrap-text align-top">{{ col.title | translate }}<span class="lbl-required"
+                          *ngIf="col.isRequired"></span>
+                </th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let rowData of purchasePlanItem">
+                    <td [title]="rowData.indexNo">{{rowData.indexNo}}</td>
+                    <td [title]="rowData.itemCode">{{rowData.itemCode}}</td>
+                    <td [title]="rowData.partNo">{{rowData.partNo}}</td>
+                    <td [title]="rowData.itemName">{{rowData.itemName}}</td>
+                    <td [title]="rowData.itemType">{{rowData.itemType}}</td>
+                    <td [title]="rowData.quantity">{{rowData.quantity}}</td>
+                    <td [title]="rowData.unit">{{rowData.unit}}</td>
+                    <td [title]="rowData.currency">{{rowData.currency}}</td>
+                    <td [title]="rowData.expectedPrice | currencyMask"
+                        class="align-right">{{rowData.expectedPrice | currencyMask}}</td>
+                    <td [title]="(rowData.expectedPrice * rowData.quantity) | currencyMask"
+                        class="align-right">
+                        {{(rowData.expectedPrice * rowData.quantity) | currencyMask}}
+                    </td>
+                    <td [title]=" rowData.expectedDate | date: mainConfig.formatDateList ">
+                        {{ rowData.expectedDate | date: mainConfig.formatDateList }}
+                    </td>
+                    <td [title]="rowData.supplierName">{{rowData.supplierName}}</td>
+                    <td [title]="rowData.producerName">{{rowData.producerName}}</td>
+                    <td [title]="rowData.guarantee">{{rowData.guarantee}}</td>
+                    <td [title]="rowData.deliveryLocation">{{rowData.deliveryLocation}}</td>
+                    <td [title]="rowData.note">{{rowData.note}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <label>{{ 'PURCHASE_PLAN.ITEM.SUM_EXPECTED_AMOUNT' | translate }}</label>
+            <div class="table-responsive">
+                <table class="table table-auto-width">
+                    <tr *ngFor="let item of totalBom; let i = index">
+                        <td class="transparent align-right">{{ item.key }}:</td>
+                        <td class="align-right"
+                            [title]="item.count | currencyMask"><b>{{ item.count | currencyMask }}</b></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</p-dialog>

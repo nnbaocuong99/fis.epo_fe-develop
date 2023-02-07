@@ -1,0 +1,24 @@
+::ng-deep {
+    .p-tree {
+        border: none;
+    }
+}
+
+.border-p-tree {
+    border: 1px solid #dee2e6;
+    background: #fff;
+    color: #495057;
+    border-radius: 3px;
+}
+
+.header_text {
+    font-size: 20px;
+    padding-top: 0.65rem;
+}
+
+.header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}

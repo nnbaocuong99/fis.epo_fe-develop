@@ -1,0 +1,16 @@
+<p-confirmDialog #cd
+                 header="Confirmation"
+                 appendTo="body"
+                 [baseZIndex]="10001"
+                 [key]="key"
+                 position="top">
+    <p-footer>
+        <button #accept
+                class="btn btn-sm btn-success"
+                type="button"
+                (click)="cd.accept()">{{ 'COMMON.ACCEPT' | translate }}</button>
+        <button class="btn btn-sm btn-secondary"
+                type="button"
+                (click)="cd.reject()">{{ 'COMMON.REJECT' | translate }}</button>
+    </p-footer>
+</p-confirmDialog>

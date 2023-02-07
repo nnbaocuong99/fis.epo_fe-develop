@@ -1,0 +1,126 @@
+<crud-dialog [dialogRef]="dialogRef"
+             (save)="onBtnSaveClick()"
+             (delete)="onBtnDeleteClick()"
+             (cancel)="onBtnCancelClick()"
+             [hideBtnSave]="showViewInfoSyncErp">
+
+    <p-table *ngIf="!showViewInfoSyncErp"
+             [value]="dataSource.items"
+             tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let header of headers"
+                    [width]="header.width"
+                    [ngClass]="header.class">{{ header.title | translate }}</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr [pEditableRow]="rowData">
+                <td [title]="rowIndex + 1">
+                    {{ rowIndex + 1 }} </td>
+                <td [title]="rowData.PoCode"> {{ rowData.PoCode }} </td>
+                <td [title]="rowData.PoCodePushErp"> {{ rowData.PoCodePushErp }} </td>
+                <td [title]="rowData.PoDescription">
+                    <input type="text"
+                           class="form-control"
+                           [(ngModel)]="rowData.PoDescriptionStep2"
+                           [ngClass]="{'invalid': rowData.isPoDescriptionStep2Valid}"
+                           (focusout)="checkValidate()">
+                </td>
+                <td *ngIf="type == 'invoice'"
+                    pEditableColumn
+                    [title]="rowData.ReceiptNumberDomain">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="text"
+                                   [(ngModel)]="rowData.ReceiptNumberDomain"
+                                   (ngModelChange)="onRowEditReceiptNumberDomain(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.ReceiptNumber}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td *ngIf="type == 'shipment'"
+                    [title]="rowData.ReceiptNumber">
+                    {{rowData.ReceiptNumber}}
+                </td>
+                <td [title]="rowData.ReceiptDateStep2">
+                    <input type="date"
+                           class="form-control background-word"
+                           [value]="rowData.ReceiptDateStep2 | date:'yyyy-MM-dd'"
+                           (input)="rowData.ReceiptDateStep2=parseDate($event.target.value)"
+                           [ngClass]="{'invalid': rowData.isReceiptDateStep2Valid}"
+                           (focusout)="checkValidate()"
+                           (change)="onChangeReceiptDate($event.target.value, rowIndex)">
+                </td>
+                <td [title]="currency"> {{ currency }} </td>
+                <td [title]="rowData.ExchangeRate">
+                    <span *ngIf="type == 'invoice'">
+                        <exchange-rate class="background-word"
+                                       name="exchangeRateType"
+                                       bindValue="type"
+                                       [(ngModel)]="rowData.ExchangeRate"
+                                       [exchangeRateData]="rowData.ExchangeRateData"
+                                       (change)="onChangeExchangeRate($event, rowData)"
+                                       [disabled]="currency === 'VND'">
+                        </exchange-rate>
+                    </span>
+                    <span *ngIf="type == 'shipment'">
+                        {{rowData.ExchangeRate}}
+                    </span>
+                </td>
+                <td [title]="rowData.ExchangeRateValue">
+                    <span *ngIf="type == 'invoice'">
+                        <input type="number"
+                               min="0"
+                               class="form-control"
+                               [(ngModel)]="rowData.ExchangeRateValue"
+                               [ngClass]="{'invalid': rowData.isExchangeRateValueValid}"
+                               (focusout)="checkValidate()"
+                               [disabled]="true">
+                    </span>
+                    <span *ngIf="type == 'shipment'">
+                        {{rowData.ExchangeRateValue}}
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-table *ngIf="showViewInfoSyncErp"
+             [value]="receiptStep2Data.items"
+             tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let header of headers"
+                    [width]="header.width"
+                    [ngClass]="header.class">{{ header.title | translate }}</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr [pEditableRow]="rowData">
+                <td [title]="rowIndex + 1">
+                    {{ rowIndex + 1 }} </td>
+                <td [title]="rowData.poCode"> {{ rowData.poCode }} </td>
+                <td [title]="rowData.poCodePushErp">{{ rowData.poCodePushErp }}</td>
+                <td [title]="rowData.poDescriptionStep2">{{ rowData.poDescriptionStep2 }}</td>
+                <td [title]="rowData.receiptNumber">{{rowData.receiptNumber}}</td>
+                <td [title]="rowData.receiptDateStep2 | date: mainConfig.formatDateList">
+                    <span class="background-word">
+                        {{rowData.receiptDateStep2 | date: mainConfig.formatDateList}}
+                    </span>
+                </td>
+                <td [title]="rowData.currency"> {{ rowData.currency }} </td>
+                <td [title]="rowData.exchangeRate">{{rowData.exchangeRate}}</td>
+                <td class="align-right"
+                    [title]="rowData.exchangeRateValue | currencyMask">{{rowData.exchangeRateValue | currencyMask}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</crud-dialog>

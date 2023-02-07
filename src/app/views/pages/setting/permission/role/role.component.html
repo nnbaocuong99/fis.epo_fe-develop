@@ -1,0 +1,91 @@
+<div class="row">
+
+    <div class="col-md-5">
+        <kt-portlet>
+            <kt-portlet-header [title]="'COMMON.ROLE' | translate"
+                               [class]="'kt-portlet__head--lg'"
+                               [viewLoading$]="roleService.isLoading$">
+                <ng-container ktPortletTools>
+                    <button class="btn btn-primary"
+                            color="primary"
+                            (click)="onBtnEditClick()"
+                            matTooltip="Create new User">{{
+                        'COMMON.CRUD.ADD' | translate }}</button>
+                </ng-container>
+            </kt-portlet-header>
+
+            <kt-portlet-body>
+                <div class="row">
+                    <div class="col-md-4">
+                        <mat-form-field class="input-general-filter">
+                            <input matInput
+                                   #searchInput
+                                   (keydown.enter)="initData()"
+                                   [(ngModel)]="request.name"
+                                   placeholder="Search ..."
+                                   class="mat-form-field mat-form-field-fluid">
+                            <mat-hint align="start">
+                                <!-- <strong>Search in all fields</strong> -->
+                            </mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-8">
+                        <mat-paginator [pageSize]="10"
+                                       [length]="dataSource.paginatorTotal"
+                                       [pageSizeOptions]="[10, 30, 50]"
+                                       [showFirstLastButtons]="true"></mat-paginator>
+                    </div>
+                </div>
+                <div class="mat-table__wrapper">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th *ngFor="let header of headers"
+                                    [width]="header.width">{{ header.title | translate }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let rowData of dataSource.items; index as i;">
+                                <td>{{ i + 1 }}</td>
+                                <td class="header-link"
+                                    (click)="onBtnEditClick(rowData)">{{ rowData.name }}</td>
+                                <td>{{ rowData.code }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </kt-portlet-body>
+        </kt-portlet>
+    </div>
+    <div class="col-md-7">
+        <kt-portlet>
+            <kt-portlet-header [title]="'COMMON.DETAILS' | translate"
+                               [class]="'kt-portlet__head--lg'"
+                               [viewLoading$]="roleService.isLoading$">
+            </kt-portlet-header>
+
+            <kt-portlet-body>
+                <div *ngIf="dialogRef.isDisplay">
+                    <app-role-details #dlgEdit
+                                      [dialogRef]="dialogRef"
+                                      (success)="onSuccess($event)"
+                                      [userDialogRef]="userDialogRef">
+                    </app-role-details>
+                </div>
+                <div *ngIf="!dialogRef.isDisplay">
+                    <div style="padding-top:1.5rem; font-weight: 200;">
+                        <h6 style="padding-top: 0.75rem; font-size: 1.25rem; font-weight: 200;"><i
+                               class="fal fa-exclamation-triangle"> </i> Please select a role to view
+                            operations</h6>
+                    </div>
+                </div>
+            </kt-portlet-body>
+        </kt-portlet>
+
+    </div>
+</div>
+<!-- 
+<app-role-edit #dlgEdit [dialogRef]="dialogRef" (success)="onSuccess($event)"
+[userDialogRef]="userDialogRef">
+</app-role-edit> -->

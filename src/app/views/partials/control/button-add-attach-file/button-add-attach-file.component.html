@@ -1,0 +1,76 @@
+<span (click)="dialogRef.show()">
+    <ng-content></ng-content>
+</span>
+
+<input #file
+       id="{{ controlId }}"
+       name="input-file"
+       style="display:none"
+       class="form-control"
+       (change)="onFilesInputChanged(file.files)"
+       type="file"
+       [multiple]="multiple">
+
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [style]="{width: '391px', minWidth: '200px'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="newFile = {}; form.form.reset()">
+    <p-header>
+        <i class="fab fa-dropbox"></i> {{ 'Upload file to server' }}
+    </p-header>
+    <form id="{{ formId }}"
+          #form="ngForm">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label class="lbl-required">File</label>
+                    <div class="input-group">
+                        <input name="file"
+                               type="text"
+                               [title]="newFile.name"
+                               [(ngModel)]="newFile.name"
+                               (click)="onInputNameFileClick()"
+                               readonly
+                               required
+                               validateTooltip
+                               [validateForm]="form"
+                               class="form-control">
+                        <div class="input-group-append"
+                             (click)="clickControlInputFile()">
+                            <label class="input-group-text input-group-right attach-button"
+                                   id="control-upload"
+                                   for="input-file">
+                                <i class="fal fa-ellipsis-v"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label [ngClass]="{'lbl-required' :isRequired}">Note</label>
+                    <textarea name="note"
+                              type="text"
+                              [required]="isRequired"
+                              class="form-control"
+                              validateTooltip
+                              [validateForm]="form"
+                              [(ngModel)]="newFile.note"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+    <p-footer>
+        <button class="btn btn-sm btn-secondary mr-2"
+                (click)="onBtnCancelClick()">Cancel</button>
+        <button class="btn btn-sm btn-success"
+                (click)="onBtnPerformClick(form)">Attach file</button>
+    </p-footer>
+</p-dialog>

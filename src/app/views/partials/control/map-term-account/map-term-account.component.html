@@ -1,0 +1,175 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [style]="{width: '80%', minWidth: '50%'}"
+          [maximizable]="true"
+          [draggable]="true"
+          [baseZIndex]="9000"
+          appendTo="body"
+          [autoZIndex]="true"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'SYNC_ERP.MAP_TERM_ACCOUNT' | translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row kt-margin-b-15">
+                <div class="col-md-6">
+                    <button class="btn btn-sm btn-success ml-3 mt-3"
+                            title="{{ 'COMMON.CRUD.ADD' | translate }}"
+                            (click)="onBtnShowDialogListClickFromRow()">
+                        {{ 'COMMON.CRUD.ADD' | translate }}
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <div class="mat-table__bottom">
+                        <mat-spinner [diameter]="20"
+                                     *ngIf="configListService.isLoading$ | async"></mat-spinner>
+                        <mat-paginator #paginator
+                                       [pageSize]="5"
+                                       [length]="dataSource.paginatorTotal"
+                                       [showFirstLastButtons]="true"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+            <div class="mat-table__wrapper">
+                <p-table [value]="dataSource.items"
+                         tableStyleClass="table-no-wrap"
+                         selectionMode="single"
+                         [(selection)]="termAccountSelected"
+                         dataKey="id">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th *ngFor="let header of headers"
+                                [width]="header.width"
+                                [ngClass]="header.class"
+                                class="align-center header-height">{{ header.title | translate }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex">
+                        <tr>
+                            <td [title]="request.pageSize * request.pageIndex + rowIndex + 1">
+                                <p-tableRadioButton [value]="rowData"></p-tableRadioButton>
+                                <span style="margin-left: 10px;">
+                                    {{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+                                </span>
+                            </td>
+                            <td [title]="rowData.code">
+                                {{ rowData.code }}
+                            </td>
+                            <td [title]="rowData.name">
+                                {{ rowData.name }}
+                            </td>
+                            <td [title]="rowData.attr1">
+                                {{ (rowData.attr1 | label:company) | translate }}
+                            </td>
+                            <td [title]="rowData.createdAt | date: mainConfig.formatFullDate">
+                                {{ rowData.createdAt | date: mainConfig.formatFullDate }}
+                            </td>
+                            <td [title]="rowData.unitOrigin">
+                                <div class="action align-center">
+                                    <button [title]="'COMMON.EDIT' | translate"
+                                            mat-icon-button
+                                            matTooltip="More actions"
+                                            (click)="onBtnEditClick(rowData)">
+                                        <span class="material-icons"> edit </span>
+                                    </button>
+                                    <button [title]="'COMMON.DELETE' | translate"
+                                            mat-icon-button
+                                            matTooltip="More actions"
+                                            (click)="onBtnDeleteClick(rowData.id)">
+                                        <span class="material-icons"> clear </span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mat-table__bottom"
+         style="margin-top: 15px;">
+        <button class="btn btn-primary ml-3"
+                title="{{ 'COMMON.CHOOSE' | translate }}"
+                (click)="onBtnSaveClick()">
+            {{ 'COMMON.CHOOSE' | translate }}
+        </button>
+        <button class="btn btn-secondary ml-3"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="close()">
+            {{ 'COMMON.CANCEL' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>
+
+
+<p-dialog [(visible)]="dialogRefAdd.isDisplay"
+          [modal]="true"
+          [style]="{width: '35%', minWidth: '35%'}"
+          [maximizable]="true"
+          [draggable]="true"
+          [baseZIndex]="9000"
+          appendTo="body"
+          [autoZIndex]="true"
+          (onHide)="closeFormRow()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'SYNC_ERP.MAP_TERM_ACCOUNT' | translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form autocomplete="off"
+                  #form="ngForm"
+                  id="id-term-account">
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label>{{ 'Tài khoản định khoản' | translate }}</label>
+                        <select-term-account name="code"
+                                             placeholder="{{ 'Tài khoản định khoản' | translate }}"
+                                             [ouId]="ouId"
+                                             [(ngModel)]="dialogRefAdd.input.code"
+                                             [required]="true">
+                        </select-term-account>
+                        <validate-message [form]="form"
+                                          controlName="code"></validate-message>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>{{ 'Loại' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="name"
+                               placeholder="{{ 'Loại' | translate }}"
+                               [(ngModel)]="dialogRefAdd.input.name"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="name"></validate-message>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="mt-3">
+            <button class="btn btn-primary ml-3"
+                    title="{{ 'COMMON.SAVE' | translate }}"
+                    (click)="onBtnSaveClickFromRow()">
+                {{ 'COMMON.SAVE' | translate }}
+            </button>
+            <button class="btn btn-secondary ml-3"
+                    title="{{ 'COMMON.CLOSE' | translate }}"
+                    (click)="closeFormRow()">
+                {{ 'COMMON.CLOSE' | translate }}
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

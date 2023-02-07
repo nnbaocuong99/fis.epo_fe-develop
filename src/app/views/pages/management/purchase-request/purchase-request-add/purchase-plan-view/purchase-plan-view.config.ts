@@ -1,0 +1,18 @@
+export const HEADER_ITEM = [
+    { width: '50px', title: 'COMMON.NO' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.ITEM_CODE' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.PART_NO' },
+    { width: '200px', title: 'PURCHASE_PLAN.ITEM.ITEM_NAME', isRequired: 'true' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.ITEM_TYPE' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.QUANTITY', isRequired: 'true' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.UNIT' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.CURRENCY', isRequired: 'true' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.EXPECTED_PRICE', isRequired: 'true' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.PRICE' },
+    { width: '150px', title: 'PURCHASE_PLAN.ITEM.EXPECTED_DATE', isRequired: 'true' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.SUPPLIER_NAME' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.PRODUCER_NAME' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.GUARANTEE' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' },
+    { width: '100px', title: 'PURCHASE_PLAN.ITEM.NOTE' },
+];

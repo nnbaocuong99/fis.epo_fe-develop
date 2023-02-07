@@ -1,0 +1,183 @@
+<div class="row">
+    <div class="col-lg-6">
+        <kt-portlet>
+            <kt-portlet-header [title]="formTitle | translate"
+                               [class]="'kt-portlet__head--lg'"
+                               [viewLoading$]="orgChartService.isLoading$">
+                <ng-container ktPortletTools>
+                    <button class="btn btn-primary"
+                            color="primary"
+                            (click)="addOrgChart()">{{ 'COMMON.CRUD.ADD' | translate }}</button>
+                </ng-container>
+            </kt-portlet-header>
+
+            <kt-portlet-body>
+                <p-treeTable [value]="treeData"
+                             [columns]="cols"
+                             [scrollable]="true"
+                             selectionMode="single"
+                             [(selection)]="selectedOrg"
+                             (onNodeSelect)="onNodeSelect($event)"
+                             (onNodeUnselect)="onNodeUnselect()"
+                             dataKey="id"
+                             scrollHeight="800px">
+                    <ng-template pTemplate="colgroup"
+                                 let-columns>
+                        <colgroup>
+                            <col *ngFor="let col of columns"
+                                 [style.width]="col.width">
+                            <col [style.width]="'75px'">
+                        </colgroup>
+                    </ng-template>
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr>
+                            <th *ngFor="let col of columns">{{ col.header | translate }}</th>
+                            <th>
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowNode
+                                 let-rowData="rowData">
+                        <tr [ttRow]="rowNode"
+                            [ttSelectableRow]="rowNode">
+                            <td>
+                                <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                                <i [ngClass]="'fas fa-folder folder-explorer'"></i>
+                                {{ rowData?.orgCode }}
+                            </td>
+                            <td [title]="rowData?.orgName">{{ rowData?.orgName }}</td>
+                            <td class="td-button align-center">
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-treeTable>
+            </kt-portlet-body>
+        </kt-portlet>
+    </div>
+    <div class="col-lg-6">
+        <form autocomplete="off"
+              #form="ngForm"
+              id="{{formData.formId}}">
+            <form-dynamic [formData]="formData"
+                          [form]="form"
+                          (save)="onBtnSaveClick()"
+                          (cancel)="onBtnCancelClick()">
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.CODE' | translate }}</label>
+                        <validate-message [form]="form"
+                                          controlName="orgCode"></validate-message>
+                        <input type="text"
+                               class="form-control"
+                               name="orgCode"
+                               placeholder="{{ 'ORG_CHART.CODE' | translate }}"
+                               [(ngModel)]="orgChartData.orgCode"
+                               required>
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.NAME' | translate }}</label>
+                        <validate-message [form]="form"
+                                          controlName="orgName"></validate-message>
+                        <input type="text"
+                               class="form-control"
+                               name="orgName"
+                               placeholder="{{ 'ORG_CHART.NAME' | translate }}"
+                               [(ngModel)]="orgChartData.orgName"
+                               required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label class="lbl-required">{{ 'ORG_CHART.PARENT' | translate }}</label>
+                        <ng-select-async name="parentId"
+                                         bindLabel="orgCode"
+                                         placeholder="{{ 'ORG_CHART.PARENT' | translate }}"
+                                         suffixLabel="orgName"
+                                         [multiple]="false"
+                                         [service]="orgChartService"
+                                         (change)="orgChartData.parentId = orgChartData.parentIdDto?.id"
+                                         [(ngModel)]="orgChartData.parentIdDto">
+                        </ng-select-async>
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.LOCATION' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="location"
+                               placeholder="{{ 'ORG_CHART.LOCATION' | translate }}"
+                               [(ngModel)]="orgChartData.location">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.TEL' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="tel"
+                               placeholder="{{ 'ORG_CHART.TEL' | translate }}"
+                               [(ngModel)]="orgChartData.tel">
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.FAX' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="fax"
+                               placeholder="{{ 'ORG_CHART.FAX' | translate }}"
+                               [(ngModel)]="orgChartData.fax">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.EMAIL' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="email"
+                               placeholder="{{ 'ORG_CHART.EMAIL' | translate }}"
+                               [(ngModel)]="orgChartData.email">
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.WEBSITE' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="website"
+                               placeholder="{{ 'ORG_CHART.WEBSITE' | translate }}"
+                               [(ngModel)]="orgChartData.website">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.OPENING_DATE' | translate }}</label>
+                        <input type="date"
+                               class="form-control"
+                               name="openingDate"
+                               placeholder="{{ 'ORG_CHART.OPENING_DATE' | translate }}"
+                               [ngModel]="orgChartData.openingDate | date:mainConfig.formatDate"
+                               (blur)="orgChartData.openingDate=$event.target.value">
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.CLOSING_DATE' | translate }}</label>
+                        <input type="date"
+                               class="form-control"
+                               name="closingDate"
+                               placeholder="{{ 'ORG_CHART.CLOSING_DATE' | translate }}"
+                               [ngModel]="orgChartData.closingDate | date:mainConfig.formatDate"
+                               (blur)="orgChartData.closingDate=$event.target.value">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label>{{ 'ORG_CHART.IS_ACTIVE' | translate }}</label>
+                        <div>
+                            <p-inputSwitch name="status"
+                                           [ngModel]="orgChartData.isActive"
+                                           (ngModelChange)="orgChartData.isActive = $event ? 1 : 0">
+                            </p-inputSwitch>
+                        </div>
+                    </div>
+                </div>
+            </form-dynamic>
+        </form>
+    </div>
+</div>

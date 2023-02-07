@@ -1,0 +1,134 @@
+<h5 *ngIf="formTitle">- {{ formTitle | translate }}</h5>
+<button *ngIf="isEditMode"
+		class="btn btn-label-success btn-sm float-right mb-3"
+		(click)="onBtnMergeFileCategoryClick(form)">
+	{{'COMMON.SAVE' | translate}}</button>
+<button *ngIf="isEditMode"
+		class="btn btn-label-dark btn-sm float-right mb-3 mr-3"
+		(click)="isEditMode = false; newLine = {}">
+	{{'COMMON.CANCEL_CUSTOM' | translate}}</button>
+<button *ngIf="!isEditMode && !viewMode"
+		class="btn btn-label-brand btn-sm float-right mb-3"
+		(click)="isEditMode = true">
+	{{'COMMON.CUSTOM' | translate}}</button>
+<div class="table-responsive kt-margin-b-15">
+	<form id="file_attach"
+		  #form="ngForm">
+		<p-treeTable class="table-no-wrap"
+					 [value]="files"
+					 [columns]="headersTree">
+			<ng-template pTemplate="header"
+						 let-columns>
+				<tr>
+					<th *ngFor="let col of columns; let i = index"
+						[width]="col.width">
+						{{ col.title | translate }}
+					</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowNode
+						 let-rowData="rowData">
+				<tr>
+					<td (mouseover)="rowData.isShowTool = true"
+						(mouseout)="rowData.isShowTool = false">
+						<p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+						<i title="Delete"
+						   *ngIf="isEditMode && !rowData.isDefault && rowData.parent && isDelete"
+						   (click)="onBtnDeleteFileCategoryClick(rowData.id)"
+						   class="fas fa-minus-circle btn-tool-attach mr-1 text-danger"></i>
+						<i
+						   [ngClass]="rowData.parent ? 'fas fa-folder folder-explorer mr-1' : 'fas fa-file-alt file-icon mr-1'"></i>
+						<span class="mr-1">{{ rowData.name }}</span>
+						<span *ngIf="rowNode.node.children?.length"
+							  class="badge badge-pill badge-secondary">{{ rowNode.node.children?.length }}</span>
+						<button-add-attach-file *ngIf="!viewMode"
+												module="{{fileModule}}\{{rowData.configListId ? rowData.configListId : rowData.id}}"
+												(uploaded)="uploaded($event)"
+												[isRequired]="isRequired"
+												[multiple]="multiple">
+							<i title="Attach file"
+							   (mouseover)="rowData.isShowTool = true"
+							   [style.display]="rowData.isShowTool && rowData.parent ? 'inherit' : 'none'"
+							   class="fal fa-paperclip btn-tool-attach float-right"></i>
+						</button-add-attach-file>
+						<app-dialog-view-pdf-file *ngIf="!rowData.parent"
+												  [file]="rowData"
+												  [style.display]="rowData.isShowTool ? '' : 'none'">
+						</app-dialog-view-pdf-file>
+						<i title="Delete file"
+						   *ngIf="!viewMode && isDelete"
+						   (mouseover)="rowData.isShowTool = true"
+						   (click)="onBtnDeleteFileClick(rowData.id)"
+						   [style.display]="rowData.isShowTool && !rowData.parent ? 'inherit' : 'none'"
+						   class="fal fa-trash-alt btn-tool-attach float-right mr-3 mt-1"></i>
+						<i title="Download file"
+						   (mouseover)="rowData.isShowTool = true"
+						   (click)="onBtnDownloadFile(rowData.id, rowData.name)"
+						   class="fal fa-arrow-to-bottom btn-tool-attach float-right mr-3 mt-1"
+						   [style.display]="rowData.isShowTool && !rowData.parent ? 'inherit' : 'none'"></i>
+					</td>
+					<td *ngIf="isEditMode"
+						class="td-no-padding align-center">
+						<mat-checkbox *ngIf="rowData.parent"
+									  name="newLineIsRequired{{!rowData.configListId ? rowData.id : rowData.configListId}}"
+									  (ngModelChange)="onChangRequiredStatus(rowData, $event)"
+									  [ngModel]="rowData.isRequired"
+									  [color]="'primary'">
+						</mat-checkbox>
+						<span *ngIf="!rowData.parent">-</span>
+					</td>
+					<td *ngIf="!isEditMode">
+						{{ rowData.parent ? (rowData.isRequired ? 'Bắt buộc' : 'Tùy chọn') : '-' }}
+					</td>
+					<td>
+						{{ !rowNode.node.children?.length ? 'Chưa đính kèm' : 'Đã đính kèm' }}
+					</td>
+					<td>
+						<i *ngIf="!rowData.isDefault && rowData.parent"
+						   title="Danh sách tùy chọn của người dùng"
+						   class="fal fa-user-cog"></i> {{ rowData.note }}
+					</td>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<tr *ngIf="isEditMode">
+					<td class="editable">
+						<input class="form-control"
+							   name="newLineName"
+							   type="text"
+							   required
+							   placeholder="Vui lòng nhập tên loại hồ sơ"
+							   [(ngModel)]="newLine.name">
+					</td>
+					<td class="td-no-padding align-center">
+						<mat-checkbox name="newLineIsRequired"
+									  (ngModelChange)="newLine.isRequired = $event"
+									  [ngModel]="newLine.isRequired"
+									  [color]="'primary'">
+						</mat-checkbox>
+					</td>
+					<td class="td-no-padding">Đang tạo</td>
+					<td class="editable">
+						<input name="newLineNote"
+							   class="form-control"
+							   type="text"
+							   required
+							   placeholder="Ghi chú"
+							   [(ngModel)]="newLine.note">
+					</td>
+				</tr>
+				<tr *ngIf="isShowBtnToggleView()">
+					<td colspan="4"
+						class="view-more">
+						<span class="link"
+							  (click)="onBtnToggleViewClick()">
+							<i [ngClass]="isShownAll ? 'fal fa-chevron-double-left' : 'fal fa-chevron-double-right'">
+							</i>
+							{{ isShownAll ? "Hide" : 'View more' }}</span>
+					</td>
+				</tr>
+			</ng-template>
+		</p-treeTable>
+	</form>
+</div>

@@ -1,0 +1,397 @@
+<crud-dialog [dialogRef]="dialogRef"
+			 [form]="form"
+			 (save)="onBtnSaveClick()">
+	<h5 (click)="isHidePoItem = !isHidePoItem"
+		class="header-link"><i class="fas fa-angle-right"
+		   [ngClass]="{'hide': !isHidePoItem}"></i><i [ngClass]="{'hide': isHidePoItem}"
+		   class="fas fa-angle-down"></i>
+		Thông tin mặt hàng từ đơn hàng
+	</h5><br>
+	<div [ngClass]="{'hide': isHidePoItem}">
+		<p-table [value]="dialogRef.input.rowData"
+				 dataKey="id"
+				 [columns]="headers"
+				 tableStyleClass="table-no-wrap-match"
+				 [frozenColumns]="frozenCols"
+				 [scrollable]="true"
+				 scrollHeight="200px"
+				 frozenWidth="100px">
+			<ng-template pTemplate="colgroup"
+						 let-columns>
+				<colgroup>
+					<col *ngFor="let col of columns"
+						 style="width:300px">
+				</colgroup>
+			</ng-template>
+			<ng-template pTemplate="header"
+						 let-columns>
+				<tr>
+					<th *ngFor="let col of columns"
+						[width]="col.width">{{ col.title | translate }}
+					</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowData
+						 let-columns="columns"
+						 let-rowIndex="rowIndex">
+				<!-- Hiển thị cho đơn hàng nội -->
+				<tr *ngIf="dialogRef.input.isInternal">
+					<td *ngFor="let col of columns; let i = index"
+						class="table-no-wrap-match"
+						[ngClass]="{'align-right': (i === 5 || i === 6)}">
+						<div style="height: 35px;">
+							<span *ngIf="i !== 2 && i !== 5 && i !== 6 && i !== 7 && i !== 9"
+								  title="{{rowData[col.field]}}">{{rowData[col.field]}}</span>
+							<span *ngIf="i === 2"
+								  title="{{rowData[col.field]}}">
+								{{rowData[col.field]}} <mat-checkbox name="itemType"
+											  *ngIf="rowData.itemType === 'SRV'"
+											  class="example-margin"
+											  [(ngModel)]="rowData.isUpdateSrv"
+											  disabled
+											  [color]="'primary'">
+								</mat-checkbox></span>
+							<span *ngIf="i === 5"
+								  title="{{  rowData.price | currencyMask }}">
+								{{ rowData.price | currencyMask }}</span>
+							<span *ngIf="i === 6"
+								  title="{{ (rowData.quantity * rowData.price)?(rowData.quantity * rowData.price | currencyMask): 0 }}">
+								{{ (rowData.quantity * rowData.price)?(rowData.quantity * rowData.price | currencyMask):
+								0}}</span>
+							<span *ngIf="i === 7"
+								  title="{{ rowData.responseDate | date: mainConfig.formatDateList }}">
+								{{ rowData.responseDate | date: mainConfig.formatDateList }}</span>
+							<span *ngIf="i === 9"
+								  title="{{ rowData.expectedDate | date: mainConfig.formatDateList }}">
+								{{ rowData.expectedDate | date: mainConfig.formatDateList }}</span>
+						</div>
+					</td>
+				</tr>
+				<!-- Hiển thị cho đơn hàng ngoại -->
+				<tr *ngIf="!dialogRef.input.isInternal">
+					<td *ngFor="let col of columns; let i = index"
+						class="table-no-wrap-match"
+						[ngClass]="{'align-right': (i === 5 || i === 6)}">
+						<div style="height: 35px;">
+							<span *ngIf="i !== 2 && i !== 5 && i !== 6 && i !== 7 && i !== 8 && i !== 9 && i !== 10"
+								  title="{{rowData[col.field]}}">{{rowData[col.field]}}</span>
+							<span *ngIf="i === 2"
+								  title="{{rowData[col.field]}}">
+								{{rowData[col.field]}} <mat-checkbox name="itemType"
+											  *ngIf="rowData.itemType === 'SRV'"
+											  class="example-margin"
+											  [(ngModel)]="rowData.isUpdateSrv"
+											  disabled
+											  [color]="'primary'">
+								</mat-checkbox></span>
+							<span *ngIf="i === 5"
+								  title="{{  rowData.price | currencyMask }}">
+								{{ rowData.price | currencyMask }}</span>
+							<span *ngIf="i === 6"
+								  title="{{ (rowData.quantity * rowData.price)?(rowData.quantity * rowData.price | currencyMask): 0 }}">
+								{{ (rowData.quantity * rowData.price)?(rowData.quantity * rowData.price | currencyMask):
+								0}}</span>
+							<span *ngIf="i === 7"
+								  title="{{ rowData.responseDate | date: mainConfig.formatDateList }}">
+								{{ rowData.responseDate | date: mainConfig.formatDateList }}</span>
+							<span *ngIf="i === 8"
+								  title="{{ (rowData.hasImportLicense ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO') | translate}}">
+								{{ (rowData.hasImportLicense ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO') | translate}}
+							</span>
+							<span *ngIf="i === 9"
+								  title="{{ (rowData.isConformity ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO') | translate}}">
+								{{ (rowData.isConformity ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO') | translate}}
+							</span>
+							<span *ngIf="i === 10"
+								  title="{{ (rowData.hasEnergyEfficiency ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO') | translate}}">
+								{{ (rowData.hasEnergyEfficiency ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO') |
+								translate}}
+							</span>
+						</div>
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	</div>
+	<br>
+	<h5 class="header-link"> Thông tin mặt hàng từ yêu cầu mua hàng </h5>
+	<br>
+	<form autocomplete="off"
+		  #formSearch="ngForm">
+		<div class="form-row">
+			<div class="col-md-2 mb-3">
+				<label>{{ 'Mã yêu cầu mua hàng' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="prNo"
+					   placeholder="Mã yêu cầu mua hàng"
+					   [(ngModel)]="request.prNo">
+			</div>
+			<div class="col-md-2 mb-3">
+				<label>{{ 'Part Number' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="partNo"
+					   placeholder="{{ 'PURCHASE_REQUEST.ITEM.PART_NO' | translate }}"
+					   [(ngModel)]="requestItems.partNo">
+			</div>
+			<div class="col-md-2 mb-3">
+				<label>{{ 'Mã hàng hóa/ dịch vụ' | translate }}</label>
+				<ng-select-async name="itemCode"
+								 categoryType="item"
+								 bindLabel="code"
+								 suffixLabel="name"
+								 placeholder="{{ 'PURCHASE_REQUEST.ITEM.ITEM_CODE' | translate }}"
+								 [multiple]="false"
+								 [closeOnSelect]="true"
+								 [service]="itemService"
+								 (change)="requestItems.itemCode=requestItems.itemCodeDto.code"
+								 [(ngModel)]="requestItems.itemCodeDto">
+				</ng-select-async>
+			</div>
+			<div class="col-md-2 mb-3">
+				<label>{{ 'Tên hàng' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="itemName"
+					   placeholder="{{ 'PURCHASE_REQUEST.ITEM.NAME' | translate }}"
+					   [(ngModel)]="requestItems.itemName">
+			</div>
+			<div class="col-md-2 mb-3">
+				<label>{{ 'Loại hàng' | translate }}</label>
+				<ng-select [items]="itemTypes"
+						   bindLabel="label"
+						   bindValue="label"
+						   name="itemType"
+						   placeholder="{{ 'PURCHASE_REQUEST.ITEM.TYPE' | translate }}"
+						   [(ngModel)]="requestItems.itemType">
+				</ng-select>
+			</div>
+		</div>
+		<div class="form-row">
+			<button type="submit"
+					class="btn btn-sm btn-label-brand ml-2"
+					(click)="loadNodes()">
+				{{ 'COMMON.SEARCH' | translate }}
+			</button>
+			<button type="reset"
+					(click)="onBtnResetSearchClick()"
+					class="btn btn-sm btn-label-brand ml-2">
+				{{ 'COMMON.RESET' | translate }}
+			</button>
+		</div>
+	</form>
+	<br>
+	<div class="row kt-margin-b-15">
+		<div class="col-md-6">
+			<mat-form-field class="input-general-filter">
+				<input matInput
+					   #searchInput
+					   (keydown.enter)="loadNodes()"
+					   [(ngModel)]="request.generalFilter"
+					   placeholder="Search ..."
+					   class="mat-form-field mat-form-field-fluid">
+				<mat-hint align="start">
+				</mat-hint>
+			</mat-form-field>
+		</div>
+	</div>
+	<div class="mat-table__wrapper">
+		<p-treeTable class="table-no-wrap"
+					 [value]="dataSource.items"
+					 [columns]="cols"
+					 [paginator]="true"
+					 [rows]="10"
+					 [lazy]="true"
+					 (onLazyLoad)="loadNodes($event)"
+					 [totalRecords]="dataSource.paginatorTotal"
+					 [loading]="false"
+					 selectionMode="checkbox"
+					 [(selection)]="selectedPurchaseRequestItems">
+			<ng-template pTemplate="header"
+						 let-columns>
+				<tr>
+					<th width="50px"
+						class="action"></th>
+					<th *ngFor="let col of columns; let i = index"
+						[width]="col.width">
+						{{col.title | translate }}
+					</th>
+				</tr>
+				<!-- <tr>
+					<th width="50px"></th>
+					<th>
+						<button mat-menu-item
+								(click)="loadNodes()">
+							<i class="fas fa-search"></i> {{ 'COMMON.SEARCH' | translate }}
+						</button>
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="partNo"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.PART_NO' | translate }}"
+							   [(ngModel)]="requestItems.partNo">
+					</th>
+					<th>
+						<ng-select-async name="itemCode"
+										 categoryType="item"
+										 bindLabel="code"
+										 suffixLabel="name"
+										 placeholder="{{ 'PURCHASE_REQUEST.ITEM.ITEM_CODE' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="itemService"
+										 (change)="requestItems.itemCode=requestItems.itemCodeDto.code"
+										 [(ngModel)]="requestItems.itemCodeDto">
+						</ng-select-async>
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="itemName"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.NAME' | translate }}"
+							   [(ngModel)]="requestItems.itemName">
+					</th>
+					<th>
+						<ng-select [items]="itemTypes"
+								   bindLabel="label"
+								   bindValue="label"
+								   name="itemType"
+								   placeholder="{{ 'PURCHASE_REQUEST.ITEM.TYPE' | translate }}"
+								   [(ngModel)]="requestItems.itemType">
+						</ng-select>
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="uom"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.UOM' | translate }}"
+							   [(ngModel)]="requestItems.unit">
+					</th>
+					<th>
+						<ng-select-async name="currency"
+										 bindLabel="name"
+										 suffixLabel=""
+										 placeholder="{{'PURCHASE_REQUEST.ITEM.CURRENCY'| translate}}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="currencyService"
+										 (change)="requestItems.currency = requestItems.currencyDto?.name"
+										 [(ngModel)]="requestItems.currencyDto">
+						</ng-select-async>
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="quantity"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.QUANTITY' | translate }}"
+							   [(ngModel)]="requestItems.quantity">
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="expectedPrice"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.EXPECTED_PRICE' | translate }}"
+							   [(ngModel)]="requestItems.expectedPrice">
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="intoMoney"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.INTO_MONEY' | translate }}"
+							   [(ngModel)]="requestItems.intoMoney"
+							   disabled>
+					</th>
+					<th>
+						<input-date name="expectedDate"
+									[(ngModel)]="requestItems.expectedDate">
+						</input-date>
+					</th>
+					<th>
+						<ng-select-async name="vendorId"
+										 bindLabel="name"
+                                         suffixLabel="code"
+                                         searchField="generalFilter"
+										 placeholder="{{ 'PURCHASE_REQUEST.ITEM.SUPPLIER_NAME' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="supplierService"
+										 (change)="onChangeSupplier($event)"
+										 [(ngModel)]="requestItems.vendorIdDto">
+						</ng-select-async>
+					</th>
+					<th>
+						<config-list-control name="producerName"
+											 type="PRODUCER_NAME"
+											 [hasEdit]="false"
+											 [items]="configListDataProducerName"
+											 header="{{ 'PURCHASE_REQUEST.ITEM.PRODUCER_NAME' | translate }}"
+											 [(ngModel)]="requestItems.producerName">
+						</config-list-control>
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="guarantee"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.GUARANTEE' | translate }}"
+							   [(ngModel)]="requestItems.guarantee">
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="deliveryLocation"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.DELIVERY_LOCATION' | translate }}"
+							   [(ngModel)]="requestItems.deliveryLocation">
+					</th>
+					<th>
+						<input type="text"
+							   class="form-control"
+							   name="note"
+							   placeholder="{{ 'PURCHASE_REQUEST.ITEM.NOTE' | translate }}"
+							   [(ngModel)]="requestItems.note">
+					</th>
+				</tr> -->
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowNode
+						 let-rowData="rowData"
+						 let-columns="columns">
+				<tr *ngIf="rowData.itemName"
+					[ttRow]="rowNode"
+					[ttSelectableRow]="rowNode">
+					<td
+						[ngClass]="{'matched': (rowData.matchedId || rowData.classifyStatus), 'un-matched': (!rowData.matchedId && !rowData.classifyStatus)}">
+						<p-treeTableCheckbox [value]="rowNode"
+											 *ngIf="(!rowData.matchedId && !rowData.classifyStatus)">
+						</p-treeTableCheckbox>
+					</td>
+					<td [title]="i == 11 ? (rowData[col.field] | date: mainConfig.formatDate) : rowData[col.field]"
+						*ngFor="let col of columns; let i = index"
+						[ngClass]="{'align-right': (i == 8 || i == 9)}">
+						<p-treeTableToggler [rowNode]="rowNode"
+											*ngIf="i == 0"></p-treeTableToggler>
+						<span *ngIf="i == 11">{{ rowData[col.field] | date: mainConfig.formatDate }}</span>
+						<span *ngIf="i == 9">{{ rowData[col.field] | currencyMask }}</span>
+						<span *ngIf="i == 10">{{ (rowData.quantity * rowData.expectedPrice) | currencyMask }}</span>
+						<span *ngIf="i != 9 && i != 10 && i != 11">{{rowData[col.field]}}</span>
+					</td>
+				</tr>
+				<tr *ngIf="!rowData.itemName">
+					<td
+						[ngClass]="{'matched': !rowData.isShowCheckBoxParentItems, 'un-matched': rowData.isShowCheckBoxParentItems}">
+						<p-treeTableCheckbox [value]="rowNode"
+											 *ngIf="rowData.isShowCheckBoxParentItems"></p-treeTableCheckbox>
+					</td>
+					<td colspan="17">
+						<p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+						<i class="fas fa-folder folder-explorer"></i>&nbsp;<b>{{ rowData.prNo }}</b>&nbsp;<span
+							  class="total-item">({{rowData.numberItems}}
+							item(s))</span>
+					</td>
+				</tr>
+			</ng-template>
+		</p-treeTable>
+	</div>
+</crud-dialog>

@@ -1,0 +1,124 @@
+<div class="mat-table__wrapper">
+    <p-treeTable class="table-no-wrap"
+                 [value]="dataSource.items"
+                 [columns]="headerItemsFollow"
+                 [loading]="false">
+        <ng-template pTemplate="header"
+                     let-columns>
+            <tr>
+                <th *ngFor="let col of headerItemsFollow; index as i"
+                    [width]="col.width">
+                    {{ col.title | translate }}
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowNode
+                     let-rowData="rowData"
+                     let-columns="columns">
+            <tr>
+                <td>
+                    <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                    {{rowData.indexNo}}
+                </td>
+                <td height="100px"
+                    title="{{ rowData.partNo }}">{{ rowData.partNo }}</td>
+                <td title="{{ rowData.itemCode }}">{{ rowData.itemCode }}</td>
+                <td title="{{ rowData.itemName }}">{{ rowData.itemName }}</td>
+                <td title="{{ rowData.itemType }}">{{ rowData.itemType }}
+                    <mat-checkbox name="itemType"
+                                  *ngIf="rowData.itemType === 'SRV'"
+                                  class="example-margin"
+                                  [checked]="rowData.isUpdateSrv === true"
+                                  [disabled]="true"
+                                  [color]="'primary'">
+                    </mat-checkbox>
+                </td>
+                <td>
+                    <span *ngIf="!rowNode.parent">{{ rowData.poCodeParent }}</span>
+                    <a *ngIf="rowNode.parent"
+                       [routerLink]="['../../../../purchase-order/list/view/', rowData.poId]"
+                       target="_blank">
+                        {{ rowData.poCode }}</a>
+                </td>
+                <td [title]="rowData.ipoNumber">{{ rowData.ipoNumber }}</td>
+                <td>
+                    <span *ngIf="!rowNode.parent">{{ rowData.piCodeParent }}</span>
+                    <span *ngIf="rowNode.parent">
+                        <a *ngFor="let pii of rowData.listPii"
+                           [routerLink]="['../../../../purchase-invoice/list/view/', pii.piId]"
+                           target="_blank">
+                            {{ pii.piCode }}</a> <br>
+                    </span>
+                </td>
+
+                <td>
+                    <span *ngIf="!rowNode.parent">{{ rowData.waybillNumberParent }}</span>
+                    <span *ngIf="rowNode.parent">
+                        <a *ngFor="let si of rowData.listSi"
+                           [routerLink]="['../../../../shipment/list/view/', si.shipmentId]"
+                           target="_blank">
+                            {{ si.waybillNumber }}</a> <br>
+                    </span>
+                </td>
+
+                <td>
+                    <span *ngIf="rowNode.parent">
+                        <p *ngFor="let si of rowData.listSi">
+                            {{ (si.importStatus | label: statusImportGoods) | translate}}
+                        </p> <br>
+                        <span *ngIf="!rowData.listSi || rowData.listSi.length === 0">
+                            <p *ngFor="let pii of rowData.listPii">
+                                {{ (pii.importStatus | label: statusImportGoods) | translate}}
+                            </p> <br>
+                        </span>
+                    </span>
+                </td>
+
+                <td>
+                    <span>{{ rowData.quantity }}</span>
+                </td>
+
+                <td>
+                    <span *ngIf="!rowNode.parent">{{ rowData.countQuantityPo }}</span>
+                    <span *ngIf="rowNode.parent">{{ rowData.countQuantityPo }}</span>
+                </td>
+
+                <td>
+                    <span *ngIf="!rowNode.parent">{{ rowData.countQuantityPi }}</span>
+                    <span *ngIf="rowNode.parent">{{ rowData.countQuantityPi }}</span>
+                </td>
+
+                <td>
+                    <span>{{ rowData.quantityRemain }}</span>
+                </td>
+
+                <td>
+                    <ng-container *ngIf="allowViewPrice">
+                        <span *ngIf="!rowNode.parent">
+                            {{ rowData.expectedPrice | currencyMask }}
+                        </span>
+                        <span *ngIf="rowNode.parent">{{ rowData.price | currencyMask }}</span>
+                    </ng-container>
+                </td>
+
+                <td>
+                    <ng-container *ngIf="allowViewPrice">
+                        <span *ngIf="!rowNode.parent">
+                            {{ (rowData.quantity * rowData.expectedPrice) ?
+                            (rowData.quantity * rowData.expectedPrice | currencyMask) : 0 }}
+                        </span>
+                        <span *ngIf="rowNode.parent">
+                            {{ (rowData.quantity * rowData.price) ?
+                            (rowData.quantity * rowData.price | currencyMask) : 0 }}
+                        </span>
+                    </ng-container>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-treeTable>
+    <div *ngIf="dataSource.items && dataSource.items.length === 0">
+        <view-empty></view-empty>
+    </div>
+</div>

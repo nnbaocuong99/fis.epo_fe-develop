@@ -1,0 +1,138 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-calendar-alt"
+                       [title]="formTitle | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="importGoodsService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel">
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+                    <h5>Lọc dữ liệu</h5>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label>{{ 'IMPORT_GOODS.WAYBILL_NUMBER_INVOICE' | translate }}</label>
+                            <select class="form-control"
+                                    name="type"
+                                    [(ngModel)]="request.type">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option>
+                                <option *ngFor="let item of importTypes"
+                                        [value]="item.value">{{ item.label | translate }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>{{ 'IMPORT_GOODS.WAYBILL_NUMBER_INVOICE_NUMBER' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="code"
+                                   placeholder="{{ 'IMPORT_GOODS.WAYBILL_NUMBER_INVOICE_NUMBER' | translate }}"
+                                   [(ngModel)]="request.code">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label>{{ 'IMPORT_GOODS.STATUS' | translate }}</label>
+                            <select class="form-control"
+                                    name="importStatus"
+                                    [(ngModel)]="request.importStatus">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option>
+                                <option *ngFor="let item of importStatusFilter"
+                                        [ngValue]="item.value">
+                                    {{ item.label | translate }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>{{ 'IMPORT_GOODS.STATUS_SYNC' | translate }}</label>
+                            <select class="form-control"
+                                    name="elimStatus"
+                                    [(ngModel)]="request.elimStatus">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option>
+                                <option *ngFor="let item of elimStatus"
+                                        [ngValue]="isArray(item.value) ? 1 : item.value">
+                                    {{ item.label | translate }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row mt-1">
+                        <button type="submit"
+                                (click)="getData()"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate }}</button>
+                    </div>
+                </form>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="importGoodsService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator [pageSize]="10"
+                                   [pageSizeOptions]="[10, 30, 50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     tableStyleClass="table-no-wrap"
+                     [(selection)]="dataSource.items">
+                <ng-template pTemplate="header">
+                    <tr *ngFor="let row of headers"
+                        class="background-table-header">
+                        <th *ngFor="let col of row"
+                            [rowSpan]="col.rowSpan ? col.rowSpan : 1"
+                            [colSpan]="col.colSpan ? col.colSpan : 1"
+                            [style.width]="col.width"
+                            class="table-no-wrap">
+                            {{ col.header | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr>
+                        <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                            {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.code">{{ rowData.code }}</td>
+                        <td [title]="(rowData.importStatus | label:importStatus) | translate">
+                            {{ (rowData.importStatus | label:importStatus) | translate }}</td>
+                        <td [title]="rowData.importDate | date: globalConfig.formatDateList">
+                            <span class="background-word">{{ rowData.importDate | date: globalConfig.formatDateList
+                                }}</span>
+                        </td>
+                        <td [title]="rowData.importUser">{{ rowData.importUser }}</td>
+                        <td [title]="(rowData.elimStatus | label:elimStatus) | translate">{{ (rowData.elimStatus |
+                            label:elimStatus) | translate }}
+                        </td>
+                        <td [title]="rowData.elimDate | date: globalConfig.formatDateList">
+                            <span class="background-word">{{ rowData.elimDate | date: globalConfig.formatDateList
+                                }}</span>
+                        </td>
+                        <td [title]="rowData.elimUser">{{ rowData.elimUser }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

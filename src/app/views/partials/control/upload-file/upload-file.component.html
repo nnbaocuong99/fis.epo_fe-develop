@@ -1,0 +1,74 @@
+<p-dialog [(visible)]="isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '782px', minWidth: '200px'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fab fa-dropbox"></i> {{ multiple ? 'Upload multiple files' : 'Upload single file' }}
+    </p-header>
+    <div style="height: 340px"
+         (dblclick)="btnAdd.click(); preventSelectText();"
+         (dragover)="onDragOverAndEnter($event)"
+         (dragenter)="onDragOverAndEnter($event)"
+         (drop)="onDropFile($event)">
+        <label id="dropContainer"
+               *ngIf="tableFile.length === 0"
+               class="upload-container"
+               for="file-upload">
+            <div class="square-dotted-border">
+                <div class="add-icon-large"></div>
+            </div>
+        </label>
+        <input #file
+               type="file"
+               multiple
+               (change)="onFilesInputChanged(file.files)"
+               id="file-upload"
+               style="display:none"
+               [accept]="accept" />
+        <table *ngIf="tableFile.length > 0"
+               class="table table-hover table-upload">
+            <tr *ngFor="let file of tableFile; index as i">
+                <td [ngClass]="checkOverwrite(file) ? 'line-through' : ''"
+                    [style.width]="'100px'"
+                    class="td-small"><i class="fas fa-file"></i> {{ file.name }}</td>
+                <td [style.width]="'20px'"
+                    class="align-right">{{ getVolume(file.size) }}</td>
+                <td [style.width]="'20px'"
+                    class="align-right">{{ file.file ? 'Queued' : 'Uploaded' }}</td>
+                <td [style.width]="'20px'"
+                    class="align-right">
+                    <i *ngIf="file.id"
+                       class="fas fa-arrow-alt-to-bottom btn-icon"
+                       (click)="onBtnDownloadFile(file)"></i>
+                    <i *ngIf="file.delete === undefined || file.delete == null || file.delete === true"
+                       class="fas fa-trash-alt btn-icon mr-md"
+                       (click)="deleteFileAttached(file)"></i></td>
+            </tr>
+        </table>
+    </div>
+    <p-footer>
+        <div style="text-align: left;">
+            <small>{{ tableFile.length }} files — {{ getVolume(getSummary(tableFile, 'size')) }}</small><br>
+            <small style="color: red">{{  message }}</small>
+        </div>
+        <label #btnAdd
+               for="file-upload"
+               class="btn default mr-r-md"
+               style="float: left;"><i class="fas fa-layer-plus"></i> Add file</label>
+        <button type="button"
+                class="btn default"
+                (click)="clearFilesAttached()"
+                style="float: left;"><i class="fas fa-eraser"></i> Clear</button>
+        <button class="btn default btn-outline sbold uppercase"
+                (click)="close()">Cancel</button>
+        <button class="btn green-haze btn-outline sbold uppercase"
+                [disabled]="disabledUpload()"
+                (click)="onupload.emit(tableFile)">Upload</button>
+    </p-footer>
+</p-dialog>

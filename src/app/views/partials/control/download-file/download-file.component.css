@@ -1,0 +1,7 @@
+.table-download-hover td  {
+    border: none;
+}
+
+.table-download-hover tr:hover {
+    background: #ebf5ff;
+}

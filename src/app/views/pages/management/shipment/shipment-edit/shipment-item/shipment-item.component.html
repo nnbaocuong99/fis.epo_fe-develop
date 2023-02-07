@@ -1,0 +1,306 @@
+<div class="table-responsive">
+    <p-treeTable #treeTable
+                 [value]="shipmentItemData?.items"
+                 dataKey="id"
+                 [rows]="10"
+                 [paginator]="editTable"
+                 [rowsPerPageOptions]="[10,25,50]"
+                 editMode="row"
+                 tableStyleClass="table-no-wrap"
+                 [columns]="headerTableItem"
+                 [frozenColumns]="frozenCols"
+                 [scrollable]="true"
+                 scrollHeight="500px"
+                 frozenWidth="900px"
+                 [(contextMenuSelection)]="selectedNode"
+                 [contextMenu]="btnContextMenu"
+                 selectionMode="checkbox"
+                 [(selection)]="selectedShipmentItems">
+        <ng-template pTemplate="colgroup"
+                     let-columns>
+            <colgroup>
+                <ng-container *ngFor="let col of columns">
+                    <col *ngIf="col.field !== 'action'"
+                         [ngStyle]="{width: col.width}"
+                         class="align-center">
+                    <col *ngIf="editTable && col.field === 'action'"
+                         [ngStyle]="{width: col.width}"
+                         class="align-center">
+                </ng-container>
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header"
+                     let-columns>
+            <tr>
+                <th *ngFor="let col of columns; let i = index"
+                    [width]="col.width"
+                    class="table-no-wrap align-center header-height"
+                    [ngClass]="col.class">
+                    <span *ngIf="col.field !== 'action'">
+                        {{ col.header | translate }}<span *ngIf="col.isRequired"
+                        class='lbl-required'></span>
+                        <button *ngIf="col.field === 'itemCode' && editTable"
+                                title="Map item code"
+                                class="btn btn"
+                                style="color: #2196F3; padding: 0 0 3px 5px; font-size: 16px;"
+                                (click)="onMapItemFromErp()">
+                            <i class="far fa-sync-alt"></i>
+                        </button>
+                        <button *ngIf="col.field === 'termAccount' && editTable"
+                                title="Map term account"
+                                class="btn btn"
+                                style="color: #2196F3; padding: 0 0 3px 5px; font-size: 16px;"
+                                (click)="onMapTermAccount()">
+                            <i class="far fa-sync-alt"></i>
+                        </button>
+                    </span>
+                    <span *ngIf="editTable && col.field === 'action'">
+                        {{ col.header | translate }}
+                    </span>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowNode
+                     let-rowData="rowData"
+                     let-columns="columns">
+            <tr [ttContextMenuRow]="rowNode"
+                [ttContextMenuRowDisabled]="!editTable"
+                (click)="clickTrTable(rowData)">
+                <td [title]="rowData.itemType">
+                    <div class="wrap-text-grid-item">
+                        <select *ngIf="editTable && rowData.isShowEditRow"
+                                class="form-control"
+                                name="{{ 'itemType' + rowData.indexNo }}"
+                                [(ngModel)]="rowData.itemType"
+                                (change)="onRowEditInit(rowData)">
+                            <!-- <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option> -->
+                            <option *ngFor="let item of itemTypes"
+                                    [value]="item.label">{{item.label | translate }}</option>
+                        </select>
+                        <span *ngIf="!editTable || !rowData.isShowEditRow">
+                            {{rowData.itemType === 'SRV' ? (rowData.itemType + ' ') : rowData.itemType}}
+                        </span>
+                        <mat-checkbox name="{{ 'isUpdateSrv' + rowData.indexNo }}"
+                                      *ngIf="rowData.itemType === 'SRV'"
+                                      class="example-margin"
+                                      (change)="onChangeisUpdateSrv(rowData, $event)"
+                                      [(ngModel)]="rowData.isUpdateSrv"
+                                      [disabled]="!editTable"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </div>
+                </td>
+
+                <td [title]="rowData.note">
+                    <div class="wrap-text-grid-item">
+                        <input *ngIf="editTable && rowData.isShowEditRow"
+                               name="{{ 'note' + rowData.indexNo }}"
+                               pInputText
+                               type="text"
+                               [(ngModel)]="rowData.note"
+                               (change)="onRowEditInit(rowData)">
+                        <span *ngIf="!editTable || !rowData.isShowEditRow">
+                            {{rowData.note}}</span>
+                    </div>
+                </td>
+
+                <td [title]="rowData.unit">
+                    <div class="wrap-text-grid-item">
+                        {{ rowData.unit }}
+                    </div>
+                </td>
+
+                <td [title]="rowData.quantity">
+                    <div class="wrap-text-grid-item">
+                        {{rowData.quantity}}
+                    </div>
+                </td>
+
+                <td [title]="rowData.price | currencyMask">
+                    <div class="wrap-text-grid-item align-right">
+                        <span>{{rowData.price | currencyMask}}</span>
+                    </div>
+                </td>
+
+                <td [title]="rowData.totalAmount | currencyMask">
+                    <div class="wrap-text-grid-item align-right">
+                        {{ (rowData.quantity == null || rowData.price == null) ? "": rowData.quantity * rowData.price |
+                        currencyMask}}
+                    </div>
+                </td>
+
+                <td [title]="rowData.itemOrigin">
+                    <div class="wrap-text-grid-item">
+                        <ng-select [items]="configListDataItemOrigin"
+                                   name="{{ 'itemOrigin' + rowData.indexNo }}"
+                                   *ngIf="editTable && rowData.isShowEditRow"
+                                   bindLabel="name"
+                                   bindValue="name"
+                                   appendTo="body"
+                                   (change)="onChangeItemOrigin($event, rowData)"
+                                   placeholder="{{ 'SHIPMENT.ITEM.ORINGIN' | translate }}"
+                                   [ngModel]="rowData.itemOrigin"
+                                   required>
+                        </ng-select>
+                        <span *ngIf="!editTable || !rowData.isShowEditRow"> {{rowData.itemOrigin}} </span>
+                    </div>
+                </td>
+
+                <td [title]="rowData.orgCode">
+                    <div class="wrap-text-grid-item">
+                        {{ rowData.orgCode }}
+                    </div>
+                </td>
+
+                <td [title]="rowData.termAccount">
+                    <div class="wrap-text-grid-item">
+                        <select-term-account *ngIf="editTable && rowData.isShowEditRow"
+                                             name="{{ 'termAccount' + rowData.indexNo }}"
+                                             placeholder="{{ 'SHIPMENT.ITEM.TERM_ACCOUNT' | translate }}"
+                                             [(ngModel)]="rowData.termAccount"
+                                             [ouId]="rowData.ouCode"
+                                             (change)="onRowEditInit(rowData)"></select-term-account>
+                        <span *ngIf="!editTable || !rowData.isShowEditRow"> {{rowData.termAccount}} </span>
+                    </div>
+                </td>
+
+                <td [title]="rowData.projectMilestone">
+                    <div class="wrap-text-grid-item">
+                        <select-project-milestone *ngIf="editTable && rowData.isShowEditRow"
+                                                  name="{{ 'projectMilestone' + rowData.indexNo }}"
+                                                  [projectCode]="rowData.projectCode"
+                                                  placeholder="Project Milestone"
+                                                  [(ngModel)]="rowData.projectMilestone"
+                                                  (change)="onRowEditInit(rowData)"></select-project-milestone>
+                        <span *ngIf="!editTable || !rowData.isShowEditRow"> {{rowData.projectMilestone}} </span>
+                    </div>
+                </td>
+
+                <td *ngIf="editTable ">
+                    <div class="wrap-text-grid-item action align-center">
+                        <button mat-icon-button
+                                [matMenuTriggerFor]="menu"
+                                matTooltip="More actions">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item
+                                    (click)="onBtnDeleteTreeRowClick(rowData)">
+                                <span>{{ 'COMMON.DELETE' | translate}}</span>
+                            </button>
+                        </mat-menu>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="frozenbody"
+                     let-rowNode
+                     let-rowData="rowData">
+            <tr [ttContextMenuRow]="rowNode"
+                [ttContextMenuRowDisabled]="!editTable"
+                [ngClass]="{'not-allow-hover': !editTable}"
+                style="height: 100px"
+                (click)="clickTrTable(rowData)">
+
+                <td [title]="rowData.indexNo">
+                    <div class="wrap-text-grid-item align-center">
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                        <p-treeTableCheckbox [value]="rowNode"
+                                             *ngIf="selectionMode"></p-treeTableCheckbox>
+                        {{rowData.indexNo}}
+                    </div>
+                </td>
+
+                <td [title]="rowData.projectCode">
+                    <div class="wrap-text-grid-item">
+                        {{rowData.projectCode}}
+                    </div>
+                </td>
+
+                <td [title]="rowData.poCode">
+                    <div class="wrap-text-grid-item">
+                        <a [routerLink]="['../../../../purchase-order/list/view/', rowData.poId]"
+                           target="_blank">
+                            {{ rowData.poCode }}</a>
+                    </div>
+                </td>
+
+                <td [title]="rowData.piCode">
+                    <div class="wrap-text-grid-item">
+                        <a [routerLink]="['../../../../purchase-invoice/list/view/', rowData.piId]"
+                           target="_blank">
+                            {{ rowData.piCode }}</a>
+                    </div>
+                </td>
+
+                <td [title]="rowData.itemCode">
+                    <div class="wrap-text-grid-item">
+                        <select-sync-source *ngIf="editTable && rowData.isShowEditRow"
+                                            name="{{ 'itemCode' + rowData.indexNo }}"
+                                            categoryType="item"
+                                            placeholder="PURCHASE_PLAN.ITEM.ITEM_CODE"
+                                            header="MENU.CATEGORY.ITEM"
+                                            bindValue="code"
+                                            categoryType="item"
+                                            [columns]="headerItems"
+                                            [width]="'70vw'"
+                                            [service]="itemService"
+                                            [requestPayload]="itemRequestPayload"
+                                            (change)="onChangeItemCode($event, rowData)"
+                                            [(ngModel)]="rowData.itemCode"
+                                            [disabled]="!editTable"
+                                            [isOnTable]="true">
+                        </select-sync-source>
+                        <span *ngIf="!editTable || !rowData.isShowEditRow">{{rowData.itemCode}}</span>
+                    </div>
+                </td>
+
+                <td [title]="rowData.partNo">
+                    <div class="wrap-text-grid-item">
+                        <input *ngIf="editTable && rowData.isShowEditRow"
+                               pInputText
+                               type="text"
+                               name="{{ 'partNo' + rowData.indexNo }}"
+                               [(ngModel)]="rowData.partNo"
+                               (change)="onRowEditInit(rowData)">
+                        <span *ngIf="!editTable || !rowData.isShowEditRow">{{rowData.partNo}}</span>
+                    </div>
+                </td>
+
+                <td [title]="rowData.itemName">
+                    <div class="wrap-text-grid-item">
+                        <span>{{rowData.itemName}}</span>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer"
+                     let-columns>
+            <tr *ngIf="shipmentItemData.items?.length > 0">
+                <td *ngFor="let col of columns">
+                    <div *ngIf="col.field === 'indexNo'"
+                         class="p-text-right">{{ 'COMMON.TOTAL' | translate }}</div>
+                    <div *ngIf="col.field === 'quantity'"
+                         [title]="quantityTotal">{{quantityTotal}}</div>
+                    <div *ngIf="col.field === 'intoMoney'"
+                         class="align-right"
+                         [title]="priceTotal | currencyMask">{{priceTotal | currencyMask}}</div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-treeTable>
+</div>
+
+<app-map-item-code-tree #mapItemCode
+                        (change)="changeSourceItem($event)"></app-map-item-code-tree>
+
+<app-map-term-account #mapTermAccount
+                      (change)="changeMapTermAccount($event)"></app-map-term-account>
+<!-- MENU -->
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

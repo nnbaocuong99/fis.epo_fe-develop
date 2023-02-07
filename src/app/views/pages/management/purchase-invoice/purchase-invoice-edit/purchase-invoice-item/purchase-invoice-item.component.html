@@ -1,0 +1,949 @@
+<form #formPii="ngForm"
+      id="purchase-invoice-item">
+    <div class="table-responsive"
+         *ngIf="purchaseInvoiceData && isShowTreeTable">
+        <p-treeTable #t1
+                     [value]="purchaseInvoiceItemsData.items"
+                     dataKey="id"
+                     [rows]="10"
+                     [paginator]="editTable"
+                     [showCurrentPageReport]="true"
+                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                     [rowsPerPageOptions]="[10,25,50]"
+                     tableStyleClass="table-no-wrap"
+                     [globalFilterFields]="listFilter"
+                     [columns]="header"
+                     [frozenColumns]="frozenCols"
+                     [scrollable]="true"
+                     scrollHeight="10000px"
+                     frozenWidth="900px"
+                     [(contextMenuSelection)]="selectedNode"
+                     [contextMenu]="btnContextMenu"
+                     selectionMode="checkbox"
+                     [(selection)]="selectedPurchaseInvoiceItems">
+            <ng-template pTemplate="colgroup"
+                         let-columns>
+                <colgroup>
+                    <ng-container *ngFor="let col of columns">
+                        <col *ngIf="col.field !== 'action'"
+                             [ngStyle]="{width: col.width}"
+                             class="align-center">
+                        <col *ngIf="editTable && col.field === 'action'"
+                             [ngStyle]="{width: col.width}"
+                             class="align-center">
+                    </ng-container>
+                </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header"
+                         let-columns>
+                <tr class="background-table-header">
+                    <th *ngFor="let col of columns; let i = index"
+                        [width]="col.width"
+                        class="table-no-wrap align-center header-height"
+                        [ngClass]="col.class">
+                        {{ col.header | translate }}
+                        <span class="lbl-required"
+                              *ngIf="col.isRequired">
+                        </span>
+                        <button *ngIf="col.field === 'itemCode' && editTable"
+                                title="Map item code"
+                                class="btn btn"
+                                style="color: #2196F3; padding: 0 0 3px 5px; font-size: 16px;"
+                                (click)="onMapItemFromErp()">
+                            <i class="far fa-sync-alt"></i>
+                        </button>
+                        <button *ngIf="col.field === 'termAccount' && editTable"
+                                title="Map term account"
+                                class="btn btn"
+                                style="color: #2196F3; padding: 0 0 3px 5px; font-size: 16px;"
+                                (click)="onMapTermAccount()">
+                            <i class="far fa-sync-alt"></i>
+                        </button>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowNode
+                         let-rowData="rowData"
+                         let-columns="columns">
+                <tr [ttContextMenuRow]="rowNode"
+                    [ttContextMenuRowDisabled]="!editTable"
+                    [ngClass]="{'not-allow-hover': !editTable}"
+                    style="height: 100px"
+                    (click)="onRowEditClick(rowData)">
+
+                    <td [title]="rowData.itemType">
+                        <div class="wrap-text-grid-item">
+                            <select *ngIf="rowData.isShowEditRow && editTable"
+                                    class="form-control"
+                                    name="{{ 'itemType' + rowData.indexNo }}"
+                                    [(ngModel)]="rowData.itemType"
+                                    (change)="onRowEditInit(rowData)">
+                                <option *ngFor="let item of itemTypes"
+                                        [value]="item.label">{{item.label | translate }}
+                                </option>
+                            </select>
+                            <span *ngIf="!rowData.isShowEditRow || !editTable">
+                                {{rowData.itemType}}
+                            </span>
+                            <mat-checkbox *ngIf="rowData.itemType === 'SRV'"
+                                          class="example-margin"
+                                          name="{{ 'isUpdateSrv' + rowData.indexNo }}"
+                                          (change)="onChangeisUpdateSrv(rowData, $event)"
+                                          [(ngModel)]="rowData.isUpdateSrv"
+                                          [disabled]="!editTable"
+                                          [color]="'primary'">
+                            </mat-checkbox>
+                        </div>
+                    </td>
+
+                    <!-- <td [title]="rowData.note">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="rowData.isShowEditRow && editTable"
+                                   pInputText
+                                   name="{{ 'note' + rowData.indexNo }}"
+                                   type="text"
+                                   [(ngModel)]="rowData.note"
+                                   (change)="onRowEditInit(rowData)">
+                            <span *ngIf="!rowData.isShowEditRow || !editTable">
+                                {{rowData.note}}
+                            </span>
+                        </div>
+                    </td> -->
+
+                    <td [title]="rowData.unit">
+                        <div class="wrap-text-grid-item">
+                            {{ rowData.unit }}
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.quantity">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="rowData.isShowEditRow && editTable"
+                                   pInputText
+                                   type="number"
+                                   min="0"
+                                   name="{{ 'quantity' + rowData.indexNo }}"
+                                   [(ngModel)]="rowData.quantity"
+                                   (ngModelChange)="onChangeRowEditInitQuatity(rowData)">
+                            <span *ngIf="!rowData.isShowEditRow || !editTable">
+                                {{rowData.quantity}}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.quantitySuggest">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="rowData.isShowEditRow && editTable"
+                                   pInputText
+                                   type="number"
+                                   name="{{ 'quantitySuggest' + rowData.indexNo }}"
+                                   min="0"
+                                   [(ngModel)]="rowData.quantitySuggest"
+                                   (change)="onRowEditInit(rowData)">
+                            <span *ngIf="!rowData.isShowEditRow || !editTable">
+                                {{rowData.quantitySuggest}}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td class="align-right"
+                        *ngIf="(rowData.itemType === 'SRV' && rowData.quantity === 1)"
+                        [title]="rowData.price | currencyMask">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="rowData.isShowEditRow && editTable"
+                                   type="text"
+                                   class="form-control"
+                                   name="{{ 'price' + rowData.indexNo }}"
+                                   numberMask
+                                   validateTooltip
+                                   [validateForm]="form"
+                                   (ngModelChange)="onModelChangePrice($event, rowData)"
+                                   [(ngModel)]="rowData.price"
+                                   placeholder="{{ 'Đơn giá' | translate }}"
+                                   [required]="true">
+                            <span *ngIf="!rowData.isShowEditRow || !editTable">
+                                {{rowData.price | currencyMask}}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.price | currencyMask"
+                        class="align-right "
+                        *ngIf="(rowData.itemType !== 'SRV' || rowData.quantity !== 1)">
+                        <div class="wrap-text-grid-item">
+                            {{rowData.price | currencyMask}}
+                        </div>
+                    </td>
+
+                    <!-- Check nếu là  SW, SRV và số lượng là 1 thì cho sửa số tiền, các TH còn lại không cho sửa số tiền -->
+                    <td [title]="rowData.amount | currencyMask"
+                        class="align-right ">
+                        <div class="wrap-text-grid-item">
+                            {{ rowData.amount | currencyMask}}
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.itemOrigin">
+                        <div class="wrap-text-grid-item">
+                            <ng-select [items]="configListDataItemOrigin"
+                                       name="{{ 'itemOrigin' + rowData.indexNo }}"
+                                       *ngIf="editTable && rowData.isShowEditRow"
+                                       bindLabel="name"
+                                       bindValue="name"
+                                       appendTo="body"
+                                       (change)="onChangeItemOrigin($event, rowData)"
+                                       placeholder="{{ 'Xuất xứ hàng hóa' | translate }}"
+                                       [ngModel]="rowData.itemOrigin">
+                            </ng-select>
+                            <span *ngIf="!editTable || !rowData.isShowEditRow">
+                                {{rowData.itemOrigin}}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.delivery">
+                        <div class="wrap-text-grid-item">
+                            {{ rowData.delivery }}
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.tax">
+                        <div class="wrap-text-grid-item">
+                            <select-sync-source *ngIf="editTable && rowData.isShowEditRow && purchaseInvoiceData.invoiceTypeOnList !== getInvoiceTypeOnListName(listInvoiceTypeOnList, '08')"
+                                                name="{{ 'tax' + rowData.indexNo }}"
+                                                [isOnTable]="true"
+                                                placeholder="Thuế"
+                                                header="Danh sách thuế"
+                                                bindValue="name"
+                                                [width]="'50vw'"
+                                                [columns]="headerTaxCode"
+                                                [service]="taxCodeService"
+                                                [requestPayload]="taxCodeRequestPayload"
+                                                (change)="onChangeTax($event, rowData)"
+                                                [(ngModel)]="rowData.tax"
+                                                validateTooltip
+                                                [validateForm]="formPii"
+                                                [required]="purchaseInvoiceData.invoiceType === 'Purchase Invoice'">
+                            </select-sync-source>
+                            <span *ngIf="!editTable || !rowData.isShowEditRow || purchaseInvoiceData.invoiceTypeOnList === getInvoiceTypeOnListName(listInvoiceTypeOnList, '08')">{{ rowData.tax }}</span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.taxAmount">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="editTable && rowData.isShowEditRow"
+                                   pInputText
+                                   name="{{ 'taxAmount' + rowData.indexNo }}"
+                                   type="number"
+                                   [(ngModel)]="rowData.taxAmount"
+                                   (change)="onChangeTaxAmount(rowData)">
+                            <span *ngIf="!editTable || !rowData.isShowEditRow">{{ rowData.taxAmount }}</span>
+                        </div>
+                    </td>
+
+                    <td *ngIf="purchaseInvoiceData.isShowContractorTax"
+                        [title]="(rowData.taxpayer | label:taxPayers) |translate">
+                        <div class="wrap-text-grid-item">
+                            {{ (rowData.taxpayer | label:taxPayers) |translate }}
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.orgCode">
+                        <div class="wrap-text-grid-item">
+                            {{ rowData.orgCode }}
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.subInventoryName">
+                        <div class="wrap-text-grid-item">
+                            <select-sync-source *ngIf="editTable && rowData.isShowEditRow"
+                                                [isOnTable]="true"
+                                                name="{{ 'subInventory' + rowData.indexNo }}"
+                                                placeholder="Sub Inventory"
+                                                header="MENU.CATEGORY.SUB_INVENTORY"
+                                                bindValue="name"
+                                                [width]="'70vw'"
+                                                [columns]="columnSubInventory"
+                                                [service]="subInventoryService"
+                                                [requestPayload]="{orgCode: rowData.orgCode}"
+                                                [(ngModel)]="rowData.subInventoryName"
+                                                (change)="onChangeSubInventoryCodeTree($event, rowData)">
+                            </select-sync-source>
+                            <span *ngIf="!editTable|| !rowData.isShowEditRow">{{ rowData.subInventoryName }}</span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.termAccount">
+                        <div class="wrap-text-grid-item">
+                            <select-term-account *ngIf="editTable && rowData.isShowEditRow"
+                                                 name="{{ 'termAccount' + rowData.indexNo }}"
+                                                 placeholder="Tài khoản định khoản"
+                                                 (saveFirstRow)="onSaveTermAccount(rowData)"
+                                                 (change)="onRowEditInit(rowData)"
+                                                 [ouId]="rowData.ouCode"
+                                                 [(ngModel)]="rowData.termAccount">
+                            </select-term-account>
+                            <span *ngIf="!editTable || !rowData.isShowEditRow">{{ rowData.termAccount }}</span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.projectMilestone">
+                        <div class="wrap-text-grid-item">
+                            <select-project-milestone *ngIf="editTable && rowData.isShowEditRow"
+                                                      name="{{ 'projectMilestone' + rowData.indexNo }}"
+                                                      placeholder="Project Milestone"
+                                                      [projectCode]="purchaseInvoiceData.projectCode"
+                                                      (saveFirstRow)="onSaveProjectMilestone(rowData)"
+                                                      (change)="onRowEditInit(rowData)"
+                                                      [(ngModel)]="rowData.projectMilestone">
+                            </select-project-milestone>
+                            <span *ngIf="!editTable || !rowData.isShowEditRow">{{ rowData.projectMilestone }}</span>
+                        </div>
+                    </td>
+
+                    <td *ngIf="editTable"
+                        class="action align-center">
+                        <button mat-icon-button
+                                [matMenuTriggerFor]="menu"
+                                matTooltip="More actions">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item
+                                    (click)="onBtnDeleteTreeRowClick(rowData)">
+                                <span>{{ 'COMMON.DELETE' | translate}}</span>
+                            </button>
+                        </mat-menu>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="frozenbody"
+                         let-rowNode
+                         let-rowData="rowData">
+                <tr [ttContextMenuRow]="rowNode"
+                    [ttContextMenuRowDisabled]="!editTable"
+                    [ngClass]="{'not-allow-hover': !editTable}"
+                    style="height: 100px"
+                    (click)="onRowEditClick(rowData)">
+                    <td [title]="rowData.indexNo">
+                        <div class="wrap-text-grid-item">
+                            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                            <p-treeTableCheckbox *ngIf="showTreeTableCheckbox"
+                                                 [value]="rowNode"></p-treeTableCheckbox>
+                            {{rowData.indexNo}}
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.projectCode">
+                        <div class="wrap-text-grid-item">
+                            {{rowData.projectCode}}
+                        </div>
+                    </td>
+
+                    <td class="header-link"
+                        [title]="rowData.poCode">
+                        <div class="wrap-text-grid-item">
+                            <a *ngIf="paramId"
+                               [routerLink]="['../../../../purchase-order/list/view/', rowData.poId]"
+                               target="_blank">
+                                {{ rowData.poCode }}</a>
+                            <a *ngIf="!paramId"
+                               [routerLink]="['../../../purchase-order/list/view/', rowData.poId]"
+                               target="_blank">
+                                {{ rowData.poCode }}</a>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.itemCode">
+                        <div class="wrap-text-grid-item">
+                            <select-sync-source *ngIf="editTable && rowData.isShowEditRow"
+                                                name="{{ 'itemCode' + rowData.indexNo }}"
+                                                placeholder="PURCHASE_PLAN.ITEM.ITEM_CODE"
+                                                header="MENU.CATEGORY.ITEM"
+                                                bindValue="code"
+                                                categoryType="item"
+                                                [isOnTable]="true"
+                                                [columns]="headerItems"
+                                                [service]="itemService"
+                                                [requestPayload]="itemRequestPayload"
+                                                (change)="onChangeItemCode($event, rowData)"
+                                                [(ngModel)]="rowData.itemCode">
+                            </select-sync-source>
+                            <span *ngIf="!editTable || !rowData.isShowEditRow">
+                                {{ rowData.itemCode }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.partNo">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="editTable && rowData.isShowEditRow"
+                                   pInputText
+                                   name="{{ 'partNo' + rowData.indexNo }}"
+                                   type="text"
+                                   [(ngModel)]="rowData.partNo"
+                                   (change)="onRowEditInit(rowData)">
+                            <span *ngIf="!editTable || !rowData.isShowEditRow">
+                                {{ rowData.partNo }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td [title]="rowData.itemName">
+                        <div class="wrap-text-grid-item">
+                            <input *ngIf="(!rowData.itemCode || rowData.itemType === 'SRV') && editTable && rowData.isShowEditRow"
+                                   pInputText
+                                   name="{{ 'itemName' + rowData.indexNo }}"
+                                   checkMaxLengthValidator
+                                   length="240"
+                                   [checkLength]="rowData.isUpdateSrv"
+                                   validateTooltip
+                                   [validateForm]="formPii"
+                                   type="text"
+                                   [(ngModel)]="rowData.itemName"
+                                   (change)="onRowEditInit(rowData)">
+                            <span
+                                  *ngIf="(rowData.itemCode && rowData.itemType !== 'SRV') || !(editTable && rowData.isShowEditRow)">
+                                {{rowData.itemName}}
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr *ngIf="purchaseInvoiceItemsData.items.length > 0">
+                    <td *ngFor="let col of columns">
+                        <div *ngIf="col.field === 'indexNo'"
+                             class="p-text-right">{{ 'COMMON.TOTAL' | translate }}</div>
+                        <div *ngIf="col.field === 'quantity'"
+                             [title]="quantityTotal">{{quantityTotal ? quantityTotal : 0}}</div>
+                        <div *ngIf="col.field === 'quantitySuggest'"
+                             [title]="quantitySuggestTotal ? quantitySuggestTotal : 0">
+                            {{quantitySuggestTotal ? quantitySuggestTotal : 0}}
+                        </div>
+                        <div *ngIf="col.field === 'intoMoney'"
+                             class="align-right"
+                             [title]="moneyTotal ? (moneyTotal | currencyMask) : (0 | currencyMask)">{{ moneyTotal ? (
+                            moneyTotal
+                            | currencyMask ) : (0 | currencyMask) }}
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-treeTable>
+    </div>
+
+    <div class="table-responsive"
+         *ngIf="purchaseInvoiceData && !isShowTreeTable">
+        <p-table #t2
+                 [value]="purchaseInvoiceItemsData.items"
+                 dataKey="id"
+                 editMode="row"
+                 tableStyleClass="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr class="background-table-header">
+                    <th *ngFor="let col of headerItemsTable"
+                        [width]="col.width"
+                        class="table-no-wrap">
+                        {{ col.header | translate }}
+                        <span class="lbl-required"
+                              *ngIf="col.isRequired">
+                        </span>
+                    </th>
+                    <th *ngIf="editTable"
+                        class="action"
+                        style="width:70px"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex"
+                         let-editing="editing">
+                <tr [pEditableRow]="rowData">
+
+                    <td [title]="paginator?.pageIndex * 10 + rowIndex + 1">
+                        {{ paginator?.pageIndex * 10 + rowIndex + 1 }}
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="true"
+                        [title]="rowData.quantity">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       name="{{ 'quantity' + (rowIndex + 1) }}"
+                                       type="number"
+                                       min="1"
+                                       [(ngModel)]="rowData.quantity">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.quantity}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td [title]="rowData.price | currencyMask">
+                        <input *ngIf="editTable"
+                               pInputText
+                               name="{{ 'price' + (rowIndex + 1) }}"
+                               type="number"
+                               min="0"
+                               [(ngModel)]="rowData.price"
+                               placeholder="Số tiền"
+                               (change)="onModelChangePrice($event, rowData)"
+                               (keydown.Tab)="onModelChangePrice($event, rowData)"
+                               (keydown.Enter)="onModelChangePrice($event, rowData)"
+                               validateTooltip
+                               [validateForm]="formPii"
+                               [required]="true">
+                        <span *ngIf="!editTable">{{rowData.price | currencyMask}}</span>
+                    </td>
+
+                    <td [title]="rowData.tax">
+                        <select-sync-source *ngIf="editTable"
+                                            name="{{ 'tax' + (rowIndex + 1) }}"
+                                            [isOnTable]="true"
+                                            placeholder="Thuế"
+                                            header="Danh sách thuế"
+                                            bindValue="name"
+                                            [width]="'50vw'"
+                                            [columns]="headerTaxCode"
+                                            [service]="taxCodeService"
+                                            [requestPayload]="taxCodeRequestPayload"
+                                            (change)="onChangeTax($event, rowData)"
+                                            [(ngModel)]="rowData.tax"
+                                            validateTooltip
+                                            [validateForm]="formPii"
+                                            [disabled]="purchaseInvoiceData.isDisableInvoiceType"
+                                            [required]="purchaseInvoiceData.invoiceType === 'Purchase Invoice'">
+                        </select-sync-source>
+                        <span *ngIf="!editTable">{{ rowData.tax }}</span>
+                    </td>
+
+                    <td [title]="rowData.taxAmount">
+                        <input *ngIf="editTable"
+                               name="{{ 'taxAmount' + (rowIndex + 1) }}"
+                               pInputText
+                               type="number"
+                               [(ngModel)]="rowData.taxAmount"
+                               (change)="onChangeTaxAmount(rowData)">
+                        <span *ngIf="!editTable">{{ rowData.taxAmount }}</span>
+                    </td>
+
+                    <td [title]="rowData.note">
+                        <input *ngIf="editTable"
+                               class="form-control"
+                               name="{{ 'note' + (rowIndex + 1) }}"
+                               type="text"
+                               maxlength="240"
+                               placeholder="Diễn giải"
+                               [(ngModel)]="rowData.note"
+                               (change)="onRowEditInit(rowData)"
+                               validateTooltip
+                               [validateForm]="formPii"
+                               [required]="true">
+                        <span *ngIf="!editTable">{{ rowData.note }}</span>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        [title]="rowData.projectCodeCreditNote">
+                        <div class="wrap-text-grid-item">
+                            {{rowData.projectCodeCreditNote}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="header-link"
+                        [title]="rowData.poCodeCreditNote">
+                        <div class="wrap-text-grid-item">
+                            <a *ngIf="paramId"
+                               [routerLink]="['../../../../purchase-order/list/view/', rowData.poIdCreditNote]"
+                               target="_blank">
+                                {{ rowData.poCodeCreditNote }}</a>
+                            <a *ngIf="!paramId"
+                               [routerLink]="['../../../purchase-order/list/view/', rowData.poIdCreditNote]"
+                               target="_blank">
+                                {{ rowData.poCodeCreditNote }}</a>
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        [title]="rowData.itemCodeCreditNote">
+                        <div class="wrap-text-grid-item">
+                            {{ rowData.itemCodeCreditNote }}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        [title]="rowData.partNoCreditNote">
+                        <div class="wrap-text-grid-item">
+                            {{ rowData.partNoCreditNote }}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        [title]="rowData.itemNameCreditNote">
+                        <div class="wrap-text-grid-item">
+                            {{rowData.itemNameCreditNote}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        [title]="rowData.itemTypeCreditNote">
+                        <div class="wrap-text-grid-item">
+                            {{rowData.itemTypeCreditNote}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        [title]="rowData.unitCreditNote">
+                        <div class="wrap-text-grid-item">
+                            {{rowData.unitCreditNote}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="!isCostTypeForShipment"
+                        [title]="rowData.subInventoryName">
+                        <select-sync-source *ngIf="editTable"
+                                            [isOnTable]="true"
+                                            name="{{ 'subInventory' + (rowIndex + 1) }}"
+                                            placeholder="Sub Inventory"
+                                            header="MENU.CATEGORY.SUB_INVENTORY"
+                                            bindValue="name"
+                                            [width]="'70vw'"
+                                            [columns]="columnSubInventory"
+                                            [service]="subInventoryService"
+                                            [requestPayload]="{orgCode: rowData.orgCode}"
+                                            [(ngModel)]="rowData.subInventoryName"
+                                            (change)="onChangeSubInventoryCode($event, rowData)">
+                        </select-sync-source>
+                        <span *ngIf="!editTable">{{ rowData.subInventoryName }}</span>
+                    </td>
+
+                    <td *ngIf="!isCostTypeForShipment"
+                        [title]="rowData.termAccount">
+                        <select-term-account *ngIf="editTable"
+                                             name="{{ 'termAccount' + (rowIndex + 1) }}"
+                                             placeholder="Tài khoản định khoản"
+                                             (saveFirstRow)="onSaveTermAccount(rowData)"
+                                             (change)="onRowEditInit(rowData)"
+                                             [ouId]="rowData.ouCode ? rowData.ouCode : purchaseInvoiceData.ouCode"
+                                             [(ngModel)]="rowData.termAccount">
+                        </select-term-account>
+                        <span *ngIf="!editTable">{{ rowData.termAccount }}</span>
+                    </td>
+
+                    <td *ngIf="!isCostTypeForShipment"
+                        [title]="rowData.projectMilestone">
+                        <select-project-milestone *ngIf="editTable"
+                                                  name="{{ 'projectMilestone' + (rowIndex + 1) }}"
+                                                  placeholder="Project Milestone"
+                                                  [projectCode]="purchaseInvoiceData.projectCode"
+                                                  (saveFirstRow)="onSaveProjectMilestone(rowData)"
+                                                  (change)="onRowEditInit(rowData)"
+                                                  [(ngModel)]="rowData.projectMilestone">
+                        </select-project-milestone>
+                        <span *ngIf="!editTable">{{ rowData.projectMilestone }}</span>
+                    </td>
+
+                    <td *ngIf="editTable"
+                        style="text-align: center;">
+                        <div *ngIf="!editing">
+                            <button pButton
+                                    pRipple
+                                    pDeleteEditableRow
+                                    type="button"
+                                    icon="fas fa-trash-alt"
+                                    (click)="onBtnDeleteRowClick(rowData)"
+                                    class="p-button-rounded p-button-text"></button>
+                        </div>
+                    </td>
+
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr *ngIf="editTable"
+                    [pEditableRow]="addItem"
+                    class="td-editable">
+
+                    <td class="th-border"></td>
+
+                    <td pEditableColumn
+                        class="th-border"
+                        [pEditableColumnDisabled]="true"
+                        [title]="addItem.quantity">
+                        {{addItem.quantity}}
+                    </td>
+
+                    <td pEditableColumn
+                        class="th-border"
+                        [pEditableColumnDisabled]="!editTable"
+                        [title]="addItem.price">
+                        <input pInputText
+                               name="price"
+                               type="number"
+                               [(ngModel)]="addItem.price"
+                               placeholder="Số tiền"
+                               (change)="onModelChangePriceWithCreditNote(addItem)"
+                               (keydown.Tab)="onModelChangePriceWithCreditNote(addItem)"
+                               (keydown.Enter)="onModelChangePriceWithCreditNote(addItem)">
+                    </td>
+
+                    <td [title]="addItem.tax">
+                        <select-sync-source name="tax"
+                                            [isOnTable]="true"
+                                            placeholder="Thuế"
+                                            header="Danh sách thuế"
+                                            bindValue="name"
+                                            [width]="'50vw'"
+                                            [columns]="headerTaxCode"
+                                            [service]="taxCodeService"
+                                            [requestPayload]="taxCodeRequestPayload"
+                                            (change)="onChangeTax($event, addItem)"
+                                            [(ngModel)]="addItem.tax"
+                                            [disabled]="purchaseInvoiceData.isDisableInvoiceType">
+                        </select-sync-source>
+                    </td>
+
+                    <td [title]="addItem.taxAmount">
+                        <input *ngIf="editTable"
+                               name="taxAmount"
+                               pInputText
+                               type="number"
+                               [(ngModel)]="addItem.taxAmount"
+                               [disabled]="purchaseInvoiceData.isDisableInvoiceType">
+                    </td>
+
+                    <td pEditableColumn
+                        class="th-border"
+                        [pEditableColumnDisabled]="!editTable"
+                        [title]="addItem.note">
+                        <input pInputText
+                               name="note"
+                               type="text"
+                               placeholder="Diễn giải"
+                               maxlength="240"
+                               [(ngModel)]="addItem.note"
+                               (change)="onRowEditInit(addItem)">
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="th-border"
+                        [title]="addItem.projectCode">
+                        <div class="wrap-text-grid-item">
+                            {{addItem.projectCode}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="header-link th-border"
+                        [title]="addItem.poCode">
+                        <div class="wrap-text-grid-item">
+                            <a *ngIf="paramId"
+                               [routerLink]="['../../../../purchase-order/list/view/', addItem.poId]"
+                               target="_blank">
+                                {{ addItem.poCode }}</a>
+                            <a *ngIf="!paramId"
+                               [routerLink]="['../../../purchase-order/list/view/', addItem.poId]"
+                               target="_blank">
+                                {{ addItem.poCode }}</a>
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="th-border"
+                        [title]="addItem.itemCode">
+                        <div class="wrap-text-grid-item">
+                            {{ addItem.itemCode }}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="th-border"
+                        [title]="addItem.partNo">
+                        <div class="wrap-text-grid-item">
+                            {{ addItem.partNo }}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="th-border"
+                        [title]="addItem.itemName">
+                        <div class="wrap-text-grid-item">
+                            {{addItem.itemName}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="th-border"
+                        [title]="addItem.itemType">
+                        <div class="wrap-text-grid-item">
+                            {{addItem.itemType}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="isCostTypeCreditNote"
+                        class="th-border"
+                        [title]="addItem.unit">
+                        <div class="wrap-text-grid-item">
+                            {{addItem.unit}}
+                        </div>
+                    </td>
+
+                    <td *ngIf="!isCostTypeForShipment"
+                        [title]="addItem.subInventoryName"
+                        class="th-border">
+                        <select-sync-source [isOnTable]="true"
+                                            name="subInventory"
+                                            placeholder="Sub Inventory"
+                                            header="MENU.CATEGORY.SUB_INVENTORY"
+                                            bindValue="name"
+                                            [width]="'70vw'"
+                                            [columns]="columnSubInventory"
+                                            [service]="subInventoryService"
+                                            [requestPayload]="{orgCode: addItem.orgCode}"
+                                            [(ngModel)]="addItem.subInventoryName"
+                                            (change)="onChangeSubInventoryCode($event, addItem)">
+                        </select-sync-source>
+                    </td>
+
+                    <td *ngIf="!isCostTypeForShipment"
+                        [title]="addItem.termAccount"
+                        class="th-border">
+                        <select-term-account name="termAccount"
+                                             placeholder="Tài khoản định khoản"
+                                             (saveFirstRow)="onSaveTermAccount(addItem)"
+                                             (change)="onRowEditInit(addItem)"
+                                             [ouId]="purchaseInvoiceData.ouCode"
+                                             [(ngModel)]="addItem.termAccount">
+                        </select-term-account>
+                    </td>
+
+                    <td *ngIf="!isCostTypeForShipment"
+                        [title]="addItem.projectMilestone"
+                        class="th-border">
+                        <select-project-milestone name="projectMilestone"
+                                                  placeholder="Project Milestone"
+                                                  [projectCode]="purchaseInvoiceData.projectCode"
+                                                  (saveFirstRow)="onSaveProjectMilestone(addItem)"
+                                                  (change)="onRowEditInit(addItem)"
+                                                  [(ngModel)]="addItem.projectMilestone">
+                        </select-project-milestone>
+                    </td>
+
+                    <td style="text-align: center;"
+                        class="th-border">
+                        <button (click)="addNewRow()"
+                                pButton
+                                pRipple
+                                type="button"
+                                pSaveEditableRow
+                                icon="flaticon2-add-1"
+                                class="p-button-rounded p-button-text"></button>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="p-text-right">{{ 'COMMON.TOTAL' | translate }}</td>
+                    <td [title]="quantityTotal">{{quantityTotal ? quantityTotal : 0}}</td>
+                    <td class="align-right">
+                        <span *ngIf="contractorTaxInvoice && purchaseInvoiceData.totalAmount !== null && (!purchaseInvoiceData.isShowTotalAmountControl || !editTable)"
+                              (click)="purchaseInvoiceData.isShowTotalAmountControl = true"
+                              [title]="purchaseInvoiceData.totalAmount ? (purchaseInvoiceData.totalAmount | currencyMask) : (0 | currencyMask)">
+                            {{ purchaseInvoiceData.totalAmount ?
+                            (purchaseInvoiceData.totalAmount | currencyMask ) : (0 | currencyMask) }}
+                        </span>
+                        <input pInputText
+                               *ngIf="purchaseInvoiceData.isShowTotalAmountControl && editTable"
+                               name="totalAmount"
+                               (focusout)="purchaseInvoiceData.isShowTotalAmountControl = false"
+                               type="number"
+                               min="0"
+                               [(ngModel)]="purchaseInvoiceData.totalAmount"
+                               placeholder="Tổng tiền"
+                               (change)="onModelChangeTotalAmount($event)">
+
+                        <span *ngIf="!contractorTaxInvoice || purchaseInvoiceData.totalAmount === null"
+                              [title]="moneyTotal ? (moneyTotal | currencyMask) : (0 | currencyMask)">
+                            {{ moneyTotal ? (moneyTotal | currencyMask ) : (0 | currencyMask) }}
+                        </span>
+                    </td>
+                    <td *ngIf="!editTable && !isCostTypeForShipment"
+                        colspan="6"
+                        class="p-text-right"></td>
+                    <td *ngIf="editTable && !isCostTypeForShipment"
+                        colspan="7"
+                        class="p-text-right"></td>
+                    <td *ngIf="!editTable && isCostTypeForShipment"
+                        colspan="3"
+                        class="p-text-right"></td>
+                    <td *ngIf="editTable && isCostTypeForShipment"
+                        colspan="4"
+                        class="p-text-right"></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+</form>
+
+<br>
+
+<table class="table table-auto-width">
+    <tbody>
+        <tr *ngIf="!purchaseInvoiceData?.showImportVAT">
+            <td>{{ 'PURCHASE_INVOICE.TOTAL_AMOUNT' | translate}}:</td>
+            <td class="align-right">
+                <span *ngIf="contractorTaxInvoice && purchaseInvoiceData.totalAmount !== null"
+                      [title]="purchaseInvoiceData.totalAmount ? (purchaseInvoiceData.totalAmount | currencyMask) : (0 | currencyMask)">
+                    <b>{{ purchaseInvoiceData.totalAmount ?
+                        (purchaseInvoiceData.totalAmount | currencyMask ) : (0 | currencyMask) }}</b>
+                </span>
+
+                <span *ngIf="!contractorTaxInvoice || purchaseInvoiceData.totalAmount === null">
+                    <b>{{ (moneyTotal ?
+                        (purchaseInvoiceData.currency === 'VND' ? (moneyTotal.toFixed(0)) : moneyTotal): 0) |
+                        currencyMask}}</b>
+                </span>
+
+            </td>
+        </tr>
+        <tr *ngIf="purchaseInvoiceData?.showImportVAT">
+            <td>{{ 'PURCHASE_INVOICE.TOTAL_AMOUNT_EXCLUDING_TAX' | translate}}:</td>
+            <td class="align-right">
+                <b>{{ (moneyTotal ? (purchaseInvoiceData.currency === 'VND' ? (moneyTotal.toFixed(0)) : moneyTotal) : 0)
+                    | currencyMask}}</b>
+            </td>
+        </tr>
+        <tr *ngIf="purchaseInvoiceData?.showImportVAT">
+            <td>{{ 'PURCHASE_INVOICE.TOTAL_TAX' | translate}}:</td>
+            <td class="align-right">
+                <b>{{ (totalWithTax ? (purchaseInvoiceData.currency === 'VND' ? (totalWithTax.toFixed(0)) :
+                    totalWithTax) : 0) | currencyMask}}</b>
+
+            </td>
+        </tr>
+        <tr *ngIf="purchaseInvoiceData?.showImportVAT">
+            <td>{{ 'PURCHASE_INVOICE.TOTAL_AMOUNT_INCLUDES_TAX' | translate}}:</td>
+            <td class="align-right">
+                <b>{{ (moneyTotal ? (purchaseInvoiceData.currency === 'VND' ? ((moneyTotal + totalWithTax).toFixed(0)) :
+                    (moneyTotal + totalWithTax)) : 0) | currencyMask}}</b>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<app-map-item-code-tree #mapItemCode
+                        (change)="changeSourceItem($event)"></app-map-item-code-tree>
+
+<app-map-term-account #mapTermAccount
+                      [ouId]="purchaseInvoiceData.ouCode"
+                      (change)="changeMapTermAccount($event)"></app-map-term-account>
+<!-- MENU -->
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

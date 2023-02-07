@@ -1,0 +1,140 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-calendar-alt"
+                       [title]="'Quản lý tài nguyên' | translate"
+                       [class]="'kt-portlet__head--lg'">
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="setParamsToRoute($event)"
+                    [activeId]="activeIdTab">
+            <ngb-tab *ngFor="let tab of tabs"
+                     [id]="tab.value">
+                <ng-template ngbTabTitle>
+                    <span>
+                        {{ tab.label | translate }} <b>
+                            <span [ngClass]="'badge badge-pill ' + tab.class"
+                                  *ngIf="tab.count">{{ tab.count
+                                }}</span></b>
+                    </span>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+        <div [style.display]="activeIdTab === 'menu' ? 'block' : 'none'">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="header">
+                        <div class="header_text">
+                            <h5><i class="fal fa-info-circle"></i> Operation</h5>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-label btn-secondary"
+                                    (click)="onBtnAddCLick()">
+                                <i class="fal fa-plus"></i>
+                                {{'COMMON.CRUD.ADD'| translate}}</button>
+                        </div>
+                    </div>
+                    <input type="checkbox"
+                           [(ngModel)]="isShowOnlyMenu"
+                           (change)="ngOnInit()"> Show only menu
+                    <div class="border-p-tree">
+                        <p-tree [value]="treeData"
+                                selectionMode="single"
+                                [(selection)]="selectedItem"
+                                [metaKeySelection]="false"
+                                (onNodeSelect)="onNodeSelect($event.node)"
+                                (onNodeUnselect)="onNodeUnselect()"
+                                [contextMenu]="lcm"
+                                [draggableNodes]="true"
+                                [droppableNodes]="true"
+                                draggableScope="self"
+                                droppableScope="self">
+                            <ng-template let-node
+                                         pTemplate="default">
+                                {{ node.label | translate }}
+                            </ng-template>
+                        </p-tree>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="header">
+                        <div class="header_text">
+                            <h5><i class="fal fa-info-circle"></i> Task</h5>
+                        </div>
+                    </div>
+                    <div *ngIf="dataSource.items">
+                        <p-table [value]="dataSource.items"
+                                 selectionMode="multiple"
+                                 [(selection)]="selectedActions"
+                                 [contextMenu]="rcm"
+                                 contextMenuSelectionMode="joint"
+                                 [metaKeySelection]="true"
+                                 dataKey="id"
+                                 [autoLayout]="true">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th [style.minWidth]="'100px'">No.</th>
+                                    <th [style.minWidth]="'200px'">Task name</th>
+                                    <th [style.minWidth]="'300px'">Note</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body"
+                                         let-action
+                                         let-rowIndex="rowIndex">
+                                <tr [pSelectableRow]="action"
+                                    [pSelectableRowIndex]="rowIndex"
+                                    [pContextMenuRow]="action"
+                                    [pContextMenuRowIndex]="rowIndex">
+                                    <td>{{ rowIndex + 1 }}</td>
+                                    <td>{{ action.name }}</td>
+                                    <td>{{ action.note }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+
+                        <mat-paginator [pageSize]="10"
+                                       [pageSizeOptions]="[10, 30, 50]"
+                                       [length]="dataSource.paginatorTotal"
+                                       [showFirstLastButtons]="true"
+                                       (page)="onPageChange($event)"></mat-paginator>
+                    </div>
+                    <div *ngIf="!dataSource.items">
+                        <div *ngIf="!selectedItem">
+                            <div style="padding-top:1.5rem; font-weight: 200;">
+                                <h6 style="padding-top: 0.75rem; font-size: 1.25rem; font-weight: 200;"><i
+                                       class="fal fa-exclamation-triangle"> </i> Please select an operation to view
+                                    actions</h6>
+                            </div>
+                        </div>
+                        <div *ngIf="selectedItem">
+                            <div style="padding-top:1.5rem; font-weight: 200;">
+                                <h6 style="padding-top: 0.75rem; font-size: 1.25rem; font-weight: 200;"><i
+                                       class="fal fa-exclamation-triangle"> </i>
+                                    Actions are only allowed for screens - <i class="fal fa-desktop"></i> or view - <i
+                                       class="fal fa-receipt"></i></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <app-action *ngIf="activeIdTab === 'data'"></app-action>
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-operation-data-edit #dlgEdit
+                         [dialogRef]="dialogRef"
+                         (success)="onSuccess($event)"></app-operation-data-edit>
+
+<app-operation-action (success)="onAddActionSuccess($event)"
+                      [dialogRef]="addDialogRef"></app-operation-action>
+
+
+<p-contextMenu #lcm
+               appendTo="body"
+               [target]="selectedItem"
+               [model]="menuItems"
+               (onShow)="checkLeaf(selectedItem)">
+    <p-contextMenu #rcm
+                   appendTo="body"
+                   [model]="actionMenuItems">
+    </p-contextMenu>

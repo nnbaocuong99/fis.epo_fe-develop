@@ -1,0 +1,808 @@
+<!-- open chức năng lưu nháp lô hàng
+        [isSaveDraft]="isShowBtnSaveDraft" -->
+<form-dynamic [formData]="formData"
+              [form]="form"
+              [isSave]="isShowBtnSave"
+              [isSaveDraft]="false"
+              (cancel)="onBtnCancelClick()"
+              (save)="onBtnSaveClick()"
+              (saveDraft)="onBtnSaveAsDraftClick()">
+    <!-- Thêm mới lô hàng -->
+    <ngb-tabset [justify]="'start'"
+                (tabChange)="setFragmentToRoute($event)"
+                [activeId]="0">
+        <ngb-tab *ngFor="let tab of tabs"
+                 [id]="tab.value">
+            <ng-template ngbTabTitle>
+                <h5>{{ tab.label | translate }}</h5>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+
+    <!-- Thông tin lô hàng -->
+    <div class="kt-grid__item"
+         [ngClass]="{'hide': currentTab !== 1}">
+        <div class="row">
+            <div class="col-md-12"
+                 style="position: relative; padding: 15px;">
+                <h5 class="kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{ 'SHIPMENT.GENERAL_SHIPMENT_INFO'| translate }}
+                </h5>
+                <div style="position: absolute; right: 15px; top: 5px;">
+                    <button class="btn btn-sm btn-label-brand mr-2"
+                            title="{{ 'SHIPMENT.COPY_FROM_PO'| translate }}"
+                            (click)="onBtnCopyPoClick()">
+                        {{ 'SHIPMENT.COPY_FROM_PO'| translate }}</button>
+                    <button class="btn btn-sm btn-label-brand mr-2"
+                            title="{{ 'SHIPMENT.COPY_FROM_PI'| translate }}"
+                            (click)="onBtnCopyPiClick()">
+                        {{ 'SHIPMENT.COPY_FROM_PI'| translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form autocomplete="off"
+              #form="ngForm"
+              id="{{formData.formId}}">
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label class="lbl-required">
+                        {{ 'SHIPMENT.WAYBILL_NUMBER' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           [disabled]="isEditWaybillNumber && id && shipmentData.smStatus !== 9"
+                           name="waybillNumber"
+                           placeholder="{{ 'SHIPMENT.WAYBILL_NUMBER' | translate }}"
+                           [(ngModel)]="shipmentData.waybillNumber"
+                           waybillNumberExistValidator
+                           [id]="shipmentData.id"
+                           required>
+                    <validate-message [form]="form"
+                                      controlName="waybillNumber"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.MASTER_BILL_NO' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="masterBillNo"
+                           placeholder="{{ 'SHIPMENT.MASTER_BILL_NO' | translate }}"
+                           [(ngModel)]="shipmentData.masterBillNo">
+                    <validate-message [form]="form"
+                                      controlName="masterBillNo"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.BILL_OF_LADING_DATE' | translate }}</label>
+                    <input-date name="billOfLadingDate"
+                                [(ngModel)]="shipmentData.billOfLadingDate"></input-date>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="lbl-required">
+                        {{ 'SHIPMENT.SUPPLIER' | translate }}</label>
+                    <select-sync-source name="smSupplierName"
+                                        placeholder="{{ 'SHIPMENT.SUPPLIER' | translate }}"
+                                        header="MENU.CATEGORY.SUPPLIER"
+                                        bindValue="name"
+                                        suffixLabel="code"
+                                        searchField="generalFilter"
+                                        [columns]="headerSuppliers"
+                                        [width]="'50vw'"
+                                        [service]="supplierService"
+                                        (change)="onChangeSupplier()"
+                                        [requestPayload]="supplierRequestPayload"
+                                        [(ngModel)]="shipmentData.smSupplierNameDto"
+                                        required>
+                    </select-sync-source>
+                    <validate-message [form]="form"
+                                      controlName="smSupplierName"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="lbl-required">{{ 'SHIPMENT.SHIPMENT_STATUS' | translate }}</label>
+                    <select class="form-control"
+                            name="smStatus"
+                            (change)="onChangeSmStatus($event)"
+                            [(ngModel)]="shipmentData.smStatus"
+                            required>
+                        <option *ngFor="let item of shipmentStatus"
+                                [value]="item.value">{{item.label | translate }}</option>
+                    </select>
+                    <validate-message [form]="form"
+                                      controlName="smStatus"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="lbl-required">{{ 'SHIPMENT.PROFILE_STATUS' | translate }}</label>
+                    <select class="form-control"
+                            name="docStatus"
+                            [(ngModel)]="shipmentData.docStatus"
+                            required
+                            disabled>
+                        <option *ngFor="let item of profileStatus"
+                                [value]="item.value">{{item.label | translate }}</option>
+                    </select>
+                    <validate-message [form]="form"
+                                      controlName="docStatus"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.COMMERCE_TERMS' | translate }}</label>
+                    <config-list-control name="businessTerm"
+                                         type="BUSINESS_TERM"
+                                         header="{{ 'SHIPMENT.COMMERCE_TERMS' | translate }}"
+                                         [(ngModel)]="shipmentData.businessTerm"></config-list-control>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.TRANS_MODE' | translate }}</label>
+                    <config-list-control name="transportationMode"
+                                         type="TRANSPORTATION_MODE"
+                                         header="{{ 'SHIPMENT.TRANS_MODE' | translate }}"
+                                         [(ngModel)]="shipmentData.transportationMode"></config-list-control>
+                </div>
+                <div class="col-md-2 mb-3"
+                     class="hide">
+                    <label>{{ 'SHIPMENT.RECEIPT_DATE' | translate }}</label>
+                    <input-date name="receiptDate"
+                                [(ngModel)]="shipmentData.receiptDate"></input-date>
+
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.IMPORT_FORM' | translate }}</label>
+                    <select class="form-control"
+                            name="importForm"
+                            [(ngModel)]="shipmentData.importForm">
+                        <option [ngValue]="undefined"
+                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                        <option *ngFor="let item of importForms"
+                                [value]="item.value">{{item.label | translate }}</option>
+                    </select>
+                    <validate-message [form]="form"
+                                      controlName="importForm"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3"
+                     [ngClass]="shipmentData.isStoring?'':'hide'">
+                    <label>{{ 'SHIPMENT.DERPARTMENT_RECEIVING_GOODS' | translate }}</label>
+                    <select-sync-source name="receivingDept"
+                                        placeholder="SHIPMENT.DERPARTMENT_RECEIVING_GOODS"
+                                        header="SHIPMENT.DERPARTMENT_RECEIVING_GOODS"
+                                        bindValue="fullName"
+                                        [columns]="headerUser"
+                                        [width]="'60vw'"
+                                        [service]="userService"
+                                        (change)="onChangeAccount()"
+                                        [requestPayload]="userRequestPayload"
+                                        [(ngModel)]="shipmentData.receivingDeptNameDto">
+                    </select-sync-source>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.STATUS_SYNC' | translate }}</label>
+                    <select class="form-control"
+                            name="SyncStatus "
+                            [(ngModel)]="shipmentData.syncStatus"
+                            disabled>
+                        <option *ngFor="let item of statusOrc"
+                                [value]="item.value">{{item.label | translate }}</option>
+                    </select>
+                    <validate-message [form]="form"
+                                      controlName="syncStatus"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.BILL_FROM' | translate }}</label>
+                    <config-list-control name="billFrom"
+                                         header="{{ 'SHIPMENT.BILL_FROM' | translate }}"
+                                         type="BILL_FROM"
+                                         [hasEdit]="false"
+                                         [(ngModel)]="shipmentData.billFrom"></config-list-control>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.BILL_TO' | translate }}</label>
+                    <ng-select name="billTo"
+                               [items]="configListDataBillTo"
+                               bindLabel="name"
+                               bindValue="name"
+                               multiple="true"
+                               placeholder="{{ 'SHIPMENT.BILL_TO' | translate }}"
+                               [ngModel]="shipmentData.billToTemp"
+                               (ngModelChange)="shipmentData.billTo = $event.join(',')">
+                    </ng-select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="lbl-required">{{ 'SHIPMENT.CURRENCY' | translate }}</label>
+                    <ng-select-async name="currency"
+                                     bindLabel="name"
+                                     placeholder="{{ 'SHIPMENT.CURRENCY' | translate }}"
+                                     [multiple]="false"
+                                     [closeOnSelect]="true"
+                                     [service]="currencyService"
+                                     (change)="onChangeCurrency()"
+                                     [(ngModel)]="shipmentData.currencyDto"
+                                     required>
+                    </ng-select-async>
+                    <validate-message [form]="form"
+                                      controlName="currency"></validate-message>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.TOTAL_AMOUNT' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="totalAmount"
+                           placeholder="{{ 'SHIPMENT.TOTAL_AMOUNT' | translate }}"
+                           [ngModel]="shipmentData.totalAmount | currencyMask"
+                           (ngModelChange)="shipmentData.totalAmount=$event"
+                           disabled>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.ADD_EMAIL_RECIPIENTS' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="receivingMail"
+                           placeholder="{{ 'SHIPMENT.ADD_EMAIL_RECIPIENTS' | translate }}"
+                           [(ngModel)]="shipmentData.receivingMail">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>{{ 'SHIPMENT.TRANSPORT_COMPANY' | translate }}</label>
+                    <config-list-control name="carrier"
+                                         type="FREIGHT_CARRIER"
+                                         header="{{ 'SHIPMENT.TRANSPORT_COMPANY' | translate }}"
+                                         [(ngModel)]="shipmentData.carrier">
+                    </config-list-control>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-4 mb-3">
+                    <label>{{ 'SHIPMENT.FLIGHT_TRAIN_NUMBER' | translate }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="tripNo"
+                           placeholder=""
+                           [(ngModel)]="shipmentData.tripNo">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <mat-radio-group (change)="valueStoreChange($event)">
+                        <mat-radio-button class="example-margin"
+                                          [value]="storeItems[0].value"
+                                          [checked]="shipmentData.isStoring == storeItems[0].value">
+                            {{ storeItems[0].label | translate}}
+                        </mat-radio-button>
+                        <mat-radio-button class="example-margin"
+                                          [value]="storeItems[1].value"
+                                          [checked]="shipmentData.isStoring == storeItems[1].value">
+                            {{ storeItems[1].label | translate }}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12"
+                     style="position: relative; padding: 15px;">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{ 'SHIPMENT.PACKING_INFORMATION'| translate }}
+                    </h5>
+                </div>
+            </div>
+            <!-- Table thông tin package list -->
+            <app-package-list-info #packageListInfo
+                                   [editTable]="true"
+                                   [shipmentPackageData]="shipmentPackageData"
+                                   [form]="form"></app-package-list-info>
+            <br>
+            <div class="form-row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="form-row">
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.NOTES_SEND_AF_WAREHOUSE'| translate }}</label>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <input type="text"
+                                   class="form-control"
+                                   name="noteAf"
+                                   placeholder=""
+                                   [(ngModel)]="shipmentData.noteAf">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.NOTES_SEND_XNK'| translate }}</label>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <input type="text"
+                                   class="form-control"
+                                   name="noteImExport"
+                                   placeholder=""
+                                   [(ngModel)]="shipmentData.noteImExport">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12"
+                     style="position: relative; padding: 15px;">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{ 'SHIPMENT.TRACK_DETAIL_GOODS_GO_ROAD'| translate }}
+                    </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="form-row">
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.EXP_RES_DATE_LEAVE'| translate }}</label>
+                            <input-date name="expectedFromDate"
+                                        [(ngModel)]="shipmentData.expectedFromDate"></input-date>
+
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.ACT_RES_DATE_LEAVE'| translate }}</label>
+                            <input-date name="actualFromDate"
+                                        [(ngModel)]="shipmentData.actualFromDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.PHYSICAL_INVENTORY_DATE'| translate }}</label>
+                            <input-date name="physicalInventoryDate"
+                                        [(ngModel)]="shipmentData.physicalInventoryDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.EXPECTED_RETURN_DATE'| translate }}</label>
+                            <input-date name="expectedToDate"
+                                        [(ngModel)]="shipmentData.expectedToDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.ACT_DATEGOODS_TO_THE_PORT'| translate }}</label>
+                            <input-date name="actualToDate"
+                                        [(ngModel)]="shipmentData.actualToDate"></input-date>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12"
+                     style="position: relative; padding: 15px;">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{ 'SHIPMENT.DETAILS_INFO_CO'| translate }}
+                    </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="form-row">
+                        <div class="col-md-2 mb-3">
+                            <label>Người mượn C/O gốc</label>
+                            <select-sync-source name="coOriginBorrower"
+                                                placeholder="Người mượn C/O gốc"
+                                                header="Người mượn C/O gốc"
+                                                bindValue="fullName"
+                                                [columns]="headerUser"
+                                                [width]="'60vw'"
+                                                [service]="userService"
+                                                (change)="shipmentData.coOriginBorrower = shipmentData.coOriginBorrowerNameDto?.userName"
+                                                [requestPayload]="userRequestPayload"
+                                                [(ngModel)]="shipmentData.coOriginBorrowerNameDto">
+                            </select-sync-source>
+                            <validate-message [form]="form"
+                                              controlName="coOriginBorrower"></validate-message>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Ngày C/O gốc</label>
+                            <input-date name="coOriginDate"
+                                        [(ngModel)]="shipmentData.coOriginDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Ngày cho mượn C/O gốc</label>
+                            <input-date name="coOrginLoanDate"
+                                        [(ngModel)]="shipmentData.coOrginLoanDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Ngày dự kiến trả C/O gốc</label>
+                            <input-date name="coOriginExpectedDate"
+                                        [(ngModel)]="shipmentData.coOriginExpectedDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Ngày trả C/O gốc</label>
+                            <input-date name="coOriginActualDate"
+                                        [(ngModel)]="shipmentData.coOriginActualDate"></input-date>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12"
+                     style="position: relative; padding: 15px;">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{ 'SHIPMENT.DECLARATION_INFORMATION'| translate }}
+                    </h5>
+                    <upload-file #importFile
+                                 [multiple]="false"
+                                 [accept]="'.xlsx, .xls'"
+                                 (onupload)="onBtnUploadClick()"></upload-file>
+                    <div style="position: absolute; right: 15px; top: 5px;">
+                        <button class="btn btn-sm btn-label-brand mr-2"
+                                title="{{ 'Import tờ khai hải quan'| translate }}"
+                                (click)="importFileDataClick()">
+                            {{ 'Import'| translate }}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="form-row">
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.DECLARATION_NUMBER'| translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="declarationNumber"
+                                   placeholder="{{ 'SHIPMENT.DECLARATION_NUMBER'| translate }}"
+                                   [(ngModel)]="shipmentData.declarationNumber">
+                            <validate-message [form]="form"
+                                              controlName="declarationNumber"></validate-message>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.DECLARATION_DATE'| translate }}</label>
+                            <input-date name="declarationDate"
+                                        [(ngModel)]="shipmentData.declarationDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.GATE'| translate }}</label>
+                            <select-sync-source name="gate"
+                                                placeholder="{{ 'SHIPMENT.GATE'| translate }}"
+                                                header="Cửa khẩu"
+                                                bindValue="acronym"
+                                                suffixLabel="name"
+                                                searchField="generalFilter"
+                                                [width]="'60vw'"
+                                                [columns]="headercustomsBranch"
+                                                [service]="customsBranchService"
+                                                [(ngModel)]="shipmentData.gateDto"
+                                                (change)="shipmentData.gate=shipmentData.gateDto?.acronym">
+                            </select-sync-source>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.DATE_OF_CUSTOMS_CLEARANCE_DECLARATION'| translate }}</label>
+                            <input-date name="declarationClearanceDate"
+                                        [(ngModel)]="shipmentData.declarationClearanceDate"></input-date>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.IMPORT_TAX'| translate }}</label>
+                            <input type="text"
+                                   class="form-control input-monney"
+                                   name="importTax"
+                                   min="0"
+                                   style="text-align: left;"
+                                   currencyMask
+                                   [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+                                   validateTooltip
+                                   [validateForm]="form"
+                                   [(ngModel)]="shipmentData.importTax"
+                                   placeholder="{{ 'SHIPMENT.IMPORT_TAX'| translate }}">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'SHIPMENT.IMPORT_VAT'| translate }}</label>
+                            <input type="text"
+                                   class="form-control input-monney"
+                                   name="importVat"
+                                   min="0"
+                                   currencyMask
+                                   [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+                                   validateTooltip
+                                   [validateForm]="form"
+                                   [(ngModel)]="shipmentData.importVat"
+                                   placeholder="{{ 'SHIPMENT.IMPORT_VAT'| translate }}">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'Mã loại hình tờ khai'| translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="declarationType"
+                                   placeholder="{{ 'Mã loại hình tờ khai'| translate }}"
+                                   [(ngModel)]="shipmentData.declarationType">
+                            <validate-message [form]="form"
+                                              controlName="declarationType"></validate-message>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'Tên người nhập khẩu'| translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="exporterName"
+                                   placeholder="{{ 'Tên người nhập khẩu'| translate }}"
+                                   [(ngModel)]="shipmentData.exporterName">
+                            <validate-message [form]="form"
+                                              controlName="exporterName"></validate-message>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>{{ 'Địa chỉ người nhập khẩu'| translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="exporterAddress"
+                                   placeholder="{{ 'Địa chỉ người nhập khẩu'| translate }}"
+                                   [(ngModel)]="shipmentData.exporterAddress">
+                            <validate-message [form]="form"
+                                              controlName="exporterAddress"></validate-message>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <br>
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="changTabDetail($event.nextId)"
+                    [activeId]="activeIdTabchild">
+            <ngb-tab [id]="tabDetails[0].value">
+                <ng-template ngbTabTitle>
+                    <h5>{{ tabDetails[0].label | translate }}</h5>
+                </ng-template>
+            </ngb-tab>
+            <ngb-tab [id]="tabDetails[1].value"
+                     [disabled]="!currentShipmentId">
+                <ng-template ngbTabTitle>
+                    <h5>{{ tabDetails[1].label | translate }}</h5>
+                </ng-template>
+            </ngb-tab>
+            <ngb-tab *ngIf="shipmentData.id && (shipmentData.syncErp && shipmentData.syncErp >= 2)"
+                     [id]="tabDetails[2].value">
+                <ng-template ngbTabTitle>
+                    <h5>{{ tabDetails[2].label | translate }}</h5>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+
+        <!-- Thông tin chi tiết hàng -->
+        <div [ngClass]="{'hide': activeIdTabchild !== 1}"
+             style="position: relative;">
+            <h5 class="kt-margin-b-15">
+                - {{ 'PURCHASE_ORDER.LIST_GOODS_SERVICES'| translate }}
+            </h5>
+
+            <div style="position: absolute; right: 15px; top: 5px;">
+                <!-- Chức năng trùng với copy to PO -->
+                <!-- <button class="btn btn-sm btn-label-brand mr-2"
+                        title="Thêm từ PO"
+                        (click)="onBtnAddFromPoClick()">
+                    Thêm từ PO</button> -->
+
+                <button *ngIf="!isShowExport && shipmentData.id"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        title="{{ 'Export excel' | translate }}"
+                        (click)="isShowExport = !isShowExport">
+                    <i class="la la-arrow-right"></i>
+                    {{ 'Export excel' | translate }}
+                </button>
+            </div>
+
+            <div *ngIf="isShowExport">
+                <app-shipment-export [shipmentData]="shipmentData"
+                                     [shipmentItem]="shipmentItem">
+                </app-shipment-export>
+            </div>
+
+            <br>
+            <app-shipment-item #shipmentItem
+                               [editTable]="true"
+                               [selectionMode]="isShowExport"
+                               [shipmentItemData]="shipmentItemData"
+                               [form]="form"
+                               (editRow)="editRow($event)">
+            </app-shipment-item>
+            <br>
+        </div>
+
+        <!-- Hồ sơ lô hàng -->
+        <div [ngClass]="{'hide': activeIdTabchild !== 2}">
+            <attach-document #attachDocument
+                             mainModule="SHIPMENT_ATTACHMENT"
+                             fileModule="Attachment\Shipment\{{currentShipmentId}}"
+                             recordId="{{currentShipmentId}}"
+                             [hideOptional]="true"
+                             [formTitle]="'Danh mục hồ sơ lô hàng'"
+                             (listFile)="checkListFile($event)"
+                             [multiple]="true">
+            </attach-document>
+            <br>
+            <div *ngIf="listPiHasFile && listPiHasFile.length > 0">
+                <h5>- {{ 'Hóa đơn' | translate }}</h5>
+                <div *ngFor="let item of listPiHasFile; let i = index">
+                    <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                        {{ item.objectName }}
+                    </p>
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label>{{ 'Hồ sơ'| translate }}</label>
+                        </div>
+                    </div>
+                    <attach-document mainModule="INVOICE_ATTACHMENT"
+                                     fileModule="Attachment\PurchaseInvoice\{{item.objectId}}"
+                                     recordId="{{item.objectId}}"
+                                     [viewMode]="true"
+                                     [hideOptional]="true"
+                                     [formTitle]="null"
+                                     [multiple]="true">
+                    </attach-document>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="listPoHasFile && listPoHasFile.length > 0">
+                <h5>- {{ 'Đơn hàng' | translate }}</h5>
+                <div *ngFor="let item of listPoHasFile; let i = index">
+                    <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                        {{ item.objectName }}
+                    </p>
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                            <single-attach-file *ngIf="item.objectId"
+                                                [edit]="false"
+                                                module="Attachment\PurchaseOrder\{{item.objectId}}">
+                            </single-attach-file>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label>{{ 'Hồ sơ'| translate }}</label>
+                        </div>
+                    </div>
+                    <attach-document mainModule="PO_ATTACHMENT"
+                                     fileModule="Attachment\PurchaseOrder\{{item.objectId}}"
+                                     recordId="{{item.objectId}}"
+                                     [viewMode]="true"
+                                     [hideOptional]="true"
+                                     [formTitle]="null"
+                                     [multiple]="true">
+                    </attach-document>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="listPrHasFile && listPrHasFile.length > 0">
+                <h5>- {{ 'Yêu cầu mua hàng' | translate }}</h5>
+                <div *ngFor="let item of listPrHasFile; let i = index">
+                    <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                        {{ item.objectName }}
+                    </p>
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                            <single-attach-file *ngIf="item.objectId"
+                                                [edit]="false"
+                                                module="Attachment\PurchaseRequest\{{item.objectId}}">
+                            </single-attach-file>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-3">
+                            <label>{{ 'Hồ sơ'| translate }}</label>
+                        </div>
+                    </div>
+                    <attach-document mainModule="PR_ATTACHMENT"
+                                     fileModule="Attachment\PurchaseRequest\{{item.objectId}}"
+                                     recordId="{{item.objectId}}"
+                                     [viewMode]="true"
+                                     [hideOptional]="true"
+                                     [formTitle]="null"
+                                     [multiple]="true">
+                    </attach-document>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="listPpHasFile && listPpHasFile.length > 0">
+                <h5>- {{ 'Kế hoạch mua hàng' | translate }}</h5>
+                <div *ngFor="let item of listPpHasFile; let i = index">
+                    <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                        {{ item.objectName }}
+                    </p>
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                            <single-attach-file *ngIf="item.objectId"
+                                                [edit]="false"
+                                                module="Attachment\PurchasePlan\{{item.objectId}}">
+                            </single-attach-file>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+
+        <!-- Thông tin đồng bộ ERP -->
+        <div [ngClass]="{'hide': activeIdTabchild !== 3}">
+            <p-table tableStyleClass="table-no-wrap"
+                     [value]="receiptStep1Data.items">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th *ngFor="let header of headersSyncERP"
+                            [width]="header.width">{{ header.title | translate }}</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr>
+                        <td [title]="rowIndex + 1">{{ rowIndex + 1 }} </td>
+                        <td [title]="rowData.poCode"> {{ rowData.poCode }} </td>
+                        <td [title]="rowData.poCodePushErp"> {{ rowData.poCodePushErp }} </td>
+                        <td [title]="rowData.poDescriptionStep1">{{ rowData.poDescriptionStep1 }}</td>
+                        <td [title]="rowData.receiptNumber">{{rowData.receiptNumber}}</td>
+                        <td [title]="rowData.receiptDateStep1 | date: mainConfig.formatDateList">
+                            <span class="background-word">{{rowData.receiptDateStep1 | date:
+                                mainConfig.formatDateList}}</span>
+                        </td>
+                        <td [title]="shipmentData.currency"> {{ shipmentData.currency }} </td>
+                        <td [title]="rowData.exchangeRate ">{{rowData.exchangeRate}} </td>
+                        <td class="align-right"
+                            [title]="rowData.exchangeRateValue | currencyMask"> {{rowData.exchangeRateValue |
+                            currencyMask }} </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <br>
+        </div>
+    </div>
+
+    <!-- Thông tin thanh toán -->
+    <div class="kt-grid__item"
+         *ngIf="currentTab === 2 && this.currentShipmentId">
+        <!-- Danh sách hóa đơn chi phí -->
+        <app-shipment-cost-bill [shipmentData]="shipmentData"
+                                [shipmentItemsData]="shipmentItemData"
+                                (success)="onLoadData()"></app-shipment-cost-bill>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12"
+             style="position: relative; padding: 15px;">
+            <div style="position: absolute; right: 15px; top: 5px;">
+
+                <button *ngIf="shipmentData.syncErp === 2 && currentTab === 1 && currentchangTab === 1 && (shipmentData.importUser === currentUser.id || currentUser.roles.includes('SUPER_ADMIN'))"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        [title]="'SYNC_ERP.CONFIRM_RETURN_MESSAGE' | translate"
+                        (click)="returnReceipt()">
+                    <i class="far fa-exclamation-triangle"
+                       style="color: red;"></i> {{ 'Return receipt' | translate }}
+                </button>
+
+                <button *ngIf="shipmentData.id && currentTab === 1 && currentchangTab === 1"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        user-role="SUPER_ADMIN"
+                        (click)="viewLogReceipt()">{{ 'View log receipt' | translate }}
+                </button>
+
+                <button [ngClass]="{'border-red': shipmentData.errorSyncReceipt}"
+                        *ngIf="shipmentData.id && currentTab === 1 && currentchangTab === 1"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        [title]="shipmentData.errorSyncReceipt ? 'Lỗi đồng bộ ERP vui lòng đồng bộ lại:\n'+ shipmentData.errorSyncReceipt : 'Đồng bộ thông tin ERP'"
+                        (click)="onBtnSyncErpClick()"
+                        [disabled]="!shipmentData.id || (shipmentData.syncErp && shipmentData.syncErp >= 2)">
+                    Đồng bộ thông tin ERP
+                </button>
+
+                <button *ngIf="shipmentData.id && currentTab === 1 && currentchangTab === 1"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        title="Xác nhận hàng đã về kho"
+                        (click)="confirmGoodsInStock()"
+                        [disabled]="!shipmentData.id || (shipmentData.importStatus && shipmentData.importStatus >= 1)">
+                    Xác nhận hàng đã về kho
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+</form-dynamic>
+
+<!-- Form copy từ PO -->
+<app-shipment-purchase-order [dialogRef]="dialogRefPo"
+                             [shipmentData]="shipmentData"
+                             *ngIf="isShowCopyPo"
+                             (save)="loadItemFromPo($event)"></app-shipment-purchase-order>
+
+<!-- Form copy từ PI -->
+<app-shipment-purchase-invoice [dialogRef]="dialogRefPi"
+                               [shipmentData]="shipmentData"
+                               *ngIf="isShowCopyInv"
+                               (save)="loadItemFromPi($event)"></app-shipment-purchase-invoice>
+
+<!-- Add item từ PO -->
+<app-shipment-add-from-po [shipmentItemDataRef]="shipmentItemData.items"
+                          [dialogRef]="dialogRefAddPo"
+                          *ngIf="isShowAddPo"
+                          (save)="loadItemAddFromPo($event)"></app-shipment-add-from-po>
+
+<!-- Đồng bộ ERP receipt bước 1 -->
+<app-receipt-step1 #dialogReceipt1
+                   [dialogRef]="dialogRefReceipt1"
+                   (success)="syncSuccess($event)"></app-receipt-step1>

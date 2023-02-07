@@ -1,0 +1,275 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'SUPPLIER.SUPPLIER_INFO' | translate"
+                       [viewLoading$]="supplierService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goToEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="viewHistory()">
+                <i class="fas fa-history"></i>
+                <span class="kt-hidden-mobile">{{ 'PURCHASE_ORDER.VIEW_HISTORY' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'SUPPLIER.GENERAL_INFO'| translate}}
+        </h5>
+        <table class="table table-no-wrap">
+            <tbody>
+                <tr>
+                    <td style="width: 25%">{{ 'SUPPLIER.TYPE' | translate }}:
+                        <b>{{(supplierData.type | label:arrType) | translate}}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.NAME' | translate }}:
+                        <b>{{ supplierData.name }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.ACRONYM_NAME' | translate }}:
+                        <b>{{ supplierData.acronymName }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.CODE_TAX_CODE' | translate }}:
+                        <b>{{ supplierData.code }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'Email' | translate }}:
+                        <b>{{ supplierData.email }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.INVOICE_ADDRESS' | translate }}:
+                        <b>{{ supplierData.invoiceAddress }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.TRADING_ADDRESS' | translate }}:
+                        <b>{{ supplierData.tradingAddress }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.PEOPLE_REPRESENT' | translate }}:
+                        <b>{{ supplierData.peopleRepresent }}</b>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'SUPPLIER.POSITION_PEOPLE_REPRESENT' | translate }}:
+                        <b>{{ supplierData.positionPeopleRepresent }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.DISTRIBUTING_GOODS' | translate }}:
+                        <b>{{ supplierData.distributingGoods }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.DEPOSIT_RATE' | translate }}:
+                        <b>{{ supplierData.depositRate }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.QUANTITY_REST_DEPOSIT_DATE' | translate }}:
+                        <b> {{ supplierData.quantityRestDepositDate }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'SUPPLIER.COMMISSION_POLICY' | translate }}:
+                        <b>{{(supplierData.commissionPolicy | label:arrCommissionPolicy) | translate}}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.COMMISSION_POLICY_DESCRIPTION' | translate }}:
+                        <b>{{ supplierData.commissionPolicyDescription }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'SUPPLIER.STATUS' | translate }}:
+                        <b>{{(supplierData.isActive | label:arrStatus) | translate}}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Các dự án với khách hàng khác' | translate }}:
+                        <b>{{ supplierData.projectOtherCus }}</b>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td *ngIf="supplierData.id"
+                        style="width: 25%">{{ 'SUPPLIER.ATTACHED_FILES' | translate }}:
+                        <b class="btn-link"
+                           style="cursor: pointer;"
+                           (click)="onBtnDownloadClick()">{{ file?.name }}</b>
+                        <app-dialog-view-pdf-file *ngIf="file"
+                                                  [file]="file">
+                        </app-dialog-view-pdf-file>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h5 class="kt-margin-t-15 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'SUPPLIER.BANK_INFO.TITLE'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="supplierData.listSupplierBank"
+                     [columns]="arrHeaderBank"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.name">
+                            {{rowData.name}}
+                        </td>
+                        <td [title]="rowData.accountNumber">
+                            {{rowData.accountNumber}}
+                        </td>
+                        <td [title]="rowData.receiverName">
+                            {{rowData.receiverName}}
+                        </td>
+                        <td [title]="rowData.main"
+                            class="text-center">
+                            <mat-checkbox name="bankMain"
+                                          class="example-margin"
+                                          (click)="$event.preventDefault()"
+                                          [checked]="rowData.main == 1"
+                                          [color]="'primary'">
+                            </mat-checkbox>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="supplierData.listSupplierBank && supplierData.listSupplierBank.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <h5 class="kt-margin-t-15 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'SUPPLIER.GUARANTEE_CENTER_INFO.TITLE'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="supplierData.listSupplierGuaranteeCenter"
+                     [columns]="arrHeaderGuaranteeCenter"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.name">
+                            {{rowData.name}}
+                        </td>
+                        <td [title]="rowData.address">
+                            {{rowData.address}}
+                        </td>
+                        <td [title]="rowData.phoneNumber">
+                            {{rowData.phoneNumber}}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div
+                 *ngIf="supplierData.listSupplierGuaranteeCenter && supplierData.listSupplierGuaranteeCenter.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <h5 class="kt-margin-t-15 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'SUPPLIER.SALES_INFO.TITLE'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="supplierData.listSupplierSales"
+                     [columns]="arrHeaderSales"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.position">
+                            {{rowData.position}}
+                        </td>
+                        <td [title]="rowData.name">
+                            {{rowData.name}}
+                        </td>
+                        <td [title]="rowData.phoneNumber">
+                            {{rowData.phoneNumber}}
+                        </td>
+                        <td [title]="rowData.email">
+                            {{rowData.email}}
+                        </td>
+                        <td [title]="rowData.note">
+                            {{rowData.note}}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="supplierData.listSupplierSales && supplierData.listSupplierSales.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <app-purchase-order-in-supplier *ngIf="supplierData.vendorId"
+                                        [vendorId]="supplierData.vendorId">
+        </app-purchase-order-in-supplier>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-supplier-history #supplierHistory></app-supplier-history>

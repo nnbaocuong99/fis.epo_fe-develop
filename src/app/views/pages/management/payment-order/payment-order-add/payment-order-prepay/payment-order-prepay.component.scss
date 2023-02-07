@@ -1,0 +1,16 @@
+.span-custom {
+    width: 100%;
+    // font-size: 12px!important;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0.375rem 0.75rem;
+    height: 2.5rem;
+    font-size: 1rem;
+    color: #495057;
+    background-color: #ebebe4;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}

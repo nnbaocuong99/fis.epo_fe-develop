@@ -1,0 +1,162 @@
+<div>
+    <!-- [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()"
+             (delete)="onBtnDeleteClick()" -->
+    <form autocomplete="off"
+          #form="ngForm"
+          id="role-edit">
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="lbl-required">{{ 'COMMON.CODE' | translate }}</label>
+                    <validate-message [form]="form"
+                                      controlName="code"></validate-message>
+                    <input type="text"
+                           class="form-control"
+                           name="code"
+                           [(ngModel)]="dialogRef.input.code"
+                           placeholder="{{ 'COMMON.CODE' | translate }}"
+                           required
+                           autofocus>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="lbl-required">{{ 'COMMON.NAME' | translate }}</label>
+                    <validate-message [form]="form"
+                                      controlName="name"></validate-message>
+                    <input type="text"
+                           class="form-control"
+                           name="name"
+                           [(ngModel)]="dialogRef.input.name"
+                           placeholder="{{ 'COMMON.NAME' | translate }}"
+                           required>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="lbl-required">{{ 'ROLE.MODULES' | translate }}</label>
+                    <div>
+                        <a [ngClass]="operationDialogRef.input.styleClass"
+                           (click)="onBtnOperationShow()">{{
+                            operationDialogRef.input.text | translate }}</a>
+                    </div>
+                    <app-role-operation [dialogRef]="operationDialogRef"></app-role-operation>
+                </div>
+            </div>
+        </div>
+    </form>
+    <label>{{ 'MENU.SETTING.USER' | translate }}</label>
+
+    <div class="form-row">
+        <div class="col-md-4">
+            <mat-form-field class="input-general-filter">
+                <input matInput
+                       #searchInput
+                       (keyup)="initData()"
+                       [(ngModel)]="request.email"
+                       name="Users"
+                       placeholder="Search by email..."
+                       class="mat-form-field mat-form-field-fluid">
+                <mat-hint align="start">
+                </mat-hint>
+                {{email}}
+            </mat-form-field>
+        </div>
+        <div class="col-md-8">
+            <mat-paginator [pageSize]="10"
+                           [hidePageSize]="true"
+                           [length]="userDialogRef.input.paginatorTotal"
+                           [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+    </div>
+    <div class="form-row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th *ngFor="let header of headers"
+                        [width]="header.width">{{ header.title | translate }}
+                    </th>
+                    <th [width]="'50px'"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let rowData of userDialogRef.input.items; index as i;">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ rowData.email }}</td>
+                    <td>{{ rowData.userName }}</td>
+                    <td>{{ rowData.fullName }}</td>
+                    <td style="padding: 3px 0 0 0;"><button class="btn btn-sm btn-link"
+                                (click)="onBtnDelUserClick(rowData)">{{"COMMON.DELETE" |
+                            translate}}</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-row"
+         style="margin-bottom: 0.5rem;">
+        <button class="btn btn-sm btn-brand"
+                (click)="onBtnAddUserClick()">
+            Add user
+        </button>
+    </div>
+    <button class="btn btn-sm btn-warning float-left "
+            style="margin-top:0.5rem; margin-bottom: 0.5rem;"
+            title="{{ 'COMMON.DELETE' | translate }}(Delete)"
+            *ngIf="dialogRef.input.id && dialogRef.input.isShowDelete"
+            (click)="onBtnDeleteClick()">{{ 'COMMON.DELETE' |
+        translate }}</button>
+    <button class="btn btn-sm btn-secondary float-right"
+            style="margin:0.5rem;"
+            title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+            (click)="onBtnCancelClick()">{{ 'COMMON.CANCEL' | translate
+        }}</button>
+    <button class="btn btn-sm btn-success float-right"
+            style="margin:0.5rem;"
+            title="{{ (dialogRef.config.btnTitle ? dialogRef.config.btnTitle : 'COMMON.SAVE') | translate }}(Enter)"
+            (click)="onBtnSaveClick()">{{ (dialogRef.config.btnTitle ? dialogRef.config.btnTitle : 'COMMON.SAVE') |
+        translate }}</button>
+</div>
+<crud-dialog></crud-dialog>
+<p-dialog [(visible)]="isShowAddUser"
+          [modal]="true"
+          [baseZIndex]="10000"
+          appendTo="body"
+          [style]=" {width: '40%'} "
+          [draggable]="true"
+          [maximizable]="true"
+          [closable]="false">
+    <p-header>
+        <i class="fal fa-user-edit"></i> {{"MENU.SETTING.USER" | translate}}
+    </p-header>
+    <form #popupForm="ngForm">
+        <div class="col-md-12">
+            <div class="form-group">
+                <ng-select-async name="user"
+                                 bindLabel="userName"
+                                 placeholder="{{ 'MENU.SETTING.USER' | translate }}"
+                                 [multiple]="true"
+                                 [service]="userService"
+                                 [closeOnSelect]="false"
+                                 [requestPayload]="userRequest"
+                                 [(ngModel)]="userList">
+                </ng-select-async>
+            </div>
+        </div>
+    </form>
+    <br><br><br><br><br><br><br><br>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-primary"
+                title="{{ ('COMMON.SAVE') | translate }}(Enter)"
+                (click)="onBtnSaveUsers()">
+            {{ (dialogRef.config.btnTitle ? dialogRef.config.btnTitle : 'COMMON.SAVE') | translate }}
+        </button>
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+                (click)="onBtnCancelUsers()">{{
+            'COMMON.CANCEL' | translate }}</button>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,675 @@
+<div class="row"
+     *ngIf="purchaseInvoiceData.currency && purchaseInvoiceData.currency !== 'VND'">
+    <div class="col-md-12"
+         style="position: relative; padding: 15px;">
+        <h5 class="kt-margin-b-15">
+            <i class="fal fa-list-ul"></i> {{ 'PURCHASE_INVOICE.EXCHANGE_RATE' | translate }}
+        </h5>
+        <div style="position: absolute; right: 15px; top: 5px;">
+            <button class="btn btn-label-brand btn-sm mt-2"
+                    style="margin-right: 5px;"
+                    title="Export contractor tax info"
+                    (click)="onBtnExportContractorTaxClick()">
+                <i class="fal fa-file-export"></i> {{ 'Export contractor tax info' | translate }}
+            </button>
+        </div>
+    </div>
+</div>
+<form autocomplete="off"
+      #form="ngForm"
+      role="form"
+      id="exchange-rate">
+    <div class="form-row"
+         *ngIf="purchaseInvoiceData.currency && purchaseInvoiceData.currency !== 'VND'">
+        <div class="col-md-2 mb-3">
+            <label>{{ 'EXCHANGE_RATE_CURRENCY.TYPE' | translate }}</label>
+            <ng-select [items]="exchangeRateTypeData"
+                       bindLabel="name"
+                       bindValue="name"
+                       name="type"
+                       (change)="onChangeType()"
+                       [(ngModel)]="exchangeRateData.type"
+                       [disabled]="!editTable || (purchaseInvoiceData.currency && purchaseInvoiceData.currency === 'VND')"
+                       placeholder="{{ 'EXCHANGE_RATE_CURRENCY.TYPE' | translate }}">
+            </ng-select>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label>{{ 'EXCHANGE_RATE_CURRENCY.DATE' | translate }}</label>
+            <input-date name="date"
+                        (change)="onChangeDate()"
+                        [(ngModel)]="exchangeRateData.date"
+                        [disabled]="!editTable || (purchaseInvoiceData.currency && purchaseInvoiceData.currency === 'VND')">
+            </input-date>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label>{{ 'EXCHANGE_RATE_CURRENCY.CURRENCY_FROM' | translate }}</label>
+            <input type="text"
+                   class="form-control"
+                   name="currencyFrom"
+                   placeholder="{{ 'EXCHANGE_RATE_CURRENCY.CURRENCY_FROM' | translate }}"
+                   [(ngModel)]="exchangeRateData.currencyFrom"
+                   disabled>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label>{{ 'EXCHANGE_RATE_CURRENCY.CURRENCY_TO' | translate }}</label>
+            <input type="text"
+                   class="form-control"
+                   name="currencyTo"
+                   placeholder="{{ 'EXCHANGE_RATE_CURRENCY.CURRENCY_TO' | translate }}"
+                   [(ngModel)]="exchangeRateData.currencyTo"
+                   disabled>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label>{{ 'EXCHANGE_RATE_CURRENCY.CONVERSION_RATE' | translate }}</label>
+            <input type="text"
+                   class="form-control"
+                   name="conversionRate"
+                   placeholder="{{ 'EXCHANGE_RATE_CURRENCY.CONVERSION_RATE' | translate }}"
+                   numberMask
+                   validateTooltip
+                   [validateForm]="form"
+                   [(ngModel)]="exchangeRateData.conversionRate"
+                   [disabled]="isDisabledConversionRate || exchangeRateData.currencyFrom === 'VND' || !editTable || (purchaseInvoiceData.currency && purchaseInvoiceData.currency === 'VND')">
+
+        </div>
+    </div>
+</form>
+
+<br>
+
+<div class="row">
+    <div class="col-md-12"
+         style="position: relative; padding: 15px;">
+        <h5 class="kt-margin-b-15">
+            <i class="fal fa-list-ul"></i> {{ 'PURCHASE_INVOICE.CONTRACTOR_TAX_CALCULATION_SHEET'| translate }}
+        </h5>
+        <div style="position: absolute; right: 15px; top: 5px;">
+            .<button *ngIf="purchaseInvoiceData.currency && purchaseInvoiceData.currency !== 'VND' && editTable"
+                    class="btn btn-label-brand btn-sm mt-2"
+                    style="margin-right: 5px;"
+                    (click)="exchangeContractorTax()"
+                    [title]="'PURCHASE_INVOICE.EXCHANGE'| translate">
+                <i class="fal fa-exchange"></i>{{ 'PURCHASE_INVOICE.EXCHANGE'| translate }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row kt-margin-b-15">
+    <div class="col-md-6">
+        <span *ngIf="editTable">
+            <label style="display: block;">{{ 'Tính thuế nhà thầu tự động' | translate }}</label>
+            <span>
+                <mat-checkbox name="accordingFormula"
+                              class="example-margin"
+                              (change)="onChangeAccordingFormula($event)"
+                              [checked]="accordingFormula"
+                              [color]="'primary'"> {{ 'Theo công thức' | translate }}
+                </mat-checkbox>
+            </span>
+            <span class="ml-3">
+                <mat-checkbox name="notAccordingFormula"
+                              class="example-margin"
+                              (change)="onChangeAccordingFormula($event)"
+                              [checked]="!accordingFormula"
+                              [color]="'primary'"> {{ 'Không theo công thức' | translate }}
+                </mat-checkbox>
+            </span>
+        </span>
+    </div>
+    <div class="col-md-6">
+        <div class="mat-table__bottom">
+            <mat-spinner [diameter]="20"
+                         *ngIf="purchaseInvoiceService.isLoading$ | async"></mat-spinner>
+            <mat-paginator [pageSize]="10"
+                           [pageSizeOptions]="[10, 30, 50]"
+                           [length]="dataSource.paginatorTotal"
+                           [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <p-treeTable [value]="dataSource.treeNodes"
+                 dataKey="id"
+                 editMode="row"
+                 tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of headers; let i = index"
+                    [width]="col.width"
+                    class="table-no-wrap"
+                    [ngClass]="col.class">
+                    {{ col.header | translate }}
+                </th>
+                <!-- <th *ngIf="editTable"
+                    class="action"
+                    style="width:70px"></th> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowNode
+                     let-rowData="rowData"
+                     let-columns="columns">
+            <tr [pEditableRow]="rowData"
+                *ngIf="rowData.taxpayer"
+                [ngClass]="{'not-allow-hover': !editTable}">
+                <td [title]="rowData.indexNo">
+                    <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                    {{rowData.indexNo}}
+                </td>
+                <td [title]="rowData.projectCode">{{ rowData.projectCode }}</td>
+                <td [title]="rowData.itemCode">{{ rowData.itemCode }}</td>
+                <td [title]="rowData.itemName">{{ rowData.itemName }}</td>
+                <td [title]="(rowData.taxpayer | label:taxPayers) | translate">
+                    {{(rowData.taxpayer | label:taxPayers) | translate}}
+                </td>
+                <td ttEditableColumn
+                    [ttEditableColumnDisabled]="!editTable"
+                    [title]="convertCurrencyMask(rowData.revenueWithoutTax)"
+                    class="align-right">
+                    <p-treeTableCellEditor>
+                        <ng-template pTemplate="input">
+                            <input type="number"
+                                   class="form-control"
+                                   name="revenueWithoutTax"
+                                   min="0"
+                                   (change)="onChangeRowRevenueWithoutTaxEditInit($event, rowData)"
+                                   [(ngModel)]="rowData.revenueWithoutTax"
+                                   placeholder="{{ 'Doanh thu chưa thuế' | translate }}">
+
+                            <!-- <p-inputNumber inputStyleClass="input-number"
+                                           inpudId="locale-us"
+                                           mode="decimal"
+                                           locale="en-US"
+                                           :min="0"
+                                           [minFractionDigits]="2"
+                                           placeholder="Nhập doanh thu chưa thuế"
+                                           [(ngModel)]="rowData.revenueWithoutTax"
+                                           (change)="onChangeRowRevenueWithoutTaxEditInit($event, rowData)">
+                            </p-inputNumber> -->
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{convertCurrencyMask(rowData.revenueWithoutTax)}}
+                        </ng-template>
+                    </p-treeTableCellEditor>
+                </td>
+                <td
+                    [title]="(rowData.corporateTaxRate !== null && rowData.corporateTaxRate !== undefined) ? rowData.corporateTaxRate + '%' : ''">
+                    <config-list-control name="corporateTaxRate"
+                                         *ngIf="editTable"
+                                         type="TAX"
+                                         header="Danh sách Thuế"
+                                         placeholder="Thuế suất TNDN"
+                                         [items]="configListDataTax"
+                                         (getChange)="onChangeRowEditCorporateTaxRate(rowData, $event)"
+                                         [(ngModel)]="rowData.corporateTaxRate">
+                    </config-list-control>
+                    <span *ngIf="!editTable">
+                        {{(rowData.corporateTaxRate !== null && rowData.corporateTaxRate !== undefined) ?
+                        (rowData.corporateTaxRate + '%') : ''}}
+                    </span>
+                </td>
+                <td ttEditableColumn
+                    [ttEditableColumnDisabled]="!editTable"
+                    [title]="convertCurrencyMask(rowData.corporateTax)"
+                    class="align-right">
+                    <p-treeTableCellEditor>
+                        <ng-template pTemplate="input">
+                            <input type="number"
+                                   class="form-control"
+                                   name="corporateTax"
+                                   min="0"
+                                   (change)="onRowEditInitCorporateTax(rowData, $event)"
+                                   [(ngModel)]="rowData.corporateTax"
+                                   placeholder="{{ 'Thuế TNDN' | translate }}">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{convertCurrencyMask(rowData.corporateTax)}}
+                        </ng-template>
+                    </p-treeTableCellEditor>
+                </td>
+                <td ttEditableColumn
+                    [ttEditableColumnDisabled]="!editTable"
+                    [title]="convertCurrencyMask(rowData.revenueCorporateTax)"
+                    class="align-right">
+                    <p-treeTableCellEditor>
+                        <ng-template pTemplate="input">
+                            <input type="number"
+                                   class="form-control"
+                                   name="revenueCorporateTax"
+                                   min="0"
+                                   (change)="onRowEditRevenueCorporateTaxInit($event, rowData)"
+                                   [(ngModel)]="rowData.revenueCorporateTax"
+                                   placeholder="{{ 'Doanh thu có thuế TNDN' | translate }}">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{convertCurrencyMask(rowData.revenueCorporateTax)}}
+                        </ng-template>
+                    </p-treeTableCellEditor>
+                </td>
+                <td
+                    [title]="(rowData.vatTaxRate !== null && rowData.vatTaxRate !== undefined) ? rowData.vatTaxRate + '%' : ''">
+                    <config-list-control *ngIf="editTable"
+                                         name="vatTaxRate"
+                                         type="TAX"
+                                         header="Danh sách Thuế"
+                                         placeholder="Thuế suất VAT"
+                                         [items]="configListDataTax"
+                                         [(ngModel)]="rowData.vatTaxRate"
+                                         (getChange)="onChangeRowEditVatTaxRate(rowData, $event)">
+                    </config-list-control>
+                    <span *ngIf="!editTable">
+                        {{(rowData.vatTaxRate !== null && rowData.vatTaxRate !== undefined) ? rowData.vatTaxRate + '%' :
+                        ''}}
+                    </span>
+                </td>
+                <td ttEditableColumn
+                    [ttEditableColumnDisabled]="!editTable"
+                    [title]="convertCurrencyMask(rowData.vatTax)"
+                    class="align-right">
+                    <p-treeTableCellEditor>
+                        <ng-template pTemplate="input">
+                            <input type="number"
+                                   class="form-control"
+                                   name="vatTax"
+                                   min="0"
+                                   (change)="onRowEditInitVatTax(rowData, $event)"
+                                   [(ngModel)]="rowData.vatTax"
+                                   placeholder="{{ 'Thuế VAT' | translate }}">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{convertCurrencyMask(rowData.vatTax)}}
+                        </ng-template>
+                    </p-treeTableCellEditor>
+                </td>
+                <td ttEditableColumn
+                    [ttEditableColumnDisabled]="!editTable"
+                    [title]="convertCurrencyMask(rowData.revenueVatTax)"
+                    class="align-right">
+                    <p-treeTableCellEditor>
+                        <ng-template pTemplate="input">
+                            <input type="number"
+                                   class="form-control"
+                                   name="revenueVatTax"
+                                   min="0"
+                                   (change)="onRowEditRevenueVatTaxInit(rowData, $event)"
+                                   [(ngModel)]="rowData.revenueVatTax"
+                                   placeholder="{{ 'Doanh thu có thuế VAT' | translate }}">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{convertCurrencyMask(rowData.revenueVatTax)}}
+                        </ng-template>
+                    </p-treeTableCellEditor>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+                <td colspan="5"
+                    class="align-right">{{ ('COMMON.TOTAL' | translate) + ': ' }}</td>
+                <td [title]="convertCurrencyMask(purchaseInvoiceData.revenueWithoutTaxTotal)"
+                    class="align-right">
+                    <input *ngIf="editTable && !accordingFormula"
+                           type="number"
+                           class="form-control"
+                           name="revenueWithoutTaxTotal"
+                           min="0"
+                           (change)="onRowEditRevenueWithoutTaxTotalInit($event)"
+                           [(ngModel)]="purchaseInvoiceData.revenueWithoutTaxTotal"
+                           placeholder="{{ 'Tổng doanh thu chưa thuế' | translate }}">
+
+                    <span *ngIf="!editTable || accordingFormula">
+                        {{convertCurrencyMask(purchaseInvoiceData.revenueWithoutTaxTotal)}}
+                    </span>
+                </td>
+                <td></td>
+                <td [title]="convertCurrencyMask(purchaseInvoiceData.corporateTaxTotal)"
+                    class="align-right">
+                    <input *ngIf="editTable && !accordingFormula"
+                           type="number"
+                           class="form-control"
+                           name="corporateTaxTotal"
+                           min="0"
+                           (change)="onRowEditCorporateTaxTotalInit($event)"
+                           [(ngModel)]="purchaseInvoiceData.corporateTaxTotal"
+                           placeholder="{{ 'Tổng thuế TNDN' | translate }}">
+
+                    <span *ngIf="!editTable || accordingFormula">
+                        {{convertCurrencyMask(purchaseInvoiceData.corporateTaxTotal)}}
+                    </span>
+                </td>
+                <td [title]="convertCurrencyMask(purchaseInvoiceData.revenueCorporateTaxTotal)"
+                    class="align-right">
+                    <input *ngIf="editTable && !accordingFormula"
+                           type="number"
+                           class="form-control"
+                           name="revenueCorporateTaxTotal"
+                           min="0"
+                           (change)="onRowEditRevenueCorporateTaxTotalInit($event)"
+                           [(ngModel)]="purchaseInvoiceData.revenueCorporateTaxTotal"
+                           placeholder="{{ 'Tổng doanh thu có thuế TNDN' | translate }}">
+
+                    <span *ngIf="!editTable || accordingFormula">
+                        {{convertCurrencyMask(purchaseInvoiceData.revenueCorporateTaxTotal)}}
+                    </span>
+                </td>
+                <td></td>
+                <td [title]="convertCurrencyMask(purchaseInvoiceData.vatTaxTotal)"
+                    class="align-right">
+                    <input *ngIf="editTable && !accordingFormula"
+                           type="number"
+                           class="form-control"
+                           name="vatTaxTotal"
+                           min="0"
+                           (change)="onRowEditVatTaxTotalInit($event)"
+                           [(ngModel)]="purchaseInvoiceData.vatTaxTotal"
+                           placeholder="{{ 'Tổng thuế VAT' | translate }}">
+
+                    <span *ngIf="!editTable || accordingFormula">
+                        {{convertCurrencyMask(purchaseInvoiceData.vatTaxTotal)}}
+                    </span>
+                </td>
+                <td [title]="convertCurrencyMask(purchaseInvoiceData.revenueVatTaxTotal)"
+                    class="align-right">
+                    <input *ngIf="editTable && !accordingFormula"
+                           type="number"
+                           class="form-control"
+                           name="revenueVatTaxTotal"
+                           min="0"
+                           (change)="onRowEditRevenueVatTaxTotalInit($event)"
+                           [(ngModel)]="purchaseInvoiceData.revenueVatTaxTotal"
+                           placeholder="{{ 'Tổng doanh thu có thuế VAT' | translate }}">
+
+                    <span *ngIf="!editTable || accordingFormula">
+                        {{convertCurrencyMask(purchaseInvoiceData.revenueVatTaxTotal)}}
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-treeTable>
+</div>
+<br>
+<br>
+<div *ngIf="isShowExchangeContractorTax && purchaseInvoiceData.currency && purchaseInvoiceData.currency !== 'VND'">
+    <div class="row">
+        <div class="col-md-12"
+             style="position: relative; padding: 15px;">
+            <h5 class="kt-margin-b-15">
+                <i class="fal fa-list-ul"></i> {{ 'Bảng tính thuế nhà thầu quy đổi'| translate }}
+            </h5>
+        </div>
+    </div>
+
+    <div class="row kt-margin-b-15">
+        <div class="col-md-6">
+            <span *ngIf="editTable">
+                <label>{{ 'Update bảng thuế nhà thầu quy đổi' | translate }}</label>
+                <div>
+                    <mat-checkbox name="editTableContractorTaxExchange"
+                                  class="example-margin"
+                                  (change)="onChangeTableContractorTaxExchange($event)"
+                                  [checked]="editTableContractorTaxExchange"
+                                  [color]="'primary'"> {{ 'Edit table' | translate }}
+                    </mat-checkbox>
+                </div>
+            </span>
+        </div>
+        <div class="col-md-6">
+            <div class="mat-table__bottom">
+                <mat-spinner [diameter]="20"
+                             *ngIf="purchaseInvoiceService.isLoading$ | async"></mat-spinner>
+                <mat-paginator [pageSize]="10"
+                               [pageSizeOptions]="[10, 30, 50]"
+                               [length]="dataSource.paginatorTotal"
+                               [showFirstLastButtons]="true"></mat-paginator>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <p-treeTable [value]="dataSource.treeNodes"
+                     dataKey="id"
+                     editMode="row"
+                     tableStyleClass="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th *ngFor="let col of headers; let i = index"
+                        [width]="col.width"
+                        class="table-no-wrap"
+                        [ngClass]="col.class">
+                        {{ col.header | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowNode
+                         let-rowData="rowData"
+                         let-columns="columns">
+                <tr [ngClass]="{'not-allow-hover': !editTable}"
+                    *ngIf="rowData.taxpayer">
+                    <td [title]="rowData.indexNo">
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                        {{rowData.indexNo}}
+                    </td>
+                    <td [title]="rowData.projectCode">{{ rowData.projectCode }}</td>
+                    <td [title]="rowData.itemCode">{{ rowData.itemCode }}</td>
+                    <td [title]="rowData.itemName">{{ rowData.itemName }}</td>
+                    <td [title]="(rowData.taxpayer | label:taxPayers) | translate">
+                        {{(rowData.taxpayer | label:taxPayers) | translate}}
+                    </td>
+                    <td ttEditableColumn
+                        [ttEditableColumnDisabled]="!editTableContractorTaxExchange"
+                        [title]="convertCurrencyMask(rowData.revenueWithoutTaxExchange)"
+                        class="align-right">
+                        <p-treeTableCellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="number"
+                                       class="form-control"
+                                       name="revenueWithoutTaxExchange"
+                                       min="0"
+                                       (change)="onRowEditRevenueWithoutTaxExchange($event, rowData)"
+                                       [(ngModel)]="rowData.revenueWithoutTaxExchange"
+                                       placeholder="{{ 'Doanh thu chưa thuế quy đổi' | translate }}">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{convertCurrencyMask(rowData.revenueWithoutTaxExchange)}}
+                            </ng-template>
+                        </p-treeTableCellEditor>
+                    </td>
+                    <td
+                        [title]="(rowData.corporateTaxRate !== null && rowData.corporateTaxRate !== undefined) ? rowData.corporateTaxRate + '%' : ''">
+                        {{ (rowData.corporateTaxRate !== null && rowData.corporateTaxRate !== undefined) ?
+                        rowData.corporateTaxRate + '%' : '' }}
+                    </td>
+                    <td ttEditableColumn
+                        [ttEditableColumnDisabled]="!editTableContractorTaxExchange"
+                        [title]="convertCurrencyMask(rowData.corporateTaxExchange)"
+                        class="align-right">
+                        <p-treeTableCellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="number"
+                                       class="form-control"
+                                       name="corporateTaxExchange"
+                                       min="0"
+                                       (change)="onRowEditCorporateTaxExchange(rowData, $event)"
+                                       [(ngModel)]="rowData.corporateTaxExchange"
+                                       placeholder="{{ 'Thuế TNDN quy đổi' | translate }}">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{convertCurrencyMask(rowData.corporateTaxExchange)}}
+                            </ng-template>
+                        </p-treeTableCellEditor>
+                    </td>
+                    <td ttEditableColumn
+                        [ttEditableColumnDisabled]="!editTableContractorTaxExchange"
+                        [title]="convertCurrencyMask(rowData.revenueCorporateTaxExchange)"
+                        class="align-right">
+                        <p-treeTableCellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="number"
+                                       class="form-control"
+                                       name="revenueCorporateTaxExchange"
+                                       min="0"
+                                       (change)="onRowEditRevenueCorporateTaxExchangeInit($event, rowData)"
+                                       [(ngModel)]="rowData.revenueCorporateTaxExchange"
+                                       placeholder="{{ 'Doanh thu có thuế TNDN quy đổi' | translate }}">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{convertCurrencyMask(rowData.revenueCorporateTaxExchange)}}
+                            </ng-template>
+                        </p-treeTableCellEditor>
+                    </td>
+                    <td
+                        [title]="(rowData.vatTaxRate !== null && rowData.vatTaxRate !== undefined) ? rowData.vatTaxRate + '%' : ''">
+                        {{ (rowData.vatTaxRate !== null && rowData.vatTaxRate !== undefined) ? rowData.vatTaxRate +
+                        '%' : '' }}
+                    </td>
+                    <td ttEditableColumn
+                        [ttEditableColumnDisabled]="!editTableContractorTaxExchange"
+                        [title]="convertCurrencyMask(rowData.vatTaxExchange)"
+                        class="align-right">
+                        <p-treeTableCellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="number"
+                                       class="form-control"
+                                       name="vatTaxExchange"
+                                       min="0"
+                                       (change)="onRowEditVatTaxExchange(rowData, $event)"
+                                       [(ngModel)]="rowData.vatTaxExchange"
+                                       placeholder="{{ 'Thuế VAT quy đổi' | translate }}">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{convertCurrencyMask(rowData.vatTaxExchange)}}
+                            </ng-template>
+                        </p-treeTableCellEditor>
+                    </td>
+                    <td ttEditableColumn
+                        [ttEditableColumnDisabled]="!editTableContractorTaxExchange"
+                        [title]="convertCurrencyMask(rowData.revenueVatTaxExchange)"
+                        class="align-right">
+                        <p-treeTableCellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="number"
+                                       class="form-control"
+                                       name="revenueVatTaxExchange"
+                                       min="0"
+                                       (change)="onRowEditRevenueVatTaxExchange(rowData, $event)"
+                                       [(ngModel)]="rowData.revenueVatTaxExchange"
+                                       placeholder="{{ 'Doanh thu có thuế VAT quy đổi' | translate }}">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{convertCurrencyMask(rowData.revenueVatTaxExchange)}}
+                            </ng-template>
+                        </p-treeTableCellEditor>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="5"
+                        class="align-right">{{ ('COMMON.TOTAL' | translate) + ': ' }}</td>
+                    <td [title]="convertCurrencyMask(purchaseInvoiceData.revenueWithoutTaxExchangeTotal)"
+                        class="align-right">
+                        <input *ngIf="editTableContractorTaxExchange"
+                               type="number"
+                               class="form-control"
+                               name="revenueWithoutTaxExchangeTotal"
+                               min="0"
+                               (change)="onRowEditRevenueWithoutTaxTotalExchangeInit($event)"
+                               [(ngModel)]="purchaseInvoiceData.revenueWithoutTaxExchangeTotal"
+                               placeholder="{{ 'Tổng doanh thu chưa thuế quy đổi' | translate }}">
+
+                        <span *ngIf="!editTableContractorTaxExchange">
+                            {{convertCurrencyMask(purchaseInvoiceData.revenueWithoutTaxExchangeTotal)}}
+                        </span>
+                    </td>
+                    <td></td>
+                    <td [title]="convertCurrencyMask(purchaseInvoiceData.corporateTaxExchangeTotal)"
+                        class="align-right">
+                        <input *ngIf="editTableContractorTaxExchange"
+                               type="number"
+                               class="form-control"
+                               name="corporateTaxExchangeTotal"
+                               min="0"
+                               (change)="onRowEditCorporateTaxTotalExchangeInit($event)"
+                               [(ngModel)]="purchaseInvoiceData.corporateTaxExchangeTotal"
+                               placeholder="{{ 'Tổng thuế TNDN quy đổi' | translate }}">
+
+                        <span *ngIf="!editTableContractorTaxExchange">
+                            {{convertCurrencyMask(purchaseInvoiceData.corporateTaxExchangeTotal)}}
+                        </span>
+                    </td>
+                    <td [title]="convertCurrencyMask(purchaseInvoiceData.revenueCorporateTaxExchangeTotal)"
+                        class="align-right">
+                        <input *ngIf="editTableContractorTaxExchange"
+                               type="number"
+                               class="form-control"
+                               name="revenueCorporateTaxExchangeTotal"
+                               min="0"
+                               (change)="onRowEditRevenueCorporateTaxTotalExchangeInit($event)"
+                               [(ngModel)]="purchaseInvoiceData.revenueCorporateTaxExchangeTotal"
+                               placeholder="{{ 'Tổng doanh thu có thuế TNDN quy đổi' | translate }}">
+
+                        <span *ngIf="!editTableContractorTaxExchange">
+                            {{convertCurrencyMask(purchaseInvoiceData.revenueCorporateTaxExchangeTotal)}}
+                        </span>
+                    </td>
+                    <td></td>
+                    <td [title]="convertCurrencyMask(purchaseInvoiceData.vatTaxExchangeTotal)"
+                        class="align-right">
+                        <input *ngIf="editTableContractorTaxExchange"
+                               type="number"
+                               class="form-control"
+                               name="vatTaxExchangeTotal"
+                               min="0"
+                               (change)="onRowEditVatTaxTotalExchangeInit($event)"
+                               [(ngModel)]="purchaseInvoiceData.vatTaxExchangeTotal"
+                               placeholder="{{ 'Tổng thuế VAT quy đổi' | translate }}">
+
+                        <span *ngIf="!editTableContractorTaxExchange">
+                            {{convertCurrencyMask(purchaseInvoiceData.vatTaxExchangeTotal)}}
+                        </span>
+                    </td>
+                    <td [title]="convertCurrencyMask(purchaseInvoiceData.revenueVatTaxExchangeTotal)"
+                        class="align-right">
+                        <input *ngIf="editTableContractorTaxExchange"
+                               type="number"
+                               class="form-control"
+                               name="revenueVatTaxExchangeTotal"
+                               min="0"
+                               (change)="onRowEditRevenueVatTaxTotalExchangeInit($event)"
+                               [(ngModel)]="purchaseInvoiceData.revenueVatTaxExchangeTotal"
+                               placeholder="{{ 'Tổng doanh thu có thuế VAT quy đổi' | translate }}">
+
+                        <span *ngIf="!editTableContractorTaxExchange">
+                            {{convertCurrencyMask(purchaseInvoiceData.revenueVatTaxExchangeTotal)}}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-treeTable>
+    </div>
+</div>
+<br>
+<br>
+<br>
+<div *ngIf="editTable">
+    <button class="btn btn-sm btn-success mr-2"
+            title="{{ 'Lưu thông tin tab tính thuế' | translate }}"
+            (click)="onBtnSaveContractTaxClick()">
+        <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}</button>
+    <button class="btn btn-sm btn-secondary mr-2"
+            title="{{ 'COMMON.CANCEL' | translate }}"
+            (click)="onBtnCancelClick()">
+        <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}</button>
+    <!-- // areaType === 2 Mua hàng nước ngoài gửi XNK -> Xác nhận thuế -->
+    <button *ngIf="purchaseInvoiceData?.taxStatus !== 4"
+            class="btn btn-sm btn-label-brand mr-2"
+            style="position: absolute; right: 57px;"
+            title="{{ dataSource.treeNodes[0]?.areaType === 2 ? 'Xác nhận thuế' : 'Gửi XNK' | translate }}"
+            (click)="onBtnSendTaxInfoClick()">
+        <i *ngIf="dataSource.treeNodes[0]?.areaType !== 2"
+           class="fal fa-paper-plane"></i>
+        {{ dataSource.treeNodes[0]?.areaType === 2 ? 'Xác nhận thuế' : 'Gửi XNK' | translate }}
+    </button>
+</div>

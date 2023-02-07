@@ -1,0 +1,72 @@
+<p-dialog #dlg
+          [modal]="true"
+          [(visible)]="dialogRef.isDisplay"
+          [baseZIndex]="11002"
+          [style]="{width: '750px'}"
+          [modal]="true"
+          [closable]="true"
+          appendTo="body"
+          (onHide)="dialogRef.visibilitySubject.next(false); currentStep = 0;">
+    <p-header>
+        <i class="fal fa-users-cog"></i> {{ getHeader() | translate }}
+    </p-header>
+    <div *ngIf="currentStep === 0">
+        <div class="border-p-tree">
+            <p-tree [value]="treeData"
+                    selectionMode="checkbox"
+                    styleClass="p-treenode-non-highlighted"
+                    [(selection)]="selectedItems"
+                    (onNodeSelect)="isSelectedChanged = true"
+                    (onNodeUnselect)="isSelectedChanged = true"
+                    key="id">
+                <ng-template let-node
+                             pTemplate="default">
+                    {{ node.label | translate }}
+                </ng-template>
+            </p-tree>
+        </div>
+    </div>
+    <div *ngIf="currentStep === 1">
+        <div class="border-p-tree">
+            <p-tree [value]="treeDataSelected">
+                <ng-template let-node
+                             pTemplate="default">
+                    {{ node.label | translate }}
+                    <!-- Show when advance mode is on and node is leaf -->
+                    <a *ngIf="isAdvanceConfig && isScreen(node)"
+                       (click)="onBtnCustomizeClick(node)"
+                       style="padding-left: 15px; color: red; text-decoration: underline;">Customize</a>
+                    <a *ngIf="isAdvanceConfig && isScreen(node) && node.data.isCustomized"
+                       (click)="onBtnResetClick(node)"
+                       style="padding-left: 15px; color: red; text-decoration: underline;">Reset</a>
+                    <a *ngIf="!isAdvanceConfig && node.data.isCustomized"
+                       style="padding-left: 15px; color: red;">Customized</a>
+                </ng-template>
+            </p-tree>
+        </div>
+    </div>
+    <div *ngIf="currentStep === 1">
+    </div>
+    <ng-template pTemplate="footer">
+        <ng-container *ngIf="currentStep === 0">
+            <button class="btn btn-sm btn-secondary"
+                    (click)="onBtnSkipClick()">{{ 'COMMON.SKIP' | translate }}</button>
+            <button class="btn btn-sm btn-success"
+                    (click)="onBtnNextClick()">{{ 'COMMON.NEXT' | translate }}
+                <i class="fal fa-arrow-right"></i></button>
+        </ng-container>
+        <ng-container *ngIf="currentStep === 1">
+            <button class="btn btn-sm btn-secondary float-left"
+                    (click)="onBtnAdvanceConfigClick()">
+                {{ (isAdvanceConfig ? 'ROLE.HIDE_RESTRICT_CONFIG' : 'ROLE.RESTRICT_CONFIG') | translate }}</button>
+            <button class="btn btn-sm btn-secondary"
+                    (click)="onBtnBackClick()">{{ 'COMMON.BACK' | translate }}
+                <i class="fal fa-arrow-left"></i></button>
+            <button class="btn btn-sm btn-success"
+                    (click)="onBtnFinishClick()">{{ 'COMMON.FINISH' | translate }}</button>
+        </ng-container>
+    </ng-template>
+</p-dialog>
+
+<app-customize-resource [dialogRef]="customizeDialogRef"
+                        (performSet)="onPerformSet()"></app-customize-resource>

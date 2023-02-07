@@ -1,0 +1,88 @@
+<ng-container>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export excel thông tin line hàng' | translate }}"
+            (click)="checkLicensedExport()">
+        <i class="fas fa-download"></i>
+        {{ 'Export excel thông tin line hàng' | translate }}
+    </button>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export danh mục hàng hóa' | translate }}"
+            (click)="btnExportMenuOfGoods()">
+        <i class="fas fa-download"></i>
+        {{ 'Export danh mục hàng hóa' | translate }}
+    </button>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export bảng kê thương mại' | translate }}"
+            (click)="btnExportCommercialList()">
+        <i class="fas fa-download"></i>
+        {{ 'Export bảng kê thương mại' | translate }}
+    </button>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export phụ lục tờ khai điện tử' | translate }}"
+            (click)="btnExportElectronicDeclarationAppendix()">
+        <i class="fas fa-download"></i>
+        {{ 'Export phụ lục tờ khai điện tử' | translate }}
+    </button>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export đề nghị nộp thuế' | translate }}"
+            (click)="exportRequestPayTaxAllSheet()">
+        <i class="fas fa-download"></i>
+        {{ 'Export đề nghị nộp thuế' | translate }}
+    </button>
+
+    <!-- <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export đề nghị nộp thuế' | translate }}"
+            [matMenuTriggerFor]="menu">
+        <i class="far fa-align-left"></i>
+        {{ 'Export đề nghị nộp thuế' | translate }}
+    </button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item
+                (click)="exportRequestPayTax()">
+            <i class="fas fa-download"></i>
+            <span>Giấy đề nghị nộp thuế</span>
+        </button>
+        <button mat-menu-item
+                (click)="exportStatementPayTax()">
+            <i class="fas fa-download"></i>
+            <span>Bảng kê nộp thuế</span>
+        </button>
+        <button mat-menu-item
+                (click)="exportRequestPaymentCustomsFees()">
+            <i class="fas fa-download"></i>
+            <span>Giấy đề nghị nộp lệ phí hải quan</span>
+        </button>
+        <button mat-menu-item
+                (click)="exportPayMoneyIntoStateBudget()">
+            <i class="fas fa-download"></i>
+            <span>Giấy nộp tiền vào ngân hàng nhà nước</span>
+        </button>
+    </mat-menu> -->
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export đăng ký kiểm tra chất lượng hàng hóa' | translate }}"
+            (click)="exportRegisterCheckQualityOfGoods()">
+        <i class="fas fa-download"></i>
+        {{ 'Export đăng ký kiểm tra chất lượng hàng hóa' | translate }}
+    </button>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export báo cáo tự đánh giá chất lượng' | translate }}"
+            (click)="exportQualitySelfAssessmentReport()">
+        <i class="fas fa-download"></i>
+        {{ 'Export báo cáo tự đánh giá chất lượng' | translate }}
+    </button>
+
+    <button class="btn btn-sm btn-label-brand mr-2 mt-2"
+            title="{{ 'Export hồ sơ đăng ký chất lượng' | translate }}"
+            (click)="btnExportQualityRegistrationDocuments()">
+        <i class="fas fa-download"></i>
+        {{ 'Export hồ sơ đăng ký chất lượng' | translate }}
+    </button>
+
+</ng-container>

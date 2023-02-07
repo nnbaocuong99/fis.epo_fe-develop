@@ -1,0 +1,143 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [style]="{width: '50%', minWidth: '50%'}"
+          [maximizable]="true"
+          [draggable]="true"
+          [baseZIndex]="9000"
+          appendTo="body"
+          [autoZIndex]="true"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Form giấy đề nghị nhập kho' | translate }}
+    </p-header>
+
+    <div id="print-page">
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <td width="62%">
+                        <span *ngIf="purchaseInvoiceData?.ouCode === '1139'">
+                            <p style="font-size: 12px;"><strong>CÔNG TY TNHH HỆ THỐNG THÔNG TIN FPT</strong></p>
+                            <a>Tầng 22, tòa nhà KeangNam Landmark 72, E6, Phạm Hùng, Mễ Trì, Nam Từ Liêm, Hà Nội</a>
+                        </span>
+
+                        <span *ngIf="purchaseInvoiceData?.ouCode === '1160'">
+                            <p style="font-size: 12px;"><strong>CHI NHÁNH TẠI TP. HỒ CHÍ MINH CÔNG TY TNHH HỆ
+                                    THỐNG THÔNG TIN FPT (TP HÀ NỘI)</strong></p>
+                            <a>Lô B3, Đường Sáng Tạo, Khu E – Office, Khu chế xuất Tân Thuận, Phường
+                                Tân Thuận Đông, Quận 7, TP. Hồ Chí Minh</a>
+                        </span>
+                    </td>
+                    <td width="38%"
+                        style="text-align: center;">
+                        <p style="font-size: 12px;"> <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
+                        <strong>Độc lập - Tự do - Hạnh phúc</strong>
+                        <br>
+                        <span *ngIf="purchaseInvoiceData?.ouCode === '1139'">
+                            <strong>{{'Hà Nội, ngày ' + getDatetime('dd') + ' tháng ' +
+                                getDatetime('mm')+ ' năm ' + getDatetime('yyyy')}}</strong>
+                        </span>
+
+                        <span *ngIf="purchaseInvoiceData?.ouCode === '1160'">
+                            <strong>{{'Hồ Chí Minh, ngày ' + getDatetime('dd') + ' tháng ' +
+                                getDatetime('mm')+ ' năm ' + getDatetime('yyyy')}}</strong>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <br>
+        <h3 style="text-align: center;"> <strong>GIẤY ĐỀ NGHI NHẬP KHO</strong></h3>
+        <br>
+        <div style="padding-left: 60px;">
+            <div>
+                <p *ngIf="purchaseInvoiceData.warehouseImportUserName">
+                    Người đề nghị: {{purchaseInvoiceData.warehouseImportUserName +' (' +
+                    purchaseInvoiceData.warehouseImportFullName +')'}},</p>
+                <p *ngIf="!purchaseInvoiceData.warehouseImportUserName">
+                    Người đề nghị: {{purchaseInvoiceData?.useNameLoginData?.userName +' (' +
+                    purchaseInvoiceData?.useNameLoginData?.fullName +')'}},</p>
+                <p>Bộ phận:
+                    {{orgChart?.orgName}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Số PO: {{poNumber}}</p>
+                <p>Số hóa đơn: {{invoiceNumberMaintenance}}</p>
+                <p>Nhập của: {{purchaseInvoiceData?.supplierName}}</p>
+                <p>Nhập vào kho: {{subInventoryName}}</p>
+                <p>Lý do nhập: {{purchaseInvoiceData?.invoiceDesc}}</p>
+            </div>
+        </div>
+        <br>
+        <table style="border: 1px solid black; width: 100%; border-collapse: collapse;">
+            <tr style="border: 1px solid black;">
+                <th style="border: 1px solid black; text-align: center;"
+                    width="58"><strong>TT</strong></th>
+                <th style="border: 1px solid black; text-align: center;"
+                    width="200"><strong>Thiết bị và cấu hình</strong></th>
+                <th style="border: 1px solid black; text-align: center;"
+                    width="100"><strong>Mã hàng</strong></th>
+                <th style="border: 1px solid black; text-align: center;"
+                    width="100"><strong>ĐVT</strong></th>
+                <th style="border: 1px solid black; text-align: center;"
+                    width="100"><strong>Số lượng</strong></th>
+                <th style="border: 1px solid black; text-align: center;"
+                    width="100"><strong>Đơn giá</strong></th>
+                <th style="border: 1px solid black; text-align: center;"
+                    width="100"><strong>Thành tiền</strong></th>
+            </tr>
+
+            <tr *ngFor="let rowData of listitems"
+                style="border: 1px solid black; text-align: center;">
+                <td style="border: 1px solid black; text-align: center;">
+                    {{rowData.indexNo}}
+                </td>
+                <td style="border: 1px solid black;">{{rowData.itemName}}</td>
+                <td style="border: 1px solid black;">{{rowData.itemCode}}</td>
+                <td style="border: 1px solid black;">{{rowData.unit}}</td>
+                <td style="border: 1px solid black;">{{rowData.quantity}}</td>
+                <td style="border: 1px solid black; text-align: right">
+                    {{convertCurrencyMask(rowData.price)}}</td>
+                <td style="border: 1px solid black;text-align: right">
+                    {{convertCurrencyMask(rowData.quantity*rowData.price)}}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black;text-align: right"
+                    colspan="6"><b>{{'Tổng cộng giá trị nhập hàng (Trước VAT): '}}</b></td>
+                <td style="border: 1px solid black; text-align: right"><b>{{convertCurrencyMask(moneyTotal)}}</b></td>
+            </tr>
+        </table>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;<b>Bằng chữ: </b><i>{{ readCurrencyToString(moneyTotal) +'./.' }}</i></p>
+        <table class="table table-borderless">
+            <tbody>
+                <tr style="height: 100px">
+                    <td width="25%"><strong>Người đề nghị</strong></td>
+                    <td width="25%"><strong>Trưởng bộ phận</strong></td>
+                    <td width="20%"><strong>Thủ kho</strong></td>
+                    <td width="30%"><strong>Trưởng ban tài chính - Kế toán</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="mat-table__bottom"
+             style="margin-top: 15px;">
+            <button class="btn btn-primary ml-3"
+                    *ngIf="!purchaseInvoiceData.print"
+                    title="{{ 'PURCHASE_INVOICE.SEND_SUGGESTIONS_IMPORT_GOODS' | translate }}"
+                    (click)="onBtnSaveClick()">
+                {{ 'COMMON.SEND' | translate }}
+            </button>
+            <button class="btn btn-secondary ml-3"
+                    title="{{ 'COMMON.CANCEL' | translate }}"
+                    (click)="close()">
+                {{ 'COMMON.CANCEL' | translate }}
+            </button>
+            <button class="btn btn-secondary ml-3"
+                    title="{{ 'COMMON.PRINT' | translate }}"
+                    (click)="printPage()">
+                <i class="fal fa-print"></i>{{ 'COMMON.PRINT' | translate }}</button>
+        </div>
+    </ng-template>
+</p-dialog>

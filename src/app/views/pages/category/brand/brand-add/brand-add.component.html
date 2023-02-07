@@ -1,0 +1,598 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="formTitle | translate"
+                       [viewLoading$]="brandService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <ngb-tabset>
+            <!-- tab Thông tin hãng -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{'Thông tin hãng'| translate}}</h5>
+                </ng-template>
+
+                <ng-template ngbTabContent>
+                    <div class="kt-grid__item">
+                        <form autocomplete="off"
+                              #form="ngForm"
+                              id="id-form-brand">
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin hãng'| translate}}
+                                </h5>
+                                <div class="form-row">
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'BRAND.CODE' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="code"
+                                               maxlength="255"
+                                               placeholder="{{ 'BRAND.CODE' | translate }}"
+                                               [(ngModel)]="brandData.code"
+                                               brandCodeExistValidator
+                                               [id]="brandData.id"
+                                               disabled>
+                                        <validate-message [form]="form"
+                                                          controlName="code"></validate-message>
+
+                                        <!-- <input type="text"
+                                               class="form-control"
+                                               name="code"
+                                               maxlength="255"
+                                               placeholder="{{ 'BRAND.CODE' | translate }}"
+                                               [(ngModel)]="brandData.code"
+                                               (focusout)="focusOutCheckExists()"
+                                               required>
+                                        <validate-message [form]="form"
+                                                          controlName="code"></validate-message> -->
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'BRAND.NAME_BRAND' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="name"
+                                               placeholder="{{ 'BRAND.NAME_BRAND' | translate }}"
+                                               (change)="onChangeBrandName($event)"
+                                               [(ngModel)]="brandData.name"
+                                               required>
+                                        <validate-message [form]="form"
+                                                          controlName="name"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'Tên hãng viết tắt' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="acronymName"
+                                               placeholder="{{ 'Tên hãng viết tắt' | translate }}"
+                                               [(ngModel)]="brandData.acronymName"
+                                               required>
+                                        <validate-message [form]="form"
+                                                          controlName="acronymName"></validate-message>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="lbl-required">
+                                            {{ 'Năm tài chính (Từ ngày - Đến ngày)' | translate }}</label>
+                                        <p-calendar name="financialYearDate"
+                                                    inputId="range"
+                                                    styleClass="ui-calendar ui-inputtext"
+                                                    selectionMode="range"
+                                                    [readonlyInput]="true"
+                                                    (onSelect)="onChangeFinancialYearDate($event)"
+                                                    dateFormat="dd/mm/yy"
+                                                    placeholder="{{ 'dd/mm/yy - dd/mm/yy' | translate }}"
+                                                    [(ngModel)]="brandData.financialYearDate"
+                                                    required>
+                                        </p-calendar>
+                                        <validate-message [form]="form"
+                                                          controlName="financialYearDate"></validate-message>
+                                    </div>
+
+                                    <!-- <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">
+                                            {{ 'Năm tài chính - Từ ngày' | translate }}</label>
+                                        <input-date name="financialYearFd"
+                                                    [(ngModel)]="brandData.financialYearFd"
+                                                    required></input-date>
+                                        <validate-message [form]="form"
+                                                          controlName="financialYearFd"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">
+                                            {{ 'Năm tài chính - Đến ngày' | translate }}</label>
+                                        <input-date name="financialYearTd"
+                                                    [(ngModel)]="brandData.financialYearTd"
+                                                    required></input-date>
+                                        <validate-message [form]="form"
+                                                          controlName="financialYearTd"></validate-message>
+                                    </div> -->
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.PARADIGM' | translate }}</label>
+                                        <config-list-control name="model"
+                                                             type="BRAND_PARADIGM"
+                                                             header="{{ 'BRAND.PARADIGM' | translate }}"
+                                                             [items]="configListDataParadigm"
+                                                             [hasEdit]="true"
+                                                             [(ngModel)]="brandData.model">
+                                        </config-list-control>
+                                        <validate-message [form]="form"
+                                                          controlName="model"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.NEW_PRODUCT' | translate }}</label>
+                                        <config-list-control name="newProduct"
+                                                             type="BRAND_NEW_PRODUCT"
+                                                             header="{{ 'BRAND.NEW_PRODUCT' | translate }}"
+                                                             [items]="configListDataNewProduct"
+                                                             [hasEdit]="true"
+                                                             [(ngModel)]="brandData.newProduct">
+                                        </config-list-control>
+                                        <validate-message [form]="form"
+                                                          controlName="newProduct"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'BRAND.PARTNER_RATING' | translate }}</label>
+                                        <config-list-control name="partnerRating"
+                                                             type="BRAND_PARTNER_RATING"
+                                                             header="{{ 'BRAND.PARTNER_RATING' | translate }}"
+                                                             [items]="configListDataPartnerRating"
+                                                             [hasEdit]="true"
+                                                             [(ngModel)]="brandData.partnerRating"
+                                                             required>
+                                        </config-list-control>
+
+                                        <validate-message [form]="form"
+                                                          controlName="partnerRating"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.BENEFIT' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="benefit"
+                                               placeholder="{{ 'BRAND.BENEFIT' | translate }}"
+                                               [(ngModel)]="brandData.benefit">
+                                        <validate-message [form]="form"
+                                                          controlName="benefit"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.DEFAULT_DISCOUNT' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="defaultDiscount"
+                                               placeholder="{{ 'BRAND.DEFAULT_DISCOUNT' | translate }}"
+                                               [(ngModel)]="brandData.defaultDiscount">
+                                        <validate-message [form]="form"
+                                                          controlName="defaultDiscount"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'Chiết khấu đặc biệt' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="specialDiscount"
+                                               placeholder="{{ 'Chiết khấu đặc biệt' | translate }}"
+                                               [(ngModel)]="brandData.specialDiscount">
+                                        <validate-message [form]="form"
+                                                          controlName="specialDiscount"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'BRAND.DISTRIBUTOR_RETAILER' | translate
+                                            }}</label>
+                                        <ng-select [items]="brandType"
+                                                   bindLabel="label"
+                                                   bindValue="value"
+                                                   name="distributorOrRetailer"
+                                                   placeholder="{{ 'BRAND.DISTRIBUTOR_RETAILER' | translate }}"
+                                                   [(ngModel)]="brandData.distributorOrRetailer"
+                                                   required>
+                                        </ng-select>
+                                        <validate-message [form]="form"
+                                                          controlName="distributorOrRetailer"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.PAYMENT_TERMS' | translate }}</label>
+                                        <input type="number"
+                                               class="form-control"
+                                               min=0
+                                               name="termsOfPayment"
+                                               placeholder="{{ 'BRAND.PAYMENT_TERMS' | translate }}"
+                                               [(ngModel)]="brandData.termsOfPayment">
+                                        <validate-message [form]="form"
+                                                          controlName="termsOfPayment"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.PAYMENT_METHODS' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="paymentMethods"
+                                               placeholder="{{ 'BRAND.PAYMENT_METHODS' | translate }}"
+                                               [(ngModel)]="brandData.paymentMethods">
+                                        <validate-message [form]="form"
+                                                          controlName="paymentMethods"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'Credit Limit' | translate }}</label>
+                                        <input type="mumber"
+                                               class="form-control"
+                                               name="creditLimit"
+                                               placeholder="{{ 'Credit Limit' | translate }}"
+                                               [(ngModel)]="brandData.creditLimit">
+                                        <validate-message [form]="form"
+                                                          controlName="creditLimit"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.POSTPAID' | translate }}</label>
+                                        <input type="number"
+                                               class="form-control"
+                                               name="postpaid"
+                                               placeholder="{{ 'BRAND.POSTPAID' | translate }}"
+                                               [(ngModel)]="brandData.postpaid">
+                                        <validate-message [form]="form"
+                                                          controlName="postpaid"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.CONTRACTOR_TAX' | translate }}</label>
+                                        <config-list-control name="fct"
+                                                             type="BRAND_CONTRACTOR_TAX"
+                                                             header="{{ 'BRAND.CONTRACTOR_TAX' | translate }}"
+                                                             [items]="configListDataFct"
+                                                             [hasEdit]="true"
+                                                             [(ngModel)]="brandData.fct">
+                                        </config-list-control>
+
+                                        <validate-message [form]="form"
+                                                          controlName="fct"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.TRANSPORT_FEE' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="freightFee"
+                                               placeholder="{{ 'BRAND.TRANSPORT_FEE' | translate }}"
+                                               [(ngModel)]="brandData.freightFee">
+                                        <validate-message [form]="form"
+                                                          controlName="freightFee"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.POLICY' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="policy"
+                                               placeholder="{{ 'BRAND.POLICY' | translate }}"
+                                               [(ngModel)]="brandData.policy">
+                                        <validate-message [form]="form"
+                                                          controlName="policy"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.INCENTIVE' | translate }}</label>
+                                        <ng-select [items]="incentiveData"
+                                                   bindLabel="label"
+                                                   bindValue="label"
+                                                   name="incentive"
+                                                   placeholder="{{ 'BRAND.INCENTIVE' | translate }}"
+                                                   [(ngModel)]="brandData.incentive">
+                                        </ng-select>
+                                        <validate-message [form]="form"
+                                                          controlName="incentive"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.MDF' | translate }}</label>
+                                        <ng-select [items]="mdfData"
+                                                   bindLabel="label"
+                                                   bindValue="label"
+                                                   name="mdf"
+                                                   placeholder="{{ 'BRAND.MDF' | translate }}"
+                                                   [(ngModel)]="brandData.mdf">
+                                        </ng-select>
+                                        <validate-message [form]="form"
+                                                          controlName="mdf"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'Năm cập nhật' | translate }}</label>
+                                        <ng-select [items]="listYearSelect"
+                                                   bindLabel="value"
+                                                   bindValue="value"
+                                                   name="brandYear"
+                                                   (change)="onChangeBrandYear($event)"
+                                                   placeholder="{{ 'Năm cập nhật' | translate }}"
+                                                   [(ngModel)]="brandData.brandYear"
+                                                   required>
+                                        </ng-select>
+                                        <validate-message [form]="form"
+                                                          controlName="brandYear"></validate-message>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="lbl-required">
+                                            {{ 'Hiệu lực đối tác (Từ ngày - Đến ngày)' | translate }}</label>
+                                        <p-calendar name="partnerEffectDate"
+                                                    inputId="range"
+                                                    styleClass="ui-calendar ui-inputtext"
+                                                    selectionMode="range"
+                                                    [readonlyInput]="true"
+                                                    (onSelect)="onChangePartnerEffectDate($event)"
+                                                    dateFormat="dd/mm/yy"
+                                                    placeholder="{{ 'dd/mm/yy - dd/mm/yy' | translate }}"
+                                                    [(ngModel)]="brandData.partnerEffectDate"
+                                                    required>
+                                        </p-calendar>
+                                        <validate-message [form]="form"
+                                                          controlName="partnerEffectDate"></validate-message>
+                                    </div>
+
+                                    <!-- <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">
+                                            {{ 'Hiệu lực đối tác - Từ ngày' | translate }}</label>
+                                        <input-date name="fromDate"
+                                                    [(ngModel)]="brandData.fromDate"
+                                                    required></input-date>
+                                        <validate-message [form]="form"
+                                                          controlName="fromDate"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">
+                                            {{ 'Hiệu lực đối tác - Đến ngày' | translate }}</label>
+                                        <input-date name="toDate"
+                                                    [(ngModel)]="brandData.toDate"
+                                                    required></input-date>
+                                        <validate-message [form]="form"
+                                                          controlName="toDate"></validate-message>
+                                    </div> -->
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'Priority' | translate }} </label>
+                                        <config-list-control name="priority"
+                                                             type="BRAND_PRIORITY"
+                                                             header="{{ 'Priority' | translate }}"
+                                                             [items]="configListDataPriority"
+                                                             [hasEdit]="true"
+                                                             [(ngModel)]="brandData.priority"
+                                                             required>
+                                        </config-list-control>
+                                        <validate-message [form]="form"
+                                                          controlName="priority"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'FIS Partner ID' | translate }}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="fisPartnerId"
+                                               placeholder="{{ 'FIS Partner ID' | translate }}"
+                                               [(ngModel)]="brandData.fisPartnerId">
+                                        <validate-message [form]="form"
+                                                          controlName="fisPartnerId"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'Deal Registration' | translate }}</label>
+                                        <ng-select [items]="dealRegistration"
+                                                   bindLabel="label"
+                                                   bindValue="label"
+                                                   name="dealRegistration"
+                                                   placeholder="{{ 'Deal Registration' | translate }}"
+                                                   [(ngModel)]="brandData.dealRegistration">
+                                        </ng-select>
+                                        <validate-message [form]="form"
+                                                          controlName="dealRegistration"></validate-message>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'Case Studies' | translate }}</label>
+                                        <textarea type="text"
+                                                  class="form-control"
+                                                  name="caseStudies"
+                                                  placeholder="{{ 'Case Studies' | translate }}"
+                                                  [(ngModel)]="brandData.caseStudies"></textarea>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label>{{ 'BRAND.NOTE' | translate }}</label>
+                                        <textarea type="text"
+                                                  class="form-control"
+                                                  name="note"
+                                                  placeholder="{{ 'BRAND.NOTE' | translate }}"
+                                                  [(ngModel)]="brandData.note"></textarea>
+                                        <validate-message [form]="form"
+                                                          controlName="note"></validate-message>
+                                    </div>
+                                    <div *ngIf="brandData.id"
+                                         class="col-md-4 mb-3">
+                                        <label>{{ 'File đính kèm' | translate }}</label>
+                                        <single-attach-file module="Attachment\Brand\{{brandData.id}}">
+                                        </single-attach-file>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-partner-hierarchy #partnerHierarchy
+                                                       [brandData]="brandData"></app-partner-hierarchy>
+                            </div>
+                            <br>
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-brand-revenue #brandRevenue
+                                                   (hasEdit)="editRow()"></app-brand-revenue>
+                            </div>
+
+                            <br>
+
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-brand-marketing-fund-info #brandMarketingFundInfo
+                                                               (hasEdit)="editRow()"></app-brand-marketing-fund-info>
+                            </div>
+
+                            <br>
+
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-brand-membership-requirement #brandMembershipRequirement
+                                                                  (hasEdit)="editRow()">
+                                </app-brand-membership-requirement>
+                            </div>
+                            <br>
+
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-t-15 kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin chi tiết bảo hành'| translate}}
+                                </h5>
+                                <div class="form-row">
+                                    <div class="col-md-2 mb-3">
+                                        <label class="lbl-required">{{ 'BRAND.WARRANTY_VALIDITY' | translate }}</label>
+                                        <config-list-control name="warrantyValidity"
+                                                             type="BRAND_WARRANTY_VALIDITY"
+                                                             header="{{ 'BRAND.WARRANTY_VALIDITY' | translate }}"
+                                                             [items]="configListDataWarrantyValidity"
+                                                             [hasEdit]="true"
+                                                             [(ngModel)]="brandData.warrantyValidity"
+                                                             required>
+                                        </config-list-control>
+                                        <validate-message [form]="form"
+                                                          controlName="warrantyValidity"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.BACKDATE' | translate }}</label>
+                                        <ng-select [items]="backDate"
+                                                   bindLabel="label"
+                                                   bindValue="value"
+                                                   name="backDate"
+                                                   placeholder="{{ 'BRAND.BACKDATE' | translate }}"
+                                                   [(ngModel)]="brandData.backDate">
+                                        </ng-select>
+                                        <validate-message [form]="form"
+                                                          controlName="backDate"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.MAINTENANCE_AND_SUPPORT' | translate}}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="maintenanceAndSupport"
+                                               placeholder="{{ 'BRAND.MAINTENANCE_AND_SUPPORT' | translate }}"
+                                               [(ngModel)]="brandData.maintenanceAndSupport">
+                                        <validate-message [form]="form"
+                                                          controlName="maintenanceAndSupport"></validate-message>
+                                    </div>
+
+
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.RELATED_DOCUMENTS' | translate}}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="relatedDocuments"
+                                               placeholder="{{ 'BRAND.RELATED_DOCUMENTS' | translate }}"
+                                               [(ngModel)]="brandData.relatedDocuments">
+                                        <validate-message [form]="form"
+                                                          controlName="relatedDocuments"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.RENEWAL' | translate}}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="renewal"
+                                               placeholder="{{ 'BRAND.RENEWAL' | translate }}"
+                                               [(ngModel)]="brandData.renewal">
+                                        <validate-message [form]="form"
+                                                          controlName="renewal"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.REINSTATEMENT' | translate}}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="reinstatement"
+                                               placeholder="{{ 'BRAND.REINSTATEMENT' | translate }}"
+                                               [(ngModel)]="brandData.reinstatement">
+                                        <validate-message [form]="form"
+                                                          controlName="reinstatement"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.REFERENCE_LINK' | translate}}</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="referenceLink"
+                                               placeholder="{{ 'BRAND.REFERENCE_LINK' | translate }}"
+                                               [(ngModel)]="brandData.referenceLink">
+                                        <validate-message [form]="form"
+                                                          controlName="referenceLink"></validate-message>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label>{{ 'BRAND.NOTE' | translate}}</label>
+                                        <textarea type="text"
+                                                  class="form-control"
+                                                  name="warrantyNotes"
+                                                  placeholder="{{ 'BRAND.NOTE' | translate }}"
+                                                  [(ngModel)]="brandData.warrantyNotes"></textarea>
+
+                                        <validate-message [form]="form"
+                                                          controlName="warrantyNotes"></validate-message>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Thông tin liên hệ -->
+                            <app-contact-info #contactInfo
+                                              (editRow)="editRow($event)"></app-contact-info>
+
+                        </form>
+
+                        <div class="mt-5">
+                            <button class="btn btn-sm btn-success mr-2"
+                                    title="{{ 'COMMON.SAVE' | translate }}"
+                                    (click)="onBtnSaveClick()">
+                                <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                            </button>
+
+                            <button class="btn btn-sm btn-secondary mr-2"
+                                    title="{{ 'COMMON.CANCEL' | translate }}"
+                                    (click)="onBtnCancelClick()">
+                                <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+                            </button>
+                        </div>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+            <!-- tab Phân cấp đổi tác -->
+            <!-- <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'Phân cấp đổi tác'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+
+                    <app-partner-hierarchy [brandData]="brandData"></app-partner-hierarchy>
+
+                </ng-template>
+            </ngb-tab> -->
+            <!-- tab thông tin hồ sơ  -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'Hồ sơ'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent
+                             *ngIf="currentBrandId">
+                    <!-- Thông tin hồ sơ -->
+                    <attach-document mainModule="BRAND_ATTACHMENT"
+                                     fileModule="Attachment\Brand\{{currentBrandId}}"
+                                     recordId="{{currentBrandId}}"
+                                     [formTitle]="'Danh mục hồ sơ hãng'"
+                                     [multiple]="true"
+                                     [hideOptional]="true">
+                    </attach-document>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </kt-portlet-body>
+</kt-portlet>

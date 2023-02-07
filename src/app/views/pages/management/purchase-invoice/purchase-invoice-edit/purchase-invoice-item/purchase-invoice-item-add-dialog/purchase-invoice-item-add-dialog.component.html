@@ -1,0 +1,303 @@
+<crud-dialog [dialogRef]="dialogRef"
+			 [form]="form"
+			 (save)="onBtnSaveClick()"
+			 (cancel)="onBtnCancelClick()">
+	<form autocomplete="off"
+		  #form="ngForm"
+		  id="role-edit">
+		<h5 class="kt-margin-b-15">
+			<i class="fab fa-envira"></i> Thông tin PO/Hợp đồng
+		</h5>
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>Số PO/Hợp đồng</label>
+				<select-sync-source placeholder="Số PO/Hợp đồng"
+									header="PO/Hợp đồng"
+									bindValue="code"
+									name="code"
+									[columns]="headerPo"
+									[service]="purchaseOrderService"
+									[requestPayload]="purchaseOrderRequestPayload"
+									(change)="onChangePoCode($event)"
+									[(ngModel)]="purchaseInvoiceItemsData.codeDto"></select-sync-source>
+				<validate-message [form]="form"
+								  controlName="code"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Mã dự án' | translate }}</label>
+				<select-sync-source name="projectCode"
+									placeholder="Mã dự án"
+									header="MENU.CATEGORY.PROJECT"
+									bindValue="code"
+									[columns]="headerProject"
+									[service]="projectService"
+									[requestPayload]="projectRequestPayload"
+									(change)="purchaseInvoiceItemsData.projectCode=purchaseInvoiceItemsData.projectCodeDto?.code"
+									[(ngModel)]="purchaseInvoiceItemsData.projectCodeDto"
+									readonly>
+				</select-sync-source>
+				<validate-message [form]="form"
+								  controlName="projectCode"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Phương thức vận chuyển' | translate }}</label>
+				<config-list-control name="delivery"
+									 header="Phương thức vận chuyển"
+									 type="TRANSPORTATION_MODE"
+									 [items]="configListDataDelivery"
+									 [hasEdit]="false"
+									 [(ngModel)]="purchaseInvoiceItemsData.delivery">
+				</config-list-control>
+				<validate-message [form]="form"
+								  controlName="delivery"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Thuế nhà thầu' | translate }}</label>
+				<select class="form-control"
+						name="taxpayer"
+						placeholder="Thuế nhà thầu"
+						[(ngModel)]="purchaseInvoiceItemsData.taxpayer">
+					<option [ngValue]="undefined"
+							selected>{{ 'COMMON.ALL' | translate }}</option>
+					<option *ngFor="let item of taxPayers"
+							[value]="item.value">{{item.label | translate }}</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Mã Org' | translate }}</label>
+				<select-sync-source name="orgCode"
+									placeholder="Mã Org"
+									header="MENU.CATEGORY.ORGANIZATION"
+									bindValue="code"
+									[width]="'70vw'"
+									[columns]="headerOrg"
+									[service]="organizationService"
+									[requestPayload]="organizationRequestPayload"
+									(change)="purchaseInvoiceItemsData.orgCode=purchaseInvoiceItemsData.orgCodeDto?.code"
+									[(ngModel)]="purchaseInvoiceItemsData.orgCodeDto">
+				</select-sync-source>
+				<validate-message [form]="form"
+								  controlName="orgCode"></validate-message>
+			</div>
+		</div>
+		<h5 class="kt-margin-b-15">
+			<i class="fab fa-envira"></i> Thông tin hàng hoá
+		</h5>
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Mã hàng' | translate }}</label>
+				<select-sync-source name="itemCode"
+									categoryType="item"
+									placeholder="Mã hàng"
+									header="MENU.CATEGORY.ITEM"
+									bindValue="code"
+									[columns]="headerItems"
+									[service]="itemService"
+									[requestPayload]="itemRequestPayload"
+									(change)="onChangeItemCode($event)"
+									[(ngModel)]="purchaseInvoiceItemsData.itemCodeDto">
+				</select-sync-source>
+				<validate-message [form]="form"
+								  controlName="itemCode"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Part number' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="partNo"
+					   placeholder="{{ 'Part number' | translate }}"
+					   [(ngModel)]="purchaseInvoiceItemsData.partNo">
+				<validate-message [form]="form"
+								  controlName="partNo"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Tên hàng hóa/dịch vụ' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="itemName"
+					   placeholder="{{ 'Tên hàng hóa/dịch vụ' | translate }}"
+					   [(ngModel)]="purchaseInvoiceItemsData.itemName">
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Loại HH/DV' | translate }}</label>
+				<select class="form-control"
+						name="itemType"
+						[(ngModel)]="purchaseInvoiceItemsData.itemType">
+					<option [ngValue]="undefined"
+							selected>{{ 'COMMON.ALL' | translate }}</option>
+					<option *ngFor="let item of itemTypes"
+							[value]="item.label">{{item.label | translate }}</option>
+				</select>
+				<validate-message [form]="form"
+								  controlName="itemType"></validate-message>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Đơn vị tính' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="unit"
+					   placeholder="{{ 'Đơn vị tính' | translate }}"
+					   [(ngModel)]="purchaseInvoiceItemsData.unit">
+				<validate-message [form]="form"
+								  controlName="unit"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">{{ 'Số lượng tạo hoá đơn' | translate }}</label>
+				<input type="number"
+					   min="0"
+					   class="form-control"
+					   name="quantity"
+					   placeholder="{{ 'Số lượng tạo hoá đơn' | translate }}"
+					   [(ngModel)]="purchaseInvoiceItemsData.quantity"
+					   required>
+				<validate-message [form]="form"
+								  controlName="quantity"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Số lượng đã nhập kho' | translate }}</label>
+				<input type="number"
+					   min="0"
+					   class="form-control"
+					   name="quantitySuggest"
+					   placeholder="{{ 'Sô lượng đã nhập kho' | translate }}"
+					   [(ngModel)]="purchaseInvoiceItemsData.quantitySuggest"
+					   disabled>
+				<validate-message [form]="form"
+								  controlName="quantitySuggest"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">{{ 'Đơn giá' | translate}}</label>
+				<input type="text"
+					   class="form-control"
+					   name="price"
+					   min="0"
+					   currencyMask
+					   [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+					   validateTooltip
+					   [validateForm]="form"
+					   (ngModelChange)="onChangePrice($event)"
+					   [(ngModel)]="purchaseInvoiceItemsData.price"
+					   placeholder="{{ 'Đơn giá' | translate }}"
+					   required>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Thành tiền' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="amount"
+					   min="0"
+					   currencyMask
+					   [options]="{ prefix: '', thousands: '.', decimal: ',', precision: 0, nullable: true }"
+					   (ngModelChange)="onChangeAmount($event)"
+					   [(ngModel)]="purchaseInvoiceItemsData.amount"
+					   placeholder="{{ 'Thành tiền' | translate }}">
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Xuất xứ hàng hoá' | translate }}</label>
+				<ng-select name="itemOrigin"
+						   [items]="configListDataItemOrigin"
+						   bindValue="name"
+						   bindLabel="name"
+						   placeholder="{{ 'Xuất xứ hàng hoá' | translate }}"
+						   [(ngModel)]="purchaseInvoiceItemsData.itemOrigin">
+					<ng-template ng-label-tmp
+								 let-item="item">
+						<span title="{{ item.note }}">{{ item.name }}
+							<!-- <span style="font-weight: 500;">{{ item.note }}</span> -->
+						</span>
+					</ng-template>
+					<ng-template ng-option-tmp
+								 let-item="item">
+						<span title="{{ item.note }}">{{ item.name }} <span
+								  style="font-weight: 500; font-style: italic;">{{ item.note
+								}}</span>
+						</span>
+					</ng-template>
+				</ng-select>
+				<validate-message [form]="form"
+								  controlName="itemOrigin"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Thuế VAT' | translate }}</label>
+				<select-sync-source name="tax"
+									placeholder="Thuế VAT"
+									header="Danh sách thuế"
+									bindValue="name"
+									[width]="'60vw'"
+									[columns]="headerTaxCode"
+									[service]="taxCodeService"
+									[requestPayload]="taxCodeRequestPayload"
+									(change)="purchaseInvoiceItemsData.tax=purchaseInvoiceItemsData.taxDto?.name"
+									[(ngModel)]="purchaseInvoiceItemsData.taxDto">
+				</select-sync-source>
+				<validate-message [form]="form"
+								  controlName="tax"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Sub Inventory' | translate }}</label>
+				<select-sync-source name="subInventory"
+									placeholder="Sub Inventory"
+									header="MENU.CATEGORY.SUB_INVENTORY"
+									bindValue="name"
+									[columns]="columnSubInventory"
+									[width]="'50vw'"
+									[service]="subInventoryService"
+									[requestPayload]="{orgCode: purchaseInvoiceItemsData.orgCode}"
+									[(ngModel)]="purchaseInvoiceItemsData.subInventoryNameDto"
+									(change)="onChangeSubInventoryCode($event)">
+				</select-sync-source>
+				<validate-message [form]="form"
+								  controlName="subInventoryName"></validate-message>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Tài khoản định khoản' | translate }}</label>
+				<select-term-account name="termAccount"
+									 placeholder="Tài khoản định khoản"
+									 [(ngModel)]="purchaseInvoiceItemsData.termAccount">
+				</select-term-account>
+				<validate-message [form]="form"
+								  controlName="termAccount"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Project Milestone' | translate }}</label>
+				<select-project-milestone name="projectMilestone"
+										  placeholder="Project Milestone"
+										  [projectCode]="purchaseInvoiceItemsData.projectCode"
+										  [(ngModel)]="purchaseInvoiceItemsData.projectMilestone">
+				</select-project-milestone>
+				<validate-message [form]="form"
+								  controlName="projectMilestone"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'Diễn giải' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="note"
+					   placeholder="{{ 'Diễn giải' | translate }}"
+					   [(ngModel)]="purchaseInvoiceItemsData.note">
+				<validate-message [form]="form"
+								  controlName="note"></validate-message>
+			</div>
+			<div class="col-md-3 mb-3"
+				 style="display: block;padding: 35px 16px 0px 10px; ">
+				<label *ngIf="purchaseInvoiceItemsData.itemType === 'SRV'">
+					<mat-checkbox name="isUpdateSrv"
+								  class="example-margin"
+								  [ngModel]="purchaseInvoiceItemsData.isUpdateSrv"
+								  (ngModelChange)="purchaseInvoiceItemsData.isUpdateSrv = $event ? 1 : 0"
+								  [checked]="purchaseInvoiceItemsData.isUpdateSrv == 1"
+								  [color]="'primary'"> {{ 'Update SRV' | translate }}
+					</mat-checkbox>
+				</label>
+			</div>
+		</div>
+	</form>
+</crud-dialog>

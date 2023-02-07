@@ -1,0 +1,139 @@
+<div class="row" *ngIf="editTable">
+    <div class="col-md-12"
+         style="position: relative; padding: 15px;">
+        <h5 class="kt-margin-b-15">
+            <i class="fal fa-list-ul"></i> {{ 'Danh sách hóa đơn'| translate }}
+        </h5>
+        <div style="position: absolute; right: 15px; top: 5px;">
+            <button *ngIf="!isEditMode"
+                    class="btn btn-label-brand btn-sm mt-2"
+                    (click)="onBtnAddPIClick()">
+                <i class="fal fa-plus"></i> {{ 'Thêm mới hóa đơn' | translate }}
+            </button>
+
+            <button *ngIf="isEditMode"
+                    class="btn btn-label-dark btn-sm mt-2 mr-3"
+                    style="margin-right: 5px;"
+                    title="Thêm mới hóa đơn chi phí bảo hiểm"
+                    (click)="onBtnAddPIInsuranceClick()">
+                <i class="fal fa-plus"></i> {{ 'Bảo hiểm' | translate }}
+            </button>
+            <button *ngIf="isEditMode"
+                    class="btn btn-label-dark btn-sm mt-2 mr-3"
+                    style="margin-right: 5px;"
+                    title="Thêm mới hóa đơn chi phí vận tải"
+                    (click)="onBtnAddPITransportClick()">
+                <i class="fal fa-plus"></i> {{ 'Vận tải' | translate }}
+            </button>
+            <button *ngIf="isEditMode"
+                    class="btn btn-label-dark btn-sm mt-2 mr-3"
+                    style="margin-right: 5px;"
+                    title="Thêm mới hóa đơn chi phí - thuế NK"
+                    (click)="onBtnAddImportTaxClick()">
+                <i class="fal fa-plus"></i> {{ 'Thuế NK' | translate }}
+            </button>
+            <button *ngIf="isEditMode"
+                    class="btn btn-label-dark btn-sm mt-2 mr-3"
+                    title="Thêm mới hóa đơn chi phí - thuế VAT NK"
+                    (click)="onBtnAddImportVatTaxClick()">
+                <i class="fal fa-plus"></i> {{ 'Thuế VAT NK' | translate }}
+            </button>
+        </div>
+    </div>
+</div>
+<br />
+
+<div class="table-responsive">
+    <p-table #dt1
+             [value]="dataSource.items"
+             dataKey="id"
+             [rows]="10"
+             [paginator]="true"
+             [showCurrentPageReport]="true"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+             [rowsPerPageOptions]="[10,25,50]"
+             editMode="row"
+             tableStyleClass="table-no-wrap"
+             [globalFilterFields]="listFilter">
+
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex">
+                <span class="p-input-icon-left p-ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText
+                           type="text"
+                           (input)="dt1.filterGlobal($event.target.value, 'contains')"
+                           placeholder="Search keyword" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of headerCostBill"
+                    [width]="col.width"
+                    [ngClass]="col.class">{{ col.header | translate }}
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr>
+                <td [title]="paginator?.pageIndex * 10 + rowIndex + 1">
+                    {{ paginator?.pageIndex * 10 + rowIndex + 1 }}
+                </td>
+                <td [title]="rowData.invoiceType"> {{ rowData.invoiceType }}</td>
+                <td [title]="rowData.costType">{{ rowData.costType }}</td>
+                <td [title]="rowData.code"
+                    class="header-link">
+                    <a [routerLink]="[ '../../../../purchase-invoice/list/view/', rowData.id]"
+                       target="_blank">{{ rowData.code }}</a>
+                </td>
+                <td [title]="rowData.date | date: mainConfig.formatDateList">
+                    {{ rowData.date | date: mainConfig.formatDateList }}</td>
+                <td [title]="rowData.currency">{{ rowData.currency }}</td>
+                <td class="align-right"
+                    [title]="rowData.totalAmount | currencyMask">{{ rowData.totalAmount | currencyMask }}</td>
+                <td class="align-right"
+                    [title]="rowData.totalActualPaymentValue | currencyMask">{{ rowData.totalActualPaymentValue |
+                    currencyMask }}</td>
+                <td [title]="rowData.invoiceDesc">{{ rowData.invoiceDesc}}</td>
+                <td [title]="(rowData.status | label:statusInvoices) | translate">
+                    {{ (rowData.status | label:statusInvoices) | translate }}</td>
+                <td [title]="(rowData.syncStatus | label:statusERPs) | translate">
+                    <span *ngIf="rowData.syncStatus">
+                        {{ (rowData.syncStatus | label:statusERPs) | translate }}
+                    </span>
+                    <span> - </span>
+                    <span>
+                        {{ (rowData.elimStatus | label:elimStatus) | translate }}
+                    </span>
+                </td>
+                <td [title]="rowData.poCode">{{ rowData.poCode }}</td>
+                <td [title]="rowData.erpInvoiceId != 0 ? rowData.erpInvoiceId : null">
+                    {{ rowData.erpInvoiceId != 0 ? rowData.erpInvoiceId : null }}
+                </td>
+                <td class="action">
+                    <button mat-icon-button
+                            [matMenuTriggerFor]="menu"
+                            [disabled]="!editTable"
+                            matTooltip="More actions">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item
+                                (click)="onBtnEditClick(rowData.id)">
+                            <!-- <i class="fad fa-money-check-edit"></i>  -->
+                            <span>{{'COMMON.EDIT'| translate}}</span>
+                        </button>
+                        <button mat-menu-item
+                                (click)="onBtnDeleteClick(rowData.id)">
+                            <!-- <i class="fa fa-ban"> </i> -->
+                            <span>{{ 'COMMON.DELETE' | translate}}</span>
+                        </button>
+                    </mat-menu>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

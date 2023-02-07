@@ -1,0 +1,12 @@
+<ng-select [items]="items"
+           [bindLabel]="bindLabel"
+           [bindValue]="bindValue"
+           [addTag]="addTag"
+           [multiple]="true"
+           [placeholder]="placeholder"
+           (change)="onChangeValue($event)"
+           [(ngModel)]="value"
+           (scrollToEnd)="onScrollToEnd()"
+           (search)="onSearch($event)"
+           (open)="onOpen()">
+</ng-select>

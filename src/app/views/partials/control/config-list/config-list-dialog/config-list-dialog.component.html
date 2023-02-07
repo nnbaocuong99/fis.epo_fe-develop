@@ -1,0 +1,226 @@
+<p-dialog #dlg
+          [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [style]="dialogRef.config.style"
+          [baseZIndex]="dialogRef.config.baseZIndex"
+          [draggable]="dialogRef.config.draggable"
+          [maximizable]="dialogRef.config.maximizable"
+          [closable]="true"
+          appendTo="body"
+          (onShow)="show.emit($event)"
+          (onHide)="hide.emit($event)">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ this.header ? this.header : 'Chi tiết' | translate }}
+    </p-header>
+    <ng-content></ng-content>
+    <div class="row kt-margin-b-15">
+        <div class="col-md-6">
+            <mat-form-field class="input-general-filter">
+                <input matInput
+                       #searchInput
+                       (keyup)="initData()"
+                       [(ngModel)]="request.name"
+                       placeholder="Search ..."
+                       class="mat-form-field mat-form-field-fluid">
+                <mat-hint align="start">
+                </mat-hint>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="mat-table__wrapper">
+        <p-table [value]="dataSource.items"
+                 tableStyleClass="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th *ngFor="let col of headers"
+                        [width]="col.width">{{ col.header | translate }}
+                    </th>
+                    <th *ngIf="attr1Name"
+                        [width]="'50px'">
+                        {{attr1Name}}
+                    </th>
+                    <th *ngIf="attr2Name"
+                        [width]="'50px'">
+                        {{attr2Name}}
+                    </th>
+                    <th *ngIf="attr3Name"
+                        [width]="'50px'">
+                        {{attr3Name}}
+                    </th>
+                    <th *ngIf="attr4Name"
+                        [width]="'50px'">
+                        {{attr4Name}}
+                    </th>
+                    <th class="action"
+                        [width]="'50px'">
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+
+                <tr *ngIf="!rowData.id || rowData.hasEdit">
+                    <td [title]="rowIndex + 1">
+                        {{ rowIndex + 1 }}
+                    </td>
+                    <td [title]="rowData[bindValue]"><input type="text"
+                               #firstColumn
+                               [(ngModel)]="rowData[bindValue]"
+                               class="form-control"
+                               (keydown)="rowData.isValueValid = true"
+                               [ngClass]="{'invalid':!rowData.isValueValid}"
+                               (focusout)="onFocusOutValue(rowData)">
+                    <td [title]="rowData[bindLabel]"><input type="text"
+                               #secondColumn
+                               [(ngModel)]="rowData[bindLabel]"
+                               class="form-control"
+                               (keydown)="rowData.isLabelValid = true"
+                               [ngClass]="{'invalid':!rowData.isLabelValid}"
+                               (focusout)="onFocusOutLabel(rowData)">
+                    <td [title]="rowData.note"><input type="text"
+                               [(ngModel)]="rowData.note"
+                               class="form-control"></td>
+                    <td *ngIf="attr1Name"
+                        [title]="attr1Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr1}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr1"
+                                      (ngModelChange)="rowData.attr1 = $event ? 1 : 0"
+                                      [checked]="rowData.attr1 == 1"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </td>
+                    <td *ngIf="attr2Name"
+                        [title]="attr2Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr2}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr2"
+                                      (ngModelChange)="rowData.attr2 = $event ? 1 : 0"
+                                      [checked]="rowData.attr2 == 1"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </td>
+                    <td *ngIf="attr3Name"
+                        [title]="attr3Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr3}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr3"
+                                      (ngModelChange)="rowData.attr3 = $event ? 1 : 0"
+                                      [checked]="rowData.attr3 == 1"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </td>
+                    <td *ngIf="attr4Name"
+                        [title]="attr4Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr4}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr4"
+                                      (ngModelChange)="rowData.attr4 = $event ? 1 : 0"
+                                      [checked]="rowData.attr4 == 1"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </td>
+                    <td class="action">
+                        <button class="button-icon"
+                                (click)="onBtnSaveRowClick(rowData)">
+                            <i class="fas fa-save"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.SAVE' | translate"></i>&nbsp;
+                        </button>
+                        <button class="button-icon"
+                                (click)="onBtnCancelRowClick(rowData)">
+                            <i class="fas fa-times"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.CANCEL' | translate"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="rowData.id && !rowData.hasEdit">
+                    <td [title]="rowIndex + 1">
+                        {{ rowIndex + 1 }}
+                    </td>
+                    <td [title]="rowData[bindValue]">{{rowData[bindValue]}}</td>
+                    <td [title]="rowData[bindLabel]">{{rowData[bindLabel]}}</td>
+                    <td [title]="rowData.note">{{rowData.note}}</td>
+                    <td *ngIf="attr1Name"
+                        [title]="attr1Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr1}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr1"
+                                      (ngModelChange)="rowData.attr1 = $event ? 1 : 0"
+                                      [checked]="rowData.attr1 == 1"
+                                      [color]="'primary'"
+                                      [disabled]="true">
+                        </mat-checkbox>
+                    </td>
+                    <td *ngIf="attr2Name"
+                        [title]="attr2Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr2}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr2"
+                                      (ngModelChange)="rowData.attr2 = $event ? 1 : 0"
+                                      [checked]="rowData.attr2 == 1"
+                                      [color]="'primary'"
+                                      [disabled]="true">
+                        </mat-checkbox>
+                    </td>
+                    <td *ngIf="attr3Name"
+                        [title]="attr3Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr3}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr3"
+                                      (ngModelChange)="rowData.attr3 = $event ? 1 : 0"
+                                      [checked]="rowData.attr3 == 1"
+                                      [color]="'primary'"
+                                      [disabled]="true">
+                        </mat-checkbox>
+                    </td>
+                    <td *ngIf="attr4Name"
+                        [title]="attr4Name"
+                        style="text-align: center;">
+                        <mat-checkbox name="{{rowData.attr4}}"
+                                      class="example-margin"
+                                      [ngModel]="rowData.attr4"
+                                      (ngModelChange)="rowData.attr4 = $event ? 1 : 0"
+                                      [checked]="rowData.attr4 == 1"
+                                      [color]="'primary'"
+                                      [disabled]="true">
+                        </mat-checkbox>
+                    </td>
+                    <td class="action">
+                        <div *ngIf="!rowData.attr1">
+                            <button class="button-icon"
+                                    (click)="onBtnEditRowClick(rowData)">
+                                <i class="fas fa-pencil-alt"
+                                   style="cursor: pointer;"
+                                   [title]="'COMMON.EDIT' | translate"></i>
+                            </button>
+                            &nbsp;
+                            <button class="button-icon"
+                                    (click)="onBtnDeleteRowClick(rowData.id)">
+                                <i class="fas fa-trash-alt"
+                                   style="cursor: pointer;"
+                                   [title]="'COMMON.DELETE' | translate"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="rowIndex === dataSource?.items?.length - 1">
+                    <td [colSpan]="totalColumn"><a (click)="addNewLine()"
+                           class="header-link">{{'CONFIG_LIST.ADD_ROW' | translate}}</a></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <ng-template pTemplate="footer">
+        <!-- footer -->
+    </ng-template>
+</p-dialog>

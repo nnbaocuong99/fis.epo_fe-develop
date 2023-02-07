@@ -1,0 +1,22 @@
+<kt-portlet>
+    <kt-portlet-header [title]="formTitle | translate"
+                       [class]="'kt-portlet__head--lg'">
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="setFragmentToRoute($event)">
+            <ngb-tab *ngFor="let tab of tabs"
+                     [id]="tab.value">
+                <ng-template ngbTabTitle>
+                    <span>
+                        {{ tab.label | translate }}
+                    </span>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+        <app-operating-unit [ngClass]="{'hide': currentTab !== 1}"></app-operating-unit>
+        <app-sub-department [ngClass]="{'hide': currentTab !== 2}"></app-sub-department>
+        <app-organization [ngClass]="{'hide':  currentTab !== 3}"></app-organization>
+        <app-sub-inventory [ngClass]="{'hide': currentTab !== 4}"></app-sub-inventory>
+    </kt-portlet-body>
+</kt-portlet>

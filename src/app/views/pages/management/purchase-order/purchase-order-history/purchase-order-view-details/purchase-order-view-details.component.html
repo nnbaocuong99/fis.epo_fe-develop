@@ -1,0 +1,193 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '90%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="mat-table__wrapper">
+                <h5 class="kt-margin-b-15">
+                    <i class="fal fa-money-check-edit"></i> {{ 'PURCHASE_ORDER.PURCHASE_ORDER_DETAIL'| translate }}
+                </h5>
+                <!-- Thông tin chung -->
+                <table class="table table-no-wrap">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%"></th>
+                            <th style="width: 25%"></th>
+                            <th style="width: 25%"></th>
+                            <th style="width: 25%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ 'PURCHASE_ORDER.PO_HD_NO' | translate }}: <b>{{ purchaseOrderHistory?.code }}</b>
+                            </td>
+                            <td>{{ 'PURCHASE_ORDER.FORM_PURCHASE' | translate }}: <b>{{(purchaseOrderHistory?.areaType |
+                                    label:areaTypes) | translate}}</b></td>
+                            <td>{{ 'PURCHASE_ORDER.SIGNING_DATE' | translate }}: <b>{{ purchaseOrderHistory?.signDate |
+                                    date:
+                                    mainConfig.formatDateList }}</b></td>
+                            <td>{{ 'PURCHASE_ORDER.SUPPLIER' | translate }}: <b>{{ purchaseOrderHistory?.supplierName
+                                    }}</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'PURCHASE_ORDER.SUPPLIER_SITE' | translate }}: <b>{{
+                                    purchaseOrderHistory?.supplierSiteName
+                                    }}</b>
+                            </td>
+                            <td>{{ 'PURCHASE_ORDER.PROJECT_CODE' | translate }}: <b>{{ purchaseOrderHistory?.projectCode
+                                    }}</b>
+                            </td>
+                            <td>{{ 'PURCHASE_ORDER.ORG_APPLY' | translate }}: <b>{{ purchaseOrderHistory?.orgApplyName
+                                    }}</b>
+                            </td>
+                            <td>{{ 'PURCHASE_ORDER.CURRENCY' | translate }}: <b>{{ purchaseOrderHistory?.currency }}</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td *ngIf="isInternal">{{ 'PURCHASE_ORDER.PAYMENT_TERMS' | translate }}: <b>{{
+                                    purchaseOrderHistory?.paymentTerm }}</b></td>
+                            <td *ngIf="isInternal">{{ 'PURCHASE_ORDER.PO_CONTRACT_TYPE' | translate }}: <b>{{
+                                    purchaseOrderHistory?.productType | label:productTypes }}</b></td>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.COMMERCE_TERMS' | translate }}: <b>{{
+                                    purchaseOrderHistory?.freightTerm
+                                    }}</b></td>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.MODE_TRANSPORTATION' | translate }}: <b>{{
+                                    purchaseOrderHistory?.delivery
+                                    }}</b></td>
+                            <td>{{ 'PURCHASE_ORDER.ORG_CODE' | translate }}: <b>{{ purchaseOrderHistory?.orgCode }}</b>
+                            </td>
+                            <td>{{ 'PURCHASE_ORDER.LEGAL' | translate }}: <b>{{ purchaseOrderHistory?.ouName }}</b></td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'PURCHASE_ORDER.CONTRACTORS_TAX' | translate }}: <b>{{
+                                    (purchaseOrderHistory?.taxpayer |
+                                    label:
+                                    taxPayers) | translate }}</b></td>
+                            <td *ngIf="isInternal">{{ 'PURCHASE_ORDER.PO_CONTRACT' | translate }}: <b>{{
+                                    (purchaseOrderHistory?.valueType | label: valueTypes) | translate }}</b></td>
+                            <td>CO: <b>{{ purchaseOrderHistory?.hasCo ? ('COMMON.ANSWER.YES'| translate) :
+                                    ('COMMON.ANSWER.NO'|
+                                    translate)}}</b>
+                            </td>
+                            <td>CQ: <b>{{ purchaseOrderHistory?.hasCq ? ('COMMON.ANSWER.YES'| translate) :
+                                    ('COMMON.ANSWER.NO'|
+                                    translate) }}</b>
+                            </td>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.SO_REF_NO' | translate }}: <b>{{
+                                    purchaseOrderHistory?.refNo
+                                    }}</b></td>
+                        </tr>
+                        <tr>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.BILL_FROM' | translate }}: <b>{{
+                                    purchaseOrderHistory?.deliveryLocationGoOut }}</b></td>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.BILL_TO' | translate }}: <b>{{
+                                    purchaseOrderHistory?.deliveryLocationComeIn }}</b></td>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.ROOT_PO' | translate }}: <b>{{
+                                    purchaseOrderHistory?.rootPoId
+                                    }}</b></td>
+                            <td *ngIf="isInternal">Rebate: <b>{{ purchaseOrderHistory?.hasRebate ? ('COMMON.ANSWER.YES'|
+                                    translate) :
+                                    ('COMMON.ANSWER.NO'| translate)}}</b>
+                            </td>
+                            <td *ngIf="isInternal && purchaseOrderHistory?.hasRebate">{{ 'PURCHASE_ORDER.REBATE_INFO' |
+                                translate}}:
+                                <b>{{ purchaseOrderHistory?.rebateInfo
+                                    }}</b>
+                            </td>
+                            <td>{{ 'PURCHASE_ORDER.NOTE' | translate }}: <b>{{ purchaseOrderHistory?.note }}</b></td>
+                            <td *ngIf="isInternal">{{ 'PURCHASE_ORDER.PEOPLE_INVOLVEL' | translate }}:
+                                <b>{{ purchaseOrderHistory?.peopleInvolved }}</b>
+                            </td>
+                            <td *ngIf="isInternal">
+                                {{'PURCHASE_ORDER.BUY_INTERNAL_USE' | translate}}:
+                                <b>
+                                    {{ (purchaseOrderHistory?.buyInternalUse | label: arrBuyInternalUse) | translate }}
+                                </b>
+                            </td>
+                            <td *ngIf="isInternal && !purchaseOrderHistory?.hasRebate"></td>
+                        </tr>
+                        <tr>
+                            <td *ngIf="!isInternal">{{ 'PURCHASE_ORDER.PEOPLE_INVOLVEL' | translate }}:
+                                <b>{{ purchaseOrderHistory?.peopleInvolved }}</b>
+                            </td>
+                            <td *ngIf="!isInternal">
+                                {{'PURCHASE_ORDER.BUY_INTERNAL_USE' | translate}}:
+                                <b>
+                                    {{ (purchaseOrderHistory?.buyInternalUse | label: arrBuyInternalUse) | translate }}
+                                </b>
+                            </td>
+                            <td style="width: 25%">{{ 'PURCHASE_ORDER.PREPAYMENT' | translate }}:
+                                <b>{{ purchaseOrderHistory?.prepayment ?
+                                    ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}</b>
+                            </td>
+                            <td *ngIf="purchaseOrderHistory?.prepayment"
+                                style="width: 25%">{{ 'PURCHASE_ORDER.PREPAYMENT_RATIO' | translate }}:
+                                <b>{{ purchaseOrderHistory?.prepaymentRatio }}%</b>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <!-- Danh sách HH/DV -->
+                <app-purchase-order-item-history *ngIf="isShowTableItem"
+                                                 [purchaseOrderHistory]="purchaseOrderHistory"
+                                                 [isInternal]="isInternal">
+                </app-purchase-order-item-history>
+                <div *ngIf="!isInternal">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fal fa-list-ul"></i>
+                        {{ 'PURCHASE_ORDER.ADDITIONAL_INFORMATION'| translate }}
+                    </h5>
+                    <table class="table table-no-wrap">
+                        <tbody>
+                            <tr>
+                                <td>{{ 'PURCHASE_ORDER.DELIVERY_FORM' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.deliveryDesc }}</b></td>
+                                <td>{{ 'Bill to/Marking' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.billTo }}</b></td>
+                                <td>{{ 'Quality' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.quality }}</b></td>
+                                <td>{{ 'Packing' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.packing }}</b></td>
+                            </tr>
+                            <tr>
+
+                                <td>{{ 'Shipping documents' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.shippingDocument }}</b></td>
+                                <td>{{ 'Claim' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.claim }}</b></td>
+                                <td>{{ 'Warranty' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.warranty }}</b></td>
+                                <td>{{ 'Additional Clause' | translate }}:</td>
+                                <td><b>{{ purchaseOrderHistory?.additionalClause }}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">{{
+            'COMMON.CLOSE' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>

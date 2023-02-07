@@ -1,0 +1,300 @@
+<form-dynamic [formData]="formData"
+              [form]="form"
+              (save)="onBtnSaveClick()"
+              (cancel)="onBtnCancelClick()">
+    <ngb-tabset [justify]="'start'"
+                (tabChange)="setFragmentToRoute($event.nextId)"
+                [activeId]="activeIdTab">
+        <ngb-tab *ngFor="let tab of tabs"
+                 [id]="tab.value"
+                 [disabled]="tab.value === '3' && (!dataModel.importStatus || dataModel.importStatus < 3)">
+            <ng-template ngbTabTitle>
+                <span>
+                    {{ tab.label | translate }} <b>
+                        <span [ngClass]="'badge badge-pill ' + tab.class"
+                              *ngIf="tab.count">{{ tab.count }}</span></b>
+                </span>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+    <!-- Tab 1: Import goods -->
+    <div [ngClass]="activeIdTab === '1' ? '' : 'collapse'">
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i>
+            {{ 'PURCHASE_PLAN.GENERAL_INFO'| translate }}
+        </h5>
+        <form autocomplete="off"
+              #form="ngForm"
+              id="{{ formData.formId }}">
+            <table class="table table-view">
+                <tr style="visibility: collapse;">
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                    <th width="100px"></th>
+                </tr>
+                <tr height="50px">
+                    <td class="title">{{ 'IMPORT_GOODS.PI_CODE' | translate }}:</td>
+                    <td class="value"
+                        class="header-link">
+                        <a [routerLink]="['../../../purchase-invoice/list/view/', dataModel.id]"
+                           target="_blank">
+                            {{ dataModel.code }}</a>
+                    </td>
+                    <td class="title">{{ 'IMPORT_GOODS.INVOICE_DATE' | translate }}:</td>
+                    <td class="value">{{ dataModel.date | date: mainConfig.formatDateList }}</td>
+                    <td class="title">{{ 'IMPORT_GOODS.FCT_TAX' | translate }}:</td>
+                    <td class="value">{{ dataModel?.summaryCorporateTax | currencyMask }}</td>
+                    <td class="title">{{ 'IMPORT_GOODS.INVOICE_TYPE_ON_THE_LIST' | translate }}:</td>
+                    <td class="value">{{ dataModel.invoiceTypeOnList }}</td>
+                </tr>
+
+                <tr height="50px">
+                    <td class="title">{{ 'IMPORT_GOODS.TAX_TYPE_NO_DEDUCTION' | translate }}:</td>
+                    <td class="value">{{ dataModel.taxType }}</td>
+                    <td class="title">{{ 'IMPORT_GOODS.CURRENCY' | translate }}:</td>
+                    <td class="value">{{ dataModel.currency }}</td>
+                    <td class="title">{{ 'IMPORT_GOODS.EXCHANGE_RATE' | translate }}:</td>
+                    <td class="value">{{ dataModel.exchangeRate | currencyMask }}</td>
+                    <td class="title">{{ 'IMPORT_GOODS.SUPPLIER' | translate }}:</td>
+                    <td class="value">{{ dataModel.supplierName }}</td>
+                </tr>
+                <tr height="50px">
+                    <td class="title">{{ 'IMPORT_GOODS.INVOICE_AMOUNT' | translate }}:</td>
+                    <td class="value">{{ dataModel.totalAmount | currencyMask }}</td>
+                    <td class="title">{{ 'IMPORT_GOODS.CREATOR' | translate }}:</td>
+                    <td class="value">{{ dataModel.fullName }}</td>
+                    <td class="title">{{ 'COMMON.NOTE' | translate }}:</td>
+                    <td class="value">
+                        <textarea name="igNote"
+                                  class="form-control"
+                                  [(ngModel)]="dataModel.igNote">
+                        </textarea>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <h5 class="kt-margin-b-15 kt-margin-t-15">
+            <i class="fab fa-envira"></i>
+            {{ 'PURCHASE_PLAN.ITEM_INFO'| translate }}
+        </h5>
+        <div class="table-responsive mb-3">
+            <p-treeTable [value]="dataSource?.items"
+                         dataKey="id"
+                         editMode="row"
+                         tableStyleClass="table-no-wrap"
+                         [columns]="cols"
+                         [frozenColumns]="frozenCols"
+                         [scrollable]="true"
+                         scrollHeight="500px"
+                         frozenWidth="1000px">
+                <ng-template pTemplate="colgroup"
+                             let-columns>
+                    <colgroup>
+                        <ng-container *ngFor="let col of columns">
+                            <col [ngStyle]="{width: col.width}"
+                                 class="align-center">
+                        </ng-container>
+                    </colgroup>
+                </ng-template>
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr>
+                        <th *ngFor="let col of columns; let i = index"
+                            [width]="col.width"
+                            class="table-no-wrap align-center header-height"
+                            [ngClass]="col.class">
+                            {{ col.header | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowNode
+                             let-rowData="rowData"
+                             let-columns="columns">
+                    <tr>
+                        <td [title]="rowData.itemType">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.itemType }} <mat-checkbox *ngIf="rowData.itemType === 'SRV'"
+                                              class="example-margin"
+                                              [(ngModel)]="rowData.isUpdateSrv"
+                                              disabled
+                                              [color]="'primary'">
+                                </mat-checkbox>
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.quantity">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.quantity }}
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.unit">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.unit }}
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.price | currencyMask">
+                            <div class="wrap-text-grid-item align-right">{{ rowData.price | currencyMask }}
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.totalAmount | currencyMask">
+                            <div class="wrap-text-grid-item align-right">
+                                {{ (rowData.quantity == null || rowData.price == null) ? "": rowData.quantity *
+                                rowData.price | currencyMask }}
+                            </div>
+                        </td>
+                        <td [title]="rowData.responseDate | date: mainConfig.formatDateList">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.responseDate | date: mainConfig.formatDateList }}
+                            </div>
+                        </td>
+                        <td [title]="rowData.igOrgCode">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.igOrgCode }}
+                            </div>
+                        </td>
+                        <td [title]="rowData.igSubInventory">
+                            <div class="wrap-text-grid-item">
+                                <select-sync-source name="subInventory"
+                                                    placeholder="Sub Inventory"
+                                                    header="MENU.CATEGORY.SUB_INVENTORY"
+                                                    bindValue="code"
+                                                    [isOnTable]="true"
+                                                    [columns]="columnSubInventory"
+                                                    [service]="subInventoryService"
+                                                    [requestPayload]="{orgCode: rowData.igOrgCode}"
+                                                    [(ngModel)]="rowData.igSubInventory"
+                                                    (change)="onChangeSubInventoryCode($event, rowData)">
+                                </select-sync-source>
+                            </div>
+                        </td>
+                        <td [title]="rowData.termAccount">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.termAccount }}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="frozenbody"
+                             let-rowNode
+                             let-rowData="rowData">
+                    <tr style="height: 100px">
+                        <td [title]="rowData.indexNo">
+                            <div class="wrap-text-grid-item align-center">
+                                <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                                {{rowData.indexNo}}
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.projectCode">
+                            <div class="wrap-text-grid-item">
+                                {{rowData.projectCode}}
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.poCode"
+                            class="header-link">
+                            <div class="wrap-text-grid-item">
+                                <a [routerLink]="['../../../purchase-order/list/view/', rowData.poId]"
+                                   target="_blank">
+                                    {{ rowData.poCode }}</a>
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.itemCode">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.itemCode}}</div>
+                        </td>
+
+                        <td [title]="rowData.partNo">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.partNo }}
+                            </div>
+                        </td>
+
+                        <td [title]="rowData.itemName">
+                            <div class="wrap-text-grid-item">
+                                {{ rowData.itemName }}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer"
+                             let-columns>
+                    <tr *ngIf="dataSource.items?.length > 0">
+                        <td *ngFor="let col of columns">
+                            <div *ngIf="col.field === 'indexNo'"
+                                 class="p-text-right">{{ 'COMMON.TOTAL' | translate }}</div>
+
+                            <div *ngIf="col.field === 'intoMoney'"
+                                 class="align-right"
+                                 [title]="dataSource.priceTotal | currencyMask">
+                                {{dataSource.priceTotal | currencyMask}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-treeTable>
+        </div>
+        <br>
+        <div class="row mb-3">
+            <div class="col-lg-12">
+
+                <button *ngIf="dataModel.syncErp === 3 && (dataModel.importUser === currentUser.id || currentUser.roles.includes('SUPER_ADMIN'))"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        [title]="'SYNC_ERP.CONFIRM_RETURN_MESSAGE' | translate"
+                        (click)="returnReceipt()">
+                    <i class="far fa-exclamation-triangle"
+                       style="color: red;"></i> {{ 'Return receipt' | translate }}
+                </button>
+
+                <button *ngIf="dataModel.importStatus"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        user-role="SUPER_ADMIN"
+                        (click)="viewLogReceipt()">{{ 'View log receipt' | translate }}
+                </button>
+
+                <button *ngIf="dataModel.importStatus && dataModel.importStatus >= 3"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        (click)="goToViewAllocation()">{{ 'IMPORT_GOODS.ALLOCATION' | translate }}
+                </button>
+
+                <button *ngIf="dataModel.id && (!dataModel.syncErp || dataModel.syncErp < 3)"
+                        [ngClass]="{'border-red': dataModel.errorSyncReceipt}"
+                        [title]="dataModel.errorSyncReceipt ? 'Lỗi đồng bộ ERP vui lòng đồng bộ lại:\n'+ dataModel.errorSyncReceipt : 'IMPORT_GOODS.IMPORT_GOODS_SYNC' | translate"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        (click)="onBtnSyncErpStep2Click()">{{ "IMPORT_GOODS.IMPORT_GOODS_SYNC" | translate}}
+                </button>
+
+                <button *ngIf="dataModel.id && !(!dataModel.syncErp || dataModel.syncErp < 3)"
+                        class="btn btn-sm btn-label-brand float-right mr-3"
+                        (click)="onBtnSyncErpStep2ViewClick()">{{ "IMPORT_GOODS.IMPORT_GOODS_SYNC_VIEW" | translate}}
+                </button>
+
+            </div>
+        </div>
+    </div>
+    <!-- Tab 3: Elimination tab -->
+    <div [ngClass]="activeIdTab === '3' ? '' : 'collapse'">
+        <app-import-goods-elimination-invoice #elimTab
+                                              [itemList]="dataSource.itemsNotSrv">
+        </app-import-goods-elimination-invoice>
+    </div>
+
+</form-dynamic>
+
+<app-dialog-import-sync-erp #dialogReceipt2
+                            type="invoice"
+                            [currency]="dataModel.currency"
+                            [dataModel]="dataModel"
+                            [dialogRef]="dlgSyncErpRef"
+                            (success)="pushReceipt2Success($event)"
+                            (error)="pushReceipt2Error($event)"></app-dialog-import-sync-erp>

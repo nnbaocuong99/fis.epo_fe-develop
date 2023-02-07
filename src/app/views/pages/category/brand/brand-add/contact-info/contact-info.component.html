@@ -1,0 +1,654 @@
+<form #formContact="ngForm"
+      id="contact-info">
+    <label>{{ 'Thông tin liên lạc'| translate }}</label>
+    <div class="table-responsive">
+        <p-table [value]="dataSourceContactPersons.items"
+                 tableStyleClass="table-no-wrap"
+                 dataKey="id"
+                 [columns]="headBrandWarrantyContactPersons">
+            <ng-template pTemplate="header">
+                <tr style="background: #f8f9fa;">
+                    <th *ngFor="let col of headBrandWarrantyContactPersons"
+                        [width]="col.width"
+                        [ngClass]="col.class">
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-rowIndex="rowIndex"
+                         let-editing="editing">
+                <tr [pEditableRow]="rowData">
+                    <td class="align-center">
+                        {{ rowIndex + 1}}
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.name }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'name'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.name"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.name}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.phoneNumber }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'phoneNumber'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.phoneNumber"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.phoneNumber}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.position }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'position'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.position"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.position}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.email}}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'email'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.email"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.email}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <!-- <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.note }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'note'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.note"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.note}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td> -->
+
+                    <td class="action align-center"
+                        *ngIf="editTable">
+                        <button class="button-icon"
+                                (click)="onBtnDeleteClick(dataSourceContactPersons, rowData)">
+                            <i class="fas fa-trash-alt"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.DELETE' | translate"></i>
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr *ngIf="editTable"
+                    [pEditableRow]="addItemContactPersons"
+                    class="td-editable"
+                    style="background: #f8f9fa;">
+
+                    <td *ngFor="let col of columns"
+                        style="border: 1px solid #e9ecef;">
+
+                        <div *ngIf="col.field === 'name'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactPersons.name">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="nameContactPersons"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactPersons.name">
+                        </div>
+                        <div *ngIf="col.field === 'phoneNumber'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactPersons.phoneNumber">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="phoneNumberContactPersons"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactPersons.phoneNumber">
+                        </div>
+
+                        <div *ngIf="col.field === 'position'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactPersons.position">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="positionContactPersons"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactPersons.position">
+                        </div>
+
+                        <div *ngIf="col.field === 'email'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactPersons.email">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="emailContactPersons"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactPersons.email">
+                        </div>
+
+                        <div *ngIf="col.field === 'note'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactPersons.note">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="noteContactPersons"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactPersons.note">
+                        </div>
+
+                        <div *ngIf="col.field === 'action'"
+                             class="align-center">
+                            <button (click)="addNewRow(addItemContactPersons, dataSourceContactPersons, 1)"
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    pSaveEditableRow
+                                    icon="flaticon2-add-1"
+                                    class="p-button-rounded p-button-text">
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <br><br>
+    <div class="row">
+        <div class="col-md-12"
+             style="position: relative; padding: 15px;">
+            <h5 class="kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'Thông tin liên hệ'| translate}}
+            </h5>
+            <div style="position: absolute; right: 15px; top: 5px;"
+                 *ngIf="editTable">
+                <upload-file #importFile
+                             [multiple]="false"
+                             [accept]="'.xlsx'"
+                             (onupload)="onBtnUploadClick()"></upload-file>
+                <div class="float-right">
+                    <button type="button"
+                            style="position: absolute;left: -79px;"
+                            class="btn btn-sm btn-label-brand"
+                            (click)="checkLicensedImport()">
+                        <i class="fal fa-file-upload"></i>{{ 'Import' }}
+                    </button>
+                    <download-file module="Template\BrandContact"
+                                   label="Template file"></download-file>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <p-table [value]="dataSourceContactInfo.items"
+                 tableStyleClass="table-no-wrap"
+                 [(contextMenuSelection)]="selectedRowData"
+                 [contextMenu]="btnContextMenu"
+                 dataKey="id"
+                 [columns]="headersContact">
+            <ng-template pTemplate="header">
+                <tr style="background: #f8f9fa;">
+                    <th *ngFor="let col of headersContact"
+                        [width]="col.width"
+                        [ngClass]="col.class">
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-rowIndex="rowIndex"
+                         let-editing="editing">
+                <tr [pContextMenuRow]="rowData"
+                    [pEditableRow]="rowData">
+                    <td class="align-center">
+                        {{ paginator?.pageIndex * paginator?.pageSize + rowIndex + 1}}
+                    </td>
+
+                    <!-- <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.productLine }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'productLine'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.productLine"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.productLine}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td> -->
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.name }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'name'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.name"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.name}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.gender  | label: gender }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <select class="form-control"
+                                        name="gender"
+                                        (change)="onRowEditInit(rowData)"
+                                        [(ngModel)]="rowData.gender">
+                                    <option [ngValue]="undefined"
+                                            selected>{{ 'COMMON.SELECT_DEFAULT' | translate }}</option>
+                                    <option *ngFor="let item of gender"
+                                            [value]="item.value"
+                                            [title]="item.label">{{item.label | translate }}</option>
+                                </select>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.gender | label: gender}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.positionTitle }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'positionTitle'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.positionTitle"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.positionTitle}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <!-- <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.jobTitle }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'jobTitle'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.jobTitle"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.jobTitle}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td> -->
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        class="wrap-text-grid-createdByName"
+                        title="{{ rowData.phoneNumber }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'phoneNumber'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.phoneNumber"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.phoneNumber}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.mail }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'mail'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.mail"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.mail}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.address }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'address'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.address"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.address}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.geo }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'geo'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.geo"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.geo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <!-- <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.productRole }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'productRole'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.productRole"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.productRole}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td> -->
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.note }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'note'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.note"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.note}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <!-- <td class="action align-center"
+                        *ngIf="editTable">
+                        <button mat-icon-button
+                                [matMenuTriggerFor]="menu"
+                                matTooltip="More actions">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item
+                                    (click)="onBtnEditClick(rowData.id)">
+                                <span>{{'COMMON.EDIT'| translate}}</span>
+                            </button>
+                            <button mat-menu-item
+                                    (click)="onBtnDeleteClick(dataSourceContactInfo, rowData)">
+                                <span>{{ 'COMMON.DELETE' | translate}}</span>
+                            </button>
+                        </mat-menu>
+                    </td> -->
+                    <td class="action align-center"
+                        *ngIf="editTable">
+                        <button class="button-icon"
+                                (click)="onBtnDeleteClick(dataSourceContactInfo, rowData)">
+                            <i class="fas fa-trash-alt"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.DELETE' | translate"></i>
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr *ngIf="editTable"
+                    [pEditableRow]="addItemContactInfo"
+                    class="td-editable"
+                    style="background: #f8f9fa;">
+
+                    <td *ngFor="let col of columns"
+                        style="border: 1px solid #e9ecef;">
+
+                        <div *ngIf="col.field === 'productLine'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.productLine">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="productLine"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.productLine">
+                        </div>
+                        <div *ngIf="col.field === 'name'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.name">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="name"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.name">
+                        </div>
+                        <div *ngIf="col.field === 'gender'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.gender">
+                            <select class="form-control"
+                                    name="gender"
+                                    [(ngModel)]="addItemContactInfo.gender">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.SELECT_DEFAULT' | translate }}</option>
+                                <option *ngFor="let item of gender"
+                                        [value]="item.value"
+                                        [title]="item.label">{{item.label | translate }}</option>
+                            </select>
+                        </div>
+                        <div *ngIf="col.field === 'positionTitle'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.positionTitle">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="positionTitle"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.positionTitle">
+                        </div>
+                        <div *ngIf="col.field === 'jobTitle'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.jobTitle">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="jobTitle"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.jobTitle">
+                        </div>
+                        <div *ngIf="col.field === 'phoneNumber'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.phoneNumber">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="phoneNumber"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.phoneNumber">
+                        </div>
+                        <div *ngIf="col.field === 'mail'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.mail">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="mail"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.mail">
+                        </div>
+                        <div *ngIf="col.field === 'address'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.address">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="address"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.address">
+                        </div>
+                        <div *ngIf="col.field === 'geo'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.geo">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="geo"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.geo">
+                        </div>
+                        <div *ngIf="col.field === 'productRole'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.productRole">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="productRole"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.productRole">
+                        </div>
+                        <div *ngIf="col.field === 'note'"
+                             class="p-text-right th-border"
+                             [title]="addItemContactInfo.note">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="note"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItemContactInfo.note">
+                        </div>
+                        <div *ngIf="col.field === 'action'"
+                             class="align-center">
+                            <button (click)="addNewRow(addItemContactInfo, dataSourceContactInfo, 2)"
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    pSaveEditableRow
+                                    icon="flaticon2-add-1"
+                                    class="p-button-rounded p-button-text">
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</form>
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

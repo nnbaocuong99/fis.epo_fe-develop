@@ -1,0 +1,60 @@
+@import "sass/pages/wizard/wizard-4";
+::ng-deep {
+    .process {
+        color: orange !important;
+    }
+    .cancel {
+        color: red;
+        font-weight: bold;
+        font-family: oppins, Helvetica, sans-serif;
+    }
+    .kt-wizard-v1__nav {
+        border-bottom: none !important;
+        overflow: auto !important;
+        .kt-wizard-v1__nav-items {
+            width: 100% !important;
+            min-width: 200px !important;
+            .ng-star-inserted {
+                padding: 1px 0 !important;
+            }
+            .kt-wizard-v1__nav-body {
+                padding: 10px 1rem !important;
+                background-color: #f8f8fb !important;
+                border-radius: 5px !important;
+                .kt-wizard-v1__nav-icon {
+                    font-size: 20px !important;
+                }
+                .kt-wizard-v1__nav-label {
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                    max-width: 140px !important;
+                    font-size: 13px !important;
+                }
+            }
+        }
+    }
+    .content-action {
+        min-height: 180px !important;
+    }
+    .input-switch {
+        margin-top: 8px;
+    }
+    .p-paginator-bottom {
+        border-width: inherit !important;
+    }
+    .btn-add {
+        height: 153px;
+    }
+}
+
+.kt-wizard-v4 {
+    .kt-wizard-v4__nav {
+        .kt-wizard-v4__nav-items {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+    }
+}

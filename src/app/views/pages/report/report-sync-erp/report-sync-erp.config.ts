@@ -1,0 +1,15 @@
+export const HEADER = [
+  { width: '26px', title: 'COMMON.NO' },
+  { width: '50px', header: 'COMMON.NO' },
+  { width: '100px', header: 'PURCHASE_ORDER.PROJECT_CODE' },
+  { width: '100px', header: 'PURCHASE_ORDER.PO_HD_NO' },
+  { width: '100px', header: 'PURCHASE_ORDER.PROVIDER' },
+  { width: '100px', header: 'PURCHASE_ORDER.UNIT_PRICE' },
+  { width: '100px', header: 'PURCHASE_ORDER.ORG_APPLY' },
+  { width: '100px', header: 'PURCHASE_ORDER.FORMAT_PO' },
+  { width: '100px', header: 'PURCHASE_ORDER.PO_CONTRACT_TYPE' },
+  { width: '100px', header: 'PURCHASE_ORDER.STATUS_PO_HD' },
+  { width: '100px', header: 'PURCHASE_ORDER.CREATE_AT' },
+  { width: '100px', header: 'PURCHASE_ORDER.ERP_SYNC_STATUS' },
+  { width: '70px', header: '', maxWidth: '50px', class: 'action' },
+];

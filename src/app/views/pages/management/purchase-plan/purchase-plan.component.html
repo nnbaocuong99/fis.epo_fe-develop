@@ -1,0 +1,558 @@
+<kt-portlet>
+	<kt-portlet-header icon="fal fa-calendar-alt"
+					   [title]="formTitle | translate"
+					   [class]="'kt-portlet__head--lg'"
+					   [viewLoading$]="purchasePlanService.isLoading$">
+		<ng-container ktPortletTools>
+			<app-toolbar [model]="toolbarModel">
+				<form autocomplete="off"
+					  #form="ngForm">
+					<h5>{{ 'COMMON.FILTER' | translate }}</h5>
+					<div class="form-row">
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.PROJECT_CODE'| translate}}</label>
+							<ng-select-async name="projectCode"
+											 bindLabel="code"
+											 suffixLabel="name"
+											 placeholder="{{'PURCHASE_PLAN.PROJECT_CODE'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="projectService"
+											 (change)="request.projectCode = request.projectCodeDto?.code"
+											 [(ngModel)]="request.projectCodeDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.CODE'| translate}}</label>
+							<ng-select-async name="code"
+											 bindLabel="code"
+											 placeholder="{{'PURCHASE_PLAN.CODE'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="purchasePlanService"
+											 (change)="request.code = request.codeDto?.code"
+											 [(ngModel)]="request.codeDto">
+							</ng-select-async>
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.AM_ACCOUNT'| translate}}</label>
+							<input type="text"
+								   class="form-control"
+								   name="amAccount"
+								   placeholder="{{'PURCHASE_PLAN.AM_ACCOUNT'| translate}}"
+								   [(ngModel)]="request.amAccount">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.PM_ACCOUNT'| translate}}</label>
+							<input type="text"
+								   class="form-control"
+								   name="pmAccount"
+								   placeholder="{{'PURCHASE_PLAN.PM_ACCOUNT'| translate}}"
+								   [(ngModel)]="request.pmAccount">
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.CONTRACT_NO'| translate}}</label>
+							<input type="text"
+								   class="form-control"
+								   name="contractNo"
+								   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_NO' | translate }}"
+								   [(ngModel)]="request.contractNo"
+								   placement="bottom-right"
+								   ngbTooltip="{{ request.contractNo }}">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.CONTRACT_TYPE'| translate}}</label>
+							<input type="text"
+								   class="form-control"
+								   name="contractType"
+								   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_TYPE' | translate }}"
+								   [(ngModel)]="request.contractType">
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label>{{ 'PURCHASE_PLAN.CREATOR' | translate }}</label>
+							<ng-select-async name="createdByName"
+											 bindLabel="fullName"
+											 placeholder="{{'PURCHASE_PLAN.CREATOR'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="userService"
+											 (change)="request.createdByName = createdByNameDto?.userName"
+											 [(ngModel)]="createdByNameDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'PURCHASE_PLAN.STATUS' | translate }}</label>
+							<select name="status"
+									class="form-control"
+									(change)="request.status = $event - 1"
+									[ngModel]="request.temp">
+								<option [ngValue]="null || undefined"
+										selected>{{ 'COMMON.ALL' | translate }}</option>
+								<option value="1">{{ 'PURCHASE_PLAN.TAB.DRAFT' | translate }}</option>
+								<option value="2">{{ 'PURCHASE_PLAN.TAB.PROCESSING' | translate }}</option>
+								<option value="3">{{ 'PURCHASE_PLAN.TAB.FINISH' | translate }}</option>
+								<option value="4">{{ 'PURCHASE_PLAN.TAB.CANCEL' | translate }}</option>
+							</select>
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.CUSTOMER'| translate}}</label>
+							<input type="text"
+								   class="form-control"
+								   name="customer"
+								   placeholder="{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}"
+								   [(ngModel)]="request.customer">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.FROM_DATE'| translate}}</label>
+							<input-date name="fromDate"
+										[(ngModel)]="request.fromDate">
+							</input-date>
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label>{{'PURCHASE_PLAN.TO_DATE'| translate}}</label>
+							<input-date name="toDate"
+										[(ngModel)]="request.toDate">
+							</input-date>
+						</div>
+					</div>
+					<div class="form-row">
+						<button type="submit"
+								class="btn btn-sm btn-label-brand ml-2"
+								(click)="onBtnSearchClick()">{{ 'COMMON.GO' | translate }}</button>
+						<button type="reset"
+								(click)="onBtnResetSearchClick()"
+								class="btn btn-sm btn-label-brand ml-2">Reset</button>
+					</div>
+				</form>
+			</app-toolbar>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<ngb-tabset [justify]="'start'"
+					(tabChange)="setParamsToRoute($event)"
+					[activeId]="activeIdTab">
+			<ngb-tab *ngFor="let tab of tabs"
+					 [id]="tab.value">
+				<ng-template ngbTabTitle>
+					<span>
+						{{ tab.label | translate }} <b>
+							<span [ngClass]="'badge badge-pill ' + tab.class"
+								  *ngIf="tab.count">{{ tab.count }}</span></b>
+					</span>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+		<div class="row kt-margin-b-15">
+			<div class="col-md-6">
+				<mat-form-field class="input-general-filter">
+					<input matInput
+						   #searchInput
+						   (keydown.enter)="onSearch()"
+						   [(ngModel)]="request.generalFilter"
+						   placeholder="Search ..."
+						   class="mat-form-field mat-form-field-fluid">
+					<mat-hint align="start"></mat-hint>
+				</mat-form-field>
+				<br>
+				<small>Ex: Mã KHMH, mã dự án, số hợp đồng đầu ra, số YCMH...</small>
+			</div>
+			<div class="col-md-6">
+				<div class="mat-table__bottom">
+					<mat-spinner [diameter]="20"
+								 *ngIf="purchasePlanService.isLoading$ | async"></mat-spinner>
+					<mat-paginator [pageSize]="5"
+								   [pageSizeOptions]="[5,10,30,50]"
+								   [length]="dataSource.paginatorTotal"
+								   [showFirstLastButtons]="true"></mat-paginator>
+				</div>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<p-table *ngIf="dataSource.items?.length > 0"
+					 class="table-no-wrap"
+					 [value]="dataSource.items"
+					 [columns]="headers"
+					 [frozenColumns]="frozenCols"
+					 [scrollable]="true"
+					 scrollHeight="600px"
+					 frozenWidth="400px"
+					 [(contextMenuSelection)]="selectedRowData"
+					 [contextMenu]="cm"
+					 dataKey="id">
+				<ng-template pTemplate="colgroup"
+							 let-columns>
+					<colgroup>
+						<ng-container *ngFor="let col of columns">
+							<col [ngStyle]="{width: col.width}"
+								 class="align-center">
+						</ng-container>
+					</colgroup>
+				</ng-template>
+				<ng-template pTemplate="header"
+							 let-columns>
+					<tr>
+						<th *ngFor="let header of columns"
+							[width]="header.width"
+							[ngClass]="header.class"
+							class="align-center header-height">{{ header.title | translate }}</th>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body"
+							 let-rowData
+							 let-columns="columns"
+							 let-rowIndex="rowIndex">
+					<tr [pContextMenuRow]="rowData">
+						<td *ngFor="let col of columns">
+
+							<div *ngIf="col.field === 'indexNo'"
+								 class="wrap-text-grid align-center">
+								{{ paginator.pageIndex * paginator.pageSize + rowIndex + 1}}
+							</div>
+
+							<div *ngIf="col.field === 'code'"
+								 class="wrap-text-grid header-link"
+								 title="{{ rowData.code }}">
+								<a (click)="onBtnViewDialog(rowData)">
+									{{ rowData.code}}</a>
+							</div>
+
+							<div *ngIf="col.field === 'createdAt'"
+								 class="wrap-text-grid"
+								 title="{{ rowData.createdAt | date: mainConfig.formatDateList }}">
+								{{ rowData.createdAt | date:mainConfig.formatDateList}}
+							</div>
+
+							<div *ngIf="col.field === 'createdBy'"
+								 class="wrap-text-grid"
+								 title="{{ rowData.createdByName }}">
+								{{ rowData.createdByName }}
+							</div>
+
+							<div *ngIf="col.field === 'status'"
+								 class="wrap-text-grid"
+								 [title]="(rowData.status| label:ppStatus) | translate">
+								{{(rowData.status | label:ppStatus) | translate}}
+							</div>
+
+							<div class="action align-center"
+								 *ngIf="col.field === 'action'">
+								<button mat-icon-button
+										[matMenuTriggerFor]="menu"
+										matTooltip="More actions">
+									<mat-icon>more_vert</mat-icon>
+								</button>
+								<!-- Đã tạo: full, Đang thực hiện: xem, Hoàn thành: Xem, Huỷ: Xem -->
+								<mat-menu #menu="matMenu">
+									<button mat-menu-item
+											(click)="onBtnViewDialog(rowData)">
+										<span>{{ 'COMMON.VIEW' | translate}}</span>
+									</button>
+									<button *ngIf="rowData.status !== 2 && rowData.status !== 3"
+											mat-menu-item
+											(click)="onBtnEditClick(rowData.id)">
+										<span>{{ 'COMMON.EDIT' | translate}}</span>
+									</button>
+									<button *ngIf="rowData.status === 0"
+											mat-menu-item
+											(click)="onBtnCancelClick(rowData)">
+										<span>{{ 'COMMON.CANCEL' | translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.status !== 0"
+											(click)="onBtnSelectPurchaseRequestClick(rowData)">
+										<span>{{ 'YCMH' | translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.status !== 0"
+											(click)="onBtnSelectPurchaseOrderClick(rowData)">
+										<span>{{ 'Đơn hàng' | translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.status !== 0"
+											(click)="onBtnSelectPurchaseInvoiceClick(rowData)">
+										<span>{{ 'Hóa đơn' | translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.status !== 0"
+											(click)="onBtnSelectShipmentClick(rowData)">
+										<span>{{ 'Lô hàng' | translate}}</span>
+									</button>
+								</mat-menu>
+							</div>
+
+							<div *ngIf="col.field !== 'indexNo' && col.field !== 'code'
+							&& col.field !== 'createdAt' && col.field !== 'createdBy' && col.field !== 'status' && col.field !== 'action'"
+								 class="wrap-text-grid"
+								 [title]="rowData[col.field]">
+								{{rowData[col.field]}}
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body"
+							 *ngIf="dataSource.items?.length === 0">
+					<tr>
+						<td colspan="12">
+							{{ 'COMMON.EMPTY_DATA'| translate }}
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+			<div *ngIf="dataSource.items && dataSource.items.length === 0">
+				<view-empty></view-empty>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>
+
+<!-- Table context menu -->
+<p-contextMenu #cm
+			   appendTo="body"
+			   [model]="contextItems "
+			   (onShow)="onShowContextMenu()"></p-contextMenu>
+
+<!-- Dialog view YCMH -->
+<p-dialog [(visible)]="isShowDialogPurchaseRequest"
+		  [style]="{width: '80vw'}"
+		  [modal]="true"
+		  appendTo="body"
+		  (onHide)="isShowDialogPurchaseRequest = false">
+	<p-header>
+		<i class="fal fa-info-circle"></i> {{ 'Kế hoạch mua hàng: ' + ppName| translate }}
+	</p-header>
+	<h5>{{ 'Danh sách yêu cầu mua hàng' | translate }}</h5>
+	<div class="mat-table__wrapper">
+		<p-table [value]="purchaseRequestData"
+				 tableStyleClass="table-no-wrap">
+			<ng-template pTemplate="header">
+				<tr>
+					<th *ngFor="let header of headerPurchaseRequest"
+						[width]="header.width"
+						class="align-center header-height">{{ header.title | translate }}</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowData
+						 let-rowIndex="rowIndex">
+				<tr>
+					<td class="align-center"
+						[title]="request.pageSize * request.pageIndex + rowIndex + 1">
+						{{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+					</td>
+					<td [title]="rowData.contractNo">
+						{{ rowData.contractNo }}
+					</td>
+					<td [title]="rowData.prNo">
+						<a [routerLink]="['../../purchase-request/list/view/', rowData.id]"
+						   target="_blank">
+							{{ rowData.prNo }}</a>
+					</td>
+					<td [title]="rowData.createdAt | date: mainConfig.formatDateList">
+						{{ rowData.createdAt | date: mainConfig.formatDateList }}
+					</td>
+					<td [title]="rowData.createdByName">
+						{{ rowData.createdByName }}
+					</td>
+					<td>{{(rowData.prStatus | label:prStatus) | translate}}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+		<div *ngIf="purchaseRequestData?.length === 0">
+			<view-empty></view-empty>
+		</div>
+	</div>
+	<br>
+</p-dialog>
+
+<!-- Dialog view Purchase-Order -->
+<p-dialog [(visible)]="isShowDialogPurchaseOrder"
+		  [style]="{width: '80vw'}"
+		  [modal]="true"
+		  appendTo="body"
+		  (onHide)="isShowDialogPurchaseOrder = false">
+	<p-header>
+		<i class="fal fa-info-circle"></i> {{ 'Kế hoạch mua hàng: ' + ppName| translate }}
+	</p-header>
+	<h5>{{ 'Danh sách đơn hàng' | translate }}</h5>
+	<div class="mat-table__wrapper">
+		<p-table [value]="purchaseOrderData"
+				 tableStyleClass="table-no-wrap">
+			<ng-template pTemplate="header">
+				<tr>
+					<th *ngFor="let header of headerPurchaseOrder"
+						[width]="header.width"
+						class="align-center header-height">{{ header.title | translate }}</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowData
+						 let-rowIndex="rowIndex">
+				<tr>
+					<td class="align-center"
+						[title]="request.pageSize * request.pageIndex + rowIndex + 1">
+						{{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+					</td>
+					<td [title]="rowData.projectCode">
+						{{ rowData.projectCode }}
+					</td>
+					<td [title]="rowData.code">
+						<a [routerLink]="['../../purchase-order/list/view/', rowData.id]"
+						   target="_blank">
+							{{ rowData.code }}</a>
+					</td>
+					<td [title]="(rowData.areaType | label:poAreaTypes) | translate">
+						{{ (rowData.areaType | label:poAreaTypes) | translate }}
+					</td>
+
+					<td [title]="(rowData.status| label:poStatus) | translate">
+						{{(rowData.status | label:poStatus) | translate}}
+					</td>
+					<td title="{{ rowData.createdAt | date: mainConfig.formatDateList }}">
+						{{ rowData.createdAt | date:mainConfig.formatDateList}}
+					</td>
+
+					<td title="{{ rowData.createdByName }}">
+						{{ rowData.createdByName}}
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+		<div *ngIf="purchaseOrderData?.length === 0">
+			<view-empty></view-empty>
+		</div>
+	</div>
+	<br>
+</p-dialog>
+
+<!-- Dialog view Purchase-Invoice -->
+<p-dialog [(visible)]="isShowDialogPurchaseInvoice"
+		  [style]="{width: '80vw'}"
+		  [modal]="true"
+		  appendTo="body"
+		  (onHide)="isShowDialogPurchaseInvoice = false">
+	<p-header>
+		<i class="fal fa-info-circle"></i> {{ 'Kế hoạch mua hàng: ' + ppName| translate }}
+	</p-header>
+	<h5>{{ 'Danh sách hóa đơn' | translate }}</h5>
+	<div class="mat-table__wrapper">
+		<p-table [value]="purchaseInvoiceData"
+				 tableStyleClass="table-no-wrap">
+			<ng-template pTemplate="header">
+				<tr>
+					<th *ngFor="let header of headerPurchaseInvoice"
+						[width]="header.width"
+						class="align-center header-height">{{ header.title | translate }}</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowData
+						 let-rowIndex="rowIndex">
+				<tr>
+					<td class="align-center"
+						[title]="request.pageSize * request.pageIndex + rowIndex + 1">
+						{{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+					</td>
+
+					<td [title]="rowData.code">
+						<a [routerLink]="['../../purchase-invoice/list/view/', rowData.id]"
+						   target="_blank">
+							{{ rowData.code }}</a>
+					</td>
+
+					<td [title]="rowData.invoiceType">
+						{{ rowData.invoiceType }}
+					</td>
+					<td [title]="rowData.costType">
+						{{ rowData.costType }}
+					</td>
+
+					<td [title]="rowData.date | date: mainConfig.formatDateList ">
+						{{ rowData.date | date: mainConfig.formatDateList }}
+					</td>
+
+					<td title="{{ rowData.creatorByName }}">
+						{{ rowData.creatorByName}}
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+		<div *ngIf="purchaseInvoiceData?.length === 0">
+			<view-empty></view-empty>
+		</div>
+	</div>
+	<br>
+</p-dialog>
+
+<!-- Dialog view shipment -->
+<p-dialog [(visible)]="isShowDialogShipment"
+		  [style]="{width: '80vw'}"
+		  [modal]="true"
+		  appendTo="body"
+		  (onHide)="isShowDialogShipment = false">
+	<p-header>
+		<i class="fal fa-info-circle"></i> {{ 'Kế hoạch mua hàng: ' + ppName| translate }}
+	</p-header>
+	<h5>{{ 'Danh sách lô hàng' | translate }}</h5>
+	<div class="mat-table__wrapper">
+		<p-table [value]="shipmentData"
+				 tableStyleClass="table-no-wrap">
+			<ng-template pTemplate="header">
+				<tr>
+					<th *ngFor="let header of headerShipment"
+						[width]="header.width"
+						class="align-center header-height">{{ header.title | translate }}</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowData
+						 let-rowIndex="rowIndex">
+				<tr>
+					<td class="align-center"
+						[title]="request.pageSize * request.pageIndex + rowIndex + 1">
+						{{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+					</td>
+
+					<td [title]="rowData.waybillNumber">
+						<a [routerLink]="['../../shipment/list/view/', rowData.id]"
+						   target="_blank">
+							{{ rowData.waybillNumber }}</a>
+					</td>
+
+					<td [title]="rowData.masterBillNo">
+						{{ rowData.masterBillNo }}
+					</td>
+
+					<td [title]="rowData.billOfLadingDate | date: mainConfig.formatDateList">
+						{{ rowData.billOfLadingDate | date: mainConfig.formatDateList }}
+					</td>
+
+					<td [title]="rowData.smSupplierName">
+						{{ rowData.smSupplierName }}
+					</td>
+
+					<td [title]="(rowData.smStatus| label:shipmentStatus) | translate">
+						{{ (rowData.smStatus| label:shipmentStatus) | translate }}
+					</td>
+
+					<td [title]="(rowData.syncStatus| label:syncErp) | translate">
+						{{ (rowData.syncStatus| label:syncErp) | translate }}
+					</td>
+
+					<td [title]="rowData.creatorName">
+						{{ rowData.creatorName }}
+					</td>
+
+				</tr>
+			</ng-template>
+		</p-table>
+		<div *ngIf="shipmentData?.length === 0">
+			<view-empty></view-empty>
+		</div>
+	</div>
+	<br>
+</p-dialog>

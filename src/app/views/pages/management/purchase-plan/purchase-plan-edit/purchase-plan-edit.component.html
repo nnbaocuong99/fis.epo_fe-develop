@@ -1,0 +1,315 @@
+<kt-portlet>
+	<kt-portlet-header [class]="'kt-portlet__head--lg'"
+					   [icon]="'fal fa-shopping-cart'"
+					   [title]="'PURCHASE_PLAN.FORM_TITLE' | translate"
+					   [viewLoading$]="purchasePlanService.isLoading$">
+		<ng-container ktPortletTools>
+			<a class="btn btn-secondary kt-margin-r-10"
+			   mat-raised-button
+			   (click)="goBack()">
+				<i class="la la-arrow-left"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+			</a>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+
+		<business-process-management *ngIf="purchasePlanData.id"
+									 #bpm
+									 titleOptionProcess="{{ 'Xem xét và phê duyệt Kế hoạch đặt hàng' | translate }}"
+									 module="PURCHASE_PLAN"
+									 [objectData]="purchasePlanData"
+									 [items]="purchasePlanItem.dataSource.treeNodes"
+									 (createTicketSuccess)="createTicketSuccess($event)"
+									 (cancelTicketSuccess)="updateStatus(ppStatus[6].value)"
+									 [file]="file">
+		</business-process-management>
+
+		<h5 class="kt-margin-b-15">
+			<i class="fab fa-envira"></i> {{ 'PURCHASE_PLAN.GENERAL_INFO'| translate }}
+		</h5>
+		<form autocomplete="off"
+			  #form="ngForm"
+			  id="id-form-purchase-plan">
+
+			<div class="form-row">
+
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_PLAN.CODE' | translate }}</label>
+					<validate-message [form]="form"
+									  controlName="code"></validate-message>
+					<input type="text"
+						   class="form-control"
+						   name="code"
+						   placeholder="{{ 'PURCHASE_PLAN.CODE' | translate }}"
+						   [(ngModel)]="purchasePlanData.code"
+						   required
+						   disabled>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>
+						<span [ngClass]="{'lbl-required': cols[2].isRequired}">
+							{{ 'PURCHASE_PLAN.CONTRACT_NO' | translate }}</span>
+					</label>
+					<div class="input-group mb-3">
+						<input type="search"
+							   class="form-control"
+							   name="contractNo"
+							   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_NO' | translate }}"
+							   [(ngModel)]="purchasePlanData.contractNo"
+							   validateTooltip
+							   [validateForm]="form"
+							   placement="bottom-right"
+							   ngbTooltip="{{ purchasePlanData.contractNo }}"
+							   (keydown)="keydownContractNo($event)"
+							   required>
+						<div class="input-group-append">
+							<button class="input-group-text input-group-right attach-button"
+									(click)="inputContract.dialogRef.show()"
+									tabindex="-1"><i class="fal fa-ellipsis-v"></i></button>
+							<input-contract #inputContract
+											(onselect)="onSelectContract($event)"></input-contract>
+						</div>
+					</div>
+					<small class="text-validate">
+						Chú ý: Vui lòng nhập lại số hợp đồng đầu ra rút gọn
+					</small>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>
+						<span>
+							{{ 'PURCHASE_PLAN.PROJECT_CODE' | translate }}
+						</span>
+					</label>
+					<input type="text"
+						   class="form-control"
+						   name="projectCode"
+						   disabled
+						   placeholder="{{ 'PURCHASE_PLAN.PROJECT_CODE' | translate }}"
+						   [(ngModel)]="purchasePlanData.projectCode">
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.CONTRACT_TYPE' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="contractType"
+						   disabled
+						   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_TYPE' | translate }}"
+						   [(ngModel)]="purchasePlanData.contractType">
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>
+						<span>{{
+							'PURCHASE_PLAN.CONTRACT_DESCRIPTION' | translate }}</span>
+					</label>
+					<input type="text"
+						   class="form-control"
+						   validateTooltip
+						   [validateForm]="form"
+						   name="contractDescription"
+						   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_DESCRIPTION' | translate }}"
+						   [(ngModel)]="purchasePlanData.contractDescription"
+						   disabled>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}</label>
+					<select-sync-source name="customer"
+										[isOnTable]="true"
+										placeholder="{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}"
+										header="{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}"
+										bindValue="name"
+										[width]="'70vw'"
+										[columns]="headerCustomer"
+										[service]="customerService"
+										(change)="onChangeCustomer($event)"
+										[(ngModel)]="purchasePlanData.customer"
+										[canEditInput]="true"
+										[required]="true">
+					</select-sync-source>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.AM_ACCOUNT' | translate }}</label>
+					<ng-select-async name="amAccount"
+									 bindLabel="userName"
+									 placeholder="{{ 'PURCHASE_PLAN.AM_ACCOUNT' | translate }}"
+									 [multiple]="true"
+									 [closeOnSelect]="true"
+									 [service]="userService"
+									 [(ngModel)]="purchasePlanData.amAccountDto"
+									 (change)="onChangeAmAccount($event)">
+					</ng-select-async>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.PM_ACCOUNT' | translate }}</label>
+					<ng-select-async name="pmAccount"
+									 bindLabel="userName"
+									 placeholder="{{ 'PURCHASE_PLAN.PM_ACCOUNT' | translate }}"
+									 [multiple]="true"
+									 [closeOnSelect]="true"
+									 [service]="userService"
+									 [(ngModel)]="purchasePlanData.pmAccountDto"
+									 (change)="onChangePmAccount($event)">
+					</ng-select-async>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.CEO_COO' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="ceoCoo"
+						   placeholder="{{ 'PURCHASE_PLAN.CEO_COO' | translate }}"
+						   [(ngModel)]="purchasePlanData.ceoCoo">
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.SIGN_DATE' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="signDate"
+						   disabled
+						   placeholder="{{ 'PURCHASE_PLAN.SIGN_DATE' | translate }}"
+						   [ngModel]="purchasePlanData.signDate | date:'dd/MM/yyyy'">
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.END_DATE' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="endDate"
+						   disabled
+						   placeholder="{{ 'PURCHASE_PLAN.END_DATE' | translate }}"
+						   [ngModel]="purchasePlanData.endDate | date:'dd/MM/yyyy'">
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.CURRENCY' | translate }}</label>
+					<ng-select-async name="currency"
+									 bindLabel="code"
+									 placeholder="{{ 'PURCHASE_PLAN.CURRENCY' | translate }}"
+									 [multiple]="false"
+									 [closeOnSelect]="true"
+									 [service]="currencyService"
+									 (change)="onChangeCurrency()"
+									 [(ngModel)]="purchasePlanData.currencyDto">
+					</ng-select-async>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_PLAN.CONTRACT_TOTAL_AMOUNT' | translate }}</label>
+					<input type="text"
+						   name="contractTotalAmount"
+						   class="form-control"
+						   numberMask
+						   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_TOTAL_AMOUNT' | translate }}"
+						   [(ngModel)]="purchasePlanData.contractTotalAmount">
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label style="display: block;">{{ 'PURCHASE_PLAN.OVER_SIX_WEEKS' | translate }}</label>
+					<span class="ml-3">
+						<mat-checkbox name="overSixWeeks"
+									  class="example-margin"
+									  [ngModel]="purchasePlanData.overSixWeeks"
+									  (ngModelChange)="purchasePlanData.overSixWeeks = $event ? 1 : 0"
+									  [checked]="purchasePlanData.overSixWeeks == 1"
+									  [color]="'primary'">
+						</mat-checkbox>
+					</span>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>{{ 'COMMON.NOTE' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="note"
+							  placeholder="{{ 'PURCHASE_PLAN.NOTE' | translate }}"
+							  [(ngModel)]="purchasePlanData.note"></textarea>
+				</div>
+
+				<div class="col-md-2 mb-3">
+					<label>
+						{{'PURCHASE_PLAN.PEOPLE_INVOLVEL' | translate}}
+					</label>
+					<ng-select-async name="peopleInvolved"
+									 bindLabel="userName"
+									 validateTooltip
+									 placeholder="{{'PURCHASE_PLAN.PEOPLE_INVOLVEL' | translate}}"
+									 [multiple]="true"
+									 [service]="userService"
+									 [(ngModel)]="purchasePlanData.peopleInvolvedDto"
+									 (ngModelChange)="onChangePeopleInvolved($event)">
+					</ng-select-async>
+				</div>
+
+			</div>
+
+			<div class="form-row">
+				<div class="col-md-2 mb-3"
+					 *ngIf="this.purchasePlanData.id">
+					<label>{{ 'COMMON.ATTACH_FILE' | translate }}</label>
+					<single-attach-file module="Attachment\PurchasePlan\{{this.purchasePlanData.id}}"
+										(success)="onSuccessInitFile($event)"
+										(uploaded)="uploadedFile($event)">
+					</single-attach-file>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label style="display: block;">{{ 'PURCHASE_ORDER.CERT_ORIGIN_QUALITY' | translate
+						}}</label>
+					<span style="display: block;">
+						<mat-checkbox name="co"
+									  class="example-margin"
+									  [ngModel]="purchasePlanData.hasCo"
+									  (ngModelChange)="purchasePlanData.hasCo = $event ? 1 : 0"
+									  [checked]="purchasePlanData.hasCo == 1"
+									  [color]="'primary'"> {{ 'PURCHASE_ORDER.CO' | translate }}
+						</mat-checkbox>
+					</span>
+					<span style="display: block;">
+						<mat-checkbox name="cq"
+									  class="example-margin"
+									  [ngModel]="purchasePlanData.hasCq"
+									  (ngModelChange)="purchasePlanData.hasCq = $event ? 1 : 0"
+									  [checked]="purchasePlanData.hasCq == 1"
+									  [color]="'primary'"> {{ 'PURCHASE_ORDER.CQ' | translate }}
+						</mat-checkbox>
+					</span>
+				</div>
+			</div>
+
+			<h5 class="kt-margin-b-15">
+				<i class="fab fa-envira"></i> {{ 'PURCHASE_PLAN.ITEM_INFO'| translate }}
+			</h5>
+			<app-purchase-plan-item #purchasePlanItem
+									[form]="form"
+									[purchasePlanData]="purchasePlanData"
+									[allowViewPrice]="allowViewPrice"
+									(save)="onBtnSaveClick()"></app-purchase-plan-item>
+		</form>
+
+		<div class="mt-5">
+			<button class="btn btn-sm btn-success mr-2"
+					title="{{ 'COMMON.SAVE' | translate }}"
+					(click)="onBtnSaveClick()">
+				<i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}</button>
+			<button class="btn btn-sm btn-secondary mr-2"
+					title="{{ 'COMMON.CANCEL' | translate }}"
+					(click)="goBack()">
+				<i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}</button>
+
+			<!-- Ẩn khi đã tạo ticket và khác huỷ -->
+			<button *ngIf="purchasePlanData.id && purchasePlanData.overSixWeeks === 1 && (purchasePlanData.status === 6 || (!purchasePlanData.sproTicketId && purchasePlanData.status !== ppStatus[3].value))"
+					class="btn btn-sm btn-label-brand float-right ml-3"
+					[ngClass]="{'border-red': purchasePlanData.sproDraftTicketId}"
+					title="{{ titleButtonCreateTicket(purchasePlanData) | translate }}"
+					(click)="onBtnCreateTicket()">
+				<i class="fal fa-paper-plane"></i> {{ 'COMMON.SUBMIT_APPROVAL' | translate }}</button>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

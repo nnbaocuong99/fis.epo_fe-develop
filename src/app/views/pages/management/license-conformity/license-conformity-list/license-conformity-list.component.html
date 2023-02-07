@@ -1,0 +1,255 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'Quản lý giấy phép và hợp quy' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="licenseConformityService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+                    <h5 style="font-size: 15px !important;"> {{ 'Nhập thông tin tìm kiếm' | translate }} </h5>
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Số PO' | translate }}</label>
+                            <ng-select-async name="poCode"
+                                             bindLabel="code"
+                                             suffixLabel=""
+                                             placeholder="{{'Số PO/Hợp đồng'| translate}}"
+                                             [multiple]="false"
+                                             [closeOnSelect]="true"
+                                             [requestPayload]="purchaseOrderRequestPayload"
+                                             [service]="purchaseOrderService"
+                                             (change)="request.poCode = request.poCodeDto?.code"
+                                             [(ngModel)]="request.poCodeDto">
+                            </ng-select-async>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Nhà cung cấp' | translate }}</label>
+                            <select-sync-source name="vendorId"
+                                                placeholder="{{ 'PURCHASE_ORDER.SUPPLIER' | translate }}"
+                                                header="MENU.CATEGORY.SUPPLIER"
+                                                bindValue="name"
+                                                suffixLabel="code"
+                                                searchField="generalFilter"
+                                                [columns]="headerSuppliers"
+                                                [width]="'60vw'"
+                                                [service]="supplierService"
+                                                [requestPayload]="supplierRequestPayload"
+                                                (change)="onChangeSmSupplier($event)"
+                                                [(ngModel)]="request.SmSupplierDto">
+                            </select-sync-source>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Lô hàng đi đường' | translate }}</label>
+                            <select-sync-source name="waybillNumber"
+                                                placeholder="Lô hàng đi đường"
+                                                header="Lô hàng đi đường"
+                                                bindValue="waybillNumber"
+                                                [columns]="headerShipment"
+                                                [service]="shipmentService"
+                                                [requestPayload]="shipmentRequestPayload"
+                                                (change)="request.waybillNumber = request.waybillNumberDto?.waybillNumber"
+                                                [(ngModel)]="request.waybillNumberDto">
+                            </select-sync-source>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Số YCMH' | translate }}</label>
+                            <ng-select-async name="prNo"
+                                             bindLabel="prNo"
+                                             placeholder="{{'PURCHASE_PLAN.CODE'| translate}}"
+                                             [multiple]="false"
+                                             [closeOnSelect]="true"
+                                             [service]="purchaseRequestService"
+                                             (change)="request.prNo = request.prNoDto?.prNo"
+                                             [(ngModel)]="request.prNoDto">
+                            </ng-select-async>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Trạng thái PO' | translate }}</label>
+                            <select class="form-control"
+                                    name="statusPo"
+                                    [(ngModel)]="request.statusPo">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option>
+                                <option *ngFor="let item of poStatus"
+                                        [value]="item.value">{{item.label | translate }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Trạng thái thực hiện' | translate }}</label>
+                            <select class="form-control"
+                                    name="status"
+                                    [(ngModel)]="request.status">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option>
+                                <option *ngFor="let item of executionStatus"
+                                        [value]="item.value">{{item.label | translate }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Từ ngày' | translate }}</label>
+                            <input-date name="fromDate"
+                                        [(ngModel)]="request.fromDate"></input-date>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Đến ngày' | translate }}</label>
+                            <input-date name="toDate"
+                                        [(ngModel)]="request.toDate"></input-date>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-2 mb-3">
+                            <label style="display: block;">
+                                HSNL <mat-checkbox name="hasEnergyEfficiency"
+                                              class="example-margin"
+                                              [ngModel]="request.hasEnergyEfficiency"
+                                              (ngModelChange)="request.hasEnergyEfficiency = $event ? 1 : 0"
+                                              [checked]="request.hasEnergyEfficiency == 1"
+                                              [color]="'primary'">
+                                </mat-checkbox></label>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label style="display: block;">
+                                KTCL <mat-checkbox name="hasImportLicense"
+                                              class="example-margin"
+                                              [ngModel]="request.hasImportLicense"
+                                              (ngModelChange)="request.hasImportLicense = $event ? 1 : 0"
+                                              [checked]="request.hasImportLicense == 1"
+                                              [color]="'primary'">
+                                </mat-checkbox></label>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label style="display: block;">
+                                Hợp quy <mat-checkbox name="co"
+                                              class="example-margin"
+                                              [ngModel]="request.isConformity"
+                                              (ngModelChange)="request.isConformity = $event ? 1 : 0"
+                                              [checked]="request.isConformity == 1"
+                                              [color]="'primary'">
+                                </mat-checkbox></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <br>
+                        <button type="button"
+                                class="btn btn-sm btn-label-brand ml-2"
+                                (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                (click)="onBtnResetSearchClick()"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate }}</button>
+                    </div>
+                </form>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="setFragmentToRoute($event)"
+                    [activeId]="activeIdTab">
+            <ngb-tab *ngFor="let tab of tabs"
+                     [id]="tab.value">
+                <ng-template ngbTabTitle>
+                    <span>
+                        {{ tab.label | translate }}
+                    </span>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+        <!-- Tất cả -->
+        <div class="kt-grid__item"
+             [ngClass]="{'hide': currentTab !== 0}">
+            <div class="row">
+                <div class="col-md-12"
+                     style="position: relative; padding: 15px;">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fal fa-list-ul"></i> {{ 'Thông tin chung'| translate }}
+                    </h5>
+                </div>
+            </div>
+            <div class="row kt-margin-b-15">
+                <div class="col-md-6">
+                    <mat-form-field class="input-general-filter">
+                        <input matInput
+                               #searchInput
+                               (keydown.enter)="initData()"
+                               [(ngModel)]="request.generalFilter"
+                               placeholder="Search ..."
+                               class="mat-form-field mat-form-field-fluid">
+                        <mat-hint align="start">
+                            <strong>Search in {{ '' | translate }}</strong>
+                        </mat-hint>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <div class="mat-table__bottom">
+                        <mat-spinner [diameter]="20"
+                                     *ngIf="licenseConformityService.isLoading$ | async"></mat-spinner>
+                        <mat-paginator [pageSize]="5"
+                                       [pageSizeOptions]="[3,5,10,30,50]"
+                                       [length]="dataSource.paginatorTotal"
+                                       [showFirstLastButtons]="true"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mat-table__wrapper">
+                <p-table [value]="dataSource.items"
+                         scrollHeight="600px"
+                         tableStyleClass="table-no-wrap">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th *ngFor="let col of cols"
+                                [width]="col.width">{{ col.title | translate }}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex">
+                        <tr>
+                            <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                                {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                            </td>
+                            <td [title]="rowData.waybillNumber"
+                                class="header-link">
+                                <a [routerLink]="['../../shipment/list/view/', rowData.id]"
+                                   target="_blank">
+                                    {{ rowData.waybillNumber }}</a>
+                            </td>
+                            <td [title]="rowData.hasEnergyEfficiency ? 'YES': 'NO'">{{ rowData.hasEnergyEfficiency ?
+                                'YES':
+                                'NO' }}</td>
+                            <td [title]="rowData.hasImportLicense ? 'YES': 'NO'">{{ rowData.hasImportLicense ?
+                                'YES': 'NO' }}</td>
+                            <td [title]="rowData.isConformity ? 'YES': 'NO'">{{ rowData.isConformity ? 'YES': 'NO' }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <!-- Giấy phép nhập khẩu -->
+        <div class="kt-grid__item"
+             [ngClass]="{'hide': currentTab !== 1}">
+            <app-energy-efficiency></app-energy-efficiency>
+        </div>
+
+        <!-- Đăng ký kiểm tra chất lượng -->
+        <div class="kt-grid__item"
+             [ngClass]="{'hide': currentTab !== 2}">
+            <app-certificate-quality></app-certificate-quality>
+        </div>
+        <!-- Hợp quy -->
+        <div class="kt-grid__item"
+             [ngClass]="{'hide': currentTab !== 3}">
+            <app-conformity></app-conformity>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

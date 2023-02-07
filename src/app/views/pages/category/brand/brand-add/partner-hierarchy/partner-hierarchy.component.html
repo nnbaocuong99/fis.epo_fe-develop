@@ -1,0 +1,352 @@
+<form autocomplete="off"
+      #form="ngForm"
+      id="id-form-partner">
+
+    <!-- <div class="row">
+            <div class="col-md-12"
+                 style="position: relative; padding: 25px;">
+                <div style="position: absolute; right: 15px; top: 5px;"
+                     *ngIf="editTable">
+                    <div class="float-right">
+                        <button type="button"
+                                class="btn btn-sm btn-label-brand"
+                                (click)="checkLicensedImport(1)">
+                            <i class="fal fa-file-upload"></i>{{ 'Import' }}
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+    <!-- <div class="table-responsive">
+            <p-table [value]="coreSolutionsData.items"
+                     tableStyleClass="table-no-wrap"
+                     dataKey="id"
+                     [columns]="headerBrandCoreSolutions">
+                <ng-template pTemplate="header">
+                    <tr style="background: #f8f9fa;">
+                        <th *ngFor="let col of headerBrandCoreSolutions"
+                            [width]="col.width"
+                            [ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+                            {{ col.title | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-columns="columns"
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="align-center">
+                            {{ rowIndex + 1}}
+                        </td>
+
+                        <td pEditableColumn
+                            [pEditableColumnDisabled]="!editTable"
+                            title="{{ rowData.name }}">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText
+                                           type="text"
+                                           class="form-control"
+                                           name="{{rowIndex + 1 + 'name'}}"
+                                           placeholder="{{ 'Nhập' | translate }}"
+                                           [(ngModel)]="rowData.name"
+                                           (change)="onRowEditInit(rowData)">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{rowData.name}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+
+                        <td pEditableColumn
+                            [pEditableColumnDisabled]="!editTable"
+                            title="{{ rowData.distributor}}">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText
+                                           type="text"
+                                           class="form-control"
+                                           name="{{rowIndex + 1 + 'distributor'}}"
+                                           placeholder="{{ 'Nhập' | translate }}"
+                                           [(ngModel)]="rowData.distributor"
+                                           (change)="onRowEditInit(rowData)">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{rowData.distributor}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+
+                        <td pEditableColumn
+                            [pEditableColumnDisabled]="!editTable"
+                            title="{{ rowData.note }}">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText
+                                           type="text"
+                                           class="form-control"
+                                           name="{{rowIndex + 1 + 'note'}}"
+                                           placeholder="{{ 'Nhập' | translate }}"
+                                           [(ngModel)]="rowData.note"
+                                           (change)="onRowEditInit(rowData)">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{rowData.note}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+
+                        <td class="action align-center"
+                            *ngIf="editTable">
+                            <button class="button-icon"
+                                    (click)="onBtnDeleteClick(coreSolutionsData, rowData)">
+                                <i class="fas fa-trash-alt"
+                                   style="cursor: pointer;"
+                                   [title]="'COMMON.DELETE' | translate"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer"
+                             let-columns>
+                    <tr *ngIf="editTable"
+                        [pEditableRow]="addCoreSolutionsItem"
+                        class="td-editable"
+                        style="background: #f8f9fa;">
+
+                        <td *ngFor="let col of columns"
+                            style="border: 1px solid #e9ecef;">
+
+                            <div *ngIf="col.field === 'name'"
+                                 class="p-text-right th-border"
+                                 [title]="addCoreSolutionsItem.name">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="name"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="addCoreSolutionsItem.name">
+                            </div>
+                            <div *ngIf="col.field === 'distributor'"
+                                 class="p-text-right th-border"
+                                 [title]="addCoreSolutionsItem.distributor">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="distributor"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="addCoreSolutionsItem.distributor">
+                            </div>
+
+                            <div *ngIf="col.field === 'note'"
+                                 class="p-text-right th-border"
+                                 [title]="addCoreSolutionsItem.note">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="noteCoreSolutions"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="addCoreSolutionsItem.note">
+                            </div>
+
+                            <div *ngIf="col.field === 'action'"
+                                 class="align-center">
+                                <button (click)="addNewRow(coreSolutionsValidateFields,coreSolutionsData, 1)"
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        pSaveEditableRow
+                                        icon="flaticon2-add-1"
+                                        class="p-button-rounded p-button-text">
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div> -->
+    <!-- <br><br><br> -->
+    <div class="row">
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Pamer'| translate}}
+        </h5>
+    </div>
+    <div class="table-responsive">
+        <p-table [value]="hierarchyData.items"
+                 tableStyleClass="table-no-wrap"
+                 dataKey="id"
+                 [columns]="headerBrandHierarchy">
+            <ng-template pTemplate="header">
+                <tr style="background: #f8f9fa;">
+                    <th *ngFor="let col of headerBrandHierarchy"
+                        [width]="col.width"
+                        [ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-rowIndex="rowIndex"
+                         let-editing="editing">
+                <tr [pEditableRow]="rowData">
+                    <td class="align-center">
+                        {{ rowIndex + 1}}
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.pamerRegion }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <config-list-control name="{{rowIndex + 1 + 'name'}}"
+                                                     type="BRAND_PAMER_REGION"
+                                                     header="Vùng"
+                                                     [items]="configListDataPamerRegion"
+                                                     [hasEdit]="true"
+                                                     [(ngModel)]="rowData.pamerRegion"
+                                                     (change)="onRowEditInit(rowData)">
+                                </config-list-control>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.pamerRegion}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.pamer}}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-multiSelect [options]="userData"
+                                               name="{{rowIndex + 1 + 'pamer'}}"
+                                               [(ngModel)]="rowData.pamerDto"
+                                               appendTo="body"
+                                               styleClass=".p-multiselect ui-inputtext"
+                                               (onChange)="onChangePamer($event, rowData)"
+                                               optionLabel="userName">
+                                </p-multiSelect>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.pamer}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.note }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'note'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.note"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.note}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td class="action align-center"
+                        *ngIf="editTable">
+                        <button class="button-icon"
+                                (click)="onBtnDeleteClick(hierarchyData, rowData)">
+                            <i class="fas fa-trash-alt"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.DELETE' | translate"></i>
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr *ngIf="editTable"
+                    [pEditableRow]="addHierarchyItem"
+                    class="td-editable"
+                    style="background: #f8f9fa;">
+
+                    <td *ngFor="let col of columns"
+                        style="border: 1px solid #e9ecef;">
+
+                        <div *ngIf="col.field === 'pamerRegion'"
+                             class="p-text-right th-border"
+                             [title]="addHierarchyItem.pamerRegion">
+                            <config-list-control name="pamerRegion"
+                                                 type="BRAND_PAMER_REGION"
+                                                 header="Vùng"
+                                                 [items]="configListDataPamerRegion"
+                                                 [hasEdit]="true"
+                                                 [(ngModel)]="addHierarchyItem.pamerRegion">
+                            </config-list-control>
+                        </div>
+                        <div *ngIf="col.field === 'pamer'"
+                             class="p-text-right th-border"
+                             [title]="addHierarchyItem.pamer">
+                            <p-multiSelect [options]="userData"
+                                           optionLabel="userName"
+                                           name="pamer"
+                                           appendTo="body"
+                                           styleClass=".p-multiselect ui-inputtext"
+                                           (onChange)="onChangePamer($event, addHierarchyItem)"
+                                           [(ngModel)]="addHierarchyItem.pamerDto">
+                            </p-multiSelect>
+                            <!-- <ng-select name="pamer"
+                                       [items]="userData"
+                                       [hideSelected]="true"
+                                       bindLabel="userName"
+                                       bindValue="userName"
+                                       multiple="true"
+                                       appendTo="body"
+                                       [addTag]="addTagFn"
+                                       placeholder="{{ 'Pamer' | translate }}"
+                                       [ngModel]="addHierarchyItem.pamerDto"
+                                       (ngModelChange)="addHierarchyItem.pamer = $event.join(',')">
+                                <ng-template ng-option-tmp
+                                             let-item="item">
+                                    <span title="{{ item.fullName + ' - ' + item.userName }}">
+                                        {{ item.fullName + ' - ' + item.userName }}
+                                    </span>
+                                </ng-template>
+                            </ng-select> -->
+                        </div>
+
+                        <div *ngIf="col.field === 'note'"
+                             class="p-text-right th-border"
+                             [title]="addHierarchyItem.note">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="noteHierarchy"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addHierarchyItem.note">
+                        </div>
+
+                        <div *ngIf="col.field === 'action'"
+                             class="align-center">
+                            <button (click)="addNewRow(hierarchyValidateFields,hierarchyData,2)"
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    pSaveEditableRow
+                                    icon="flaticon2-add-1"
+                                    class="p-button-rounded p-button-text">
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+</form>

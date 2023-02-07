@@ -1,0 +1,279 @@
+<div class="table-responsive">
+    <p-table [value]="shipmentPackageData.items"
+             dataKey="id"
+             editMode="row"
+             tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of headerPackageList"
+                    [width]="col.width"
+                    class="table-no-wrap">
+                    {{ col.header | translate }}<span *ngIf="col.isRequired"
+                          class='lbl-required'></span>
+                </th>
+                <th *ngIf="editTable"
+                    class="action"
+                    style="width:50px"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex"
+                     let-editing="editing">
+            <tr [pEditableRow]="rowData">
+                <td class="align-center"
+                    [title]="rowIndex + 1"> {{ rowIndex + 1 }}</td>
+                <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.type">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <config-list-control name="type"
+                                                 type="PACKING_TYPE"
+                                                 header="Loại đóng gói"
+                                                 [hasEdit]="false"
+                                                 [items]="configListDataPackageType"
+                                                 [(ngModel)]="rowData.type"
+                                                 (ngModelChange)="onRowEditInit(rowData)">
+                            </config-list-control>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.type}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <!-- <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.itemQuantity">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="number"
+                                   min="1"
+                                   placeholder="Nhập số lượng"
+                                   [(ngModel)]="rowData.itemQuantity"
+                                   (ngModelChange)="onRowEditInit(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.itemQuantity}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td> -->
+                <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.packageQuantity">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="number"
+                                   min="1"
+                                   placeholder="Nhập số kiện"
+                                   [(ngModel)]="rowData.packageQuantity"
+                                   (ngModelChange)="onRowEditInit(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.packageQuantity}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.grossWeight">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="number"
+                                   min="1"
+                                   placeholder="Nhập gross weight (kg)"
+                                   [(ngModel)]="rowData.grossWeight"
+                                   (ngModelChange)="onRowEditInit(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.grossWeight}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.weight">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="number"
+                                   min="1"
+                                   placeholder="Nhập chargeable weight (kg)"
+                                   [(ngModel)]="rowData.weight"
+                                   (ngModelChange)="onRowEditInit(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.weight}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+
+                <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.volume">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="number"
+                                   min="1"
+                                   placeholder="Nhập số m3"
+                                   [(ngModel)]="rowData.volume"
+                                   (ngModelChange)="onRowEditInit(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.volume}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn
+                    [pEditableColumnDisabled]="!editTable"
+                    [title]="rowData.note">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText
+                                   type="text"
+                                   placeholder="Nhập ghi chú"
+                                   [(ngModel)]="rowData.note"
+                                   (ngModelChange)="onRowEditInit(rowData)">
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.note}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td *ngIf="editTable"
+                    style="text-align: center;">
+                    <div *ngIf="!editing">
+                        <button pButton
+                                pRipple
+                                type="button"
+                                pInitEditableRow
+                                icon="pi pi-pencil"
+                                (click)="onRowEditInit(rowData)"
+                                class="p-button-rounded p-button-text"></button>
+                        <button pButton
+                                pRipple
+                                pDeleteEditableRow
+                                type="button"
+                                icon="fas fa-trash-alt"
+                                (click)="onBtnDeleteRowClick(rowData)"
+                                class="p-button-rounded p-button-text"></button>
+                    </div>
+                    <button *ngIf="editing"
+                            pButton
+                            pRipple
+                            type="button"
+                            pSaveEditableRow
+                            icon="pi pi-check"
+                            class="p-button-rounded p-button-text p-button-success p-mr-2"></button>
+                    <button *ngIf="editing"
+                            pButton
+                            pRipple
+                            type="button"
+                            pCancelEditableRow
+                            icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-danger"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr *ngIf="editTable"
+                [pEditableRow]="addItem"
+                class="td-editable">
+                <td></td>
+                <td>
+                    <config-list-control name="type"
+                                         type="PACKING_TYPE"
+                                         header="Loại đóng gói"
+                                         [hasEdit]="true"
+                                         [items]="configListDataPackageType"
+                                         [(ngModel)]="addItem.type">
+                    </config-list-control>
+                </td>
+                <!-- <td>
+                    <input pInputText
+                           type="number"
+                           min="1"
+                           class="form-control"
+                           name="itemQuantity"
+                           placeholder="Nhập số lượng"
+                           [(ngModel)]="addItem.itemQuantity">
+                </td> -->
+                <td>
+                    <input pInputText
+                           type="number"
+                           min="1"
+                           class="form-control"
+                           name="packageQuantity"
+                           placeholder="Nhập số kiện"
+                           [(ngModel)]="addItem.packageQuantity">
+                </td>
+
+                <td>
+                    <input pInputText
+                           type="number"
+                           min="1"
+                           class="form-control"
+                           name="grossWeight"
+                           placeholder="Nhập gross weight "
+                           [(ngModel)]="addItem.grossWeight">
+                </td>
+                <td>
+                    <input pInputText
+                           type="number"
+                           min="1"
+                           class="form-control"
+                           name="weight"
+                           placeholder="Nhập chargeable weight"
+                           [(ngModel)]="addItem.weight">
+                </td>
+                <td>
+                    <input pInputText
+                           type="number"
+                           min="1"
+                           class="form-control"
+                           name="volume"
+                           placeholder="Nhập số m3"
+                           [(ngModel)]="addItem.volume">
+                </td>
+                <td>
+                    <input pInputText
+                           type="text"
+                           class="form-control"
+                           name="note"
+                           placeholder="Nhập ghi chú"
+                           [(ngModel)]="addItem.note">
+                </td>
+                <td style="text-align: center;">
+                    <button pButton
+                            pRipple
+                            type="button"
+                            pSaveEditableRow
+                            icon="flaticon2-add-1"
+                            (click)="addNewRow()"
+                            class="p-button-rounded p-button-text"></button>
+                </td>
+            </tr>
+            <tr *ngIf="shipmentPackageData.items?.length > 0 || editTable">
+                <td colspan="2"
+                    class="p-text-right">{{ 'COMMON.TOTAL' | translate }}</td>
+                <td [title]="packageQuantityTotal">{{ packageQuantityTotal }}</td>
+                <td [title]="grossWeightTotal">{{ grossWeightTotal }}</td>
+                <td [title]="weightTotal">{{ weightTotal }}</td>
+                <td [title]="volumeTotal">{{ volumeTotal }}</td>
+                <td *ngIf="!editTable"
+                    colspan="1"
+                    class="p-text-right"></td>
+                <td *ngIf="editTable"
+                    colspan="2"
+                    class="p-text-right"></td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <div *ngIf="shipmentPackageData.items && shipmentPackageData.items.length === 0">
+        <view-empty></view-empty>
+    </div>
+</div>

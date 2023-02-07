@@ -1,0 +1,312 @@
+<form #form="ngForm"
+	  id="purchase-request-item">
+	<div class="table-responsive kt-margin-b-15"
+		 *ngIf="isShowTableItem">
+		<p-treeTable class="table-no-wrap"
+					 [value]="dataSource.items"
+					 [columns]="cols"
+					 [lazy]="true"
+					 (onLazyLoad)="loadNodes($event)"
+					 [totalRecords]="dataSource.paginatorTotal"
+					 [loading]="false"
+					 selectionMode="checkbox"
+					 [(selection)]="selectedPurchasePlanItems"
+					 [frozenColumns]="frozenCols"
+					 [scrollable]="true"
+					 scrollHeight="1000px"
+					 frozenWidth="700px">
+			<ng-template pTemplate="colgroup"
+						 let-columns>
+				<colgroup>
+					<ng-container *ngFor="let col of columns">
+						<col [ngStyle]="{width: col.width}"
+							 class="align-center">
+					</ng-container>
+				</colgroup>
+			</ng-template>
+			<ng-template pTemplate="header"
+						 let-columns>
+				<tr>
+					<th *ngFor="let col of columns; let i = index"
+						[width]="col.width"
+						class="align-center header-height"
+						[ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+						<span *ngIf="col.field === 'checkBox'">
+							<p-treeTableHeaderCheckbox *ngIf="!purchaseRequestData.id && isShowCheckBoxHeader">
+							</p-treeTableHeaderCheckbox>
+						</span>
+						<span *ngIf="col.field !== 'checkBox'">
+							{{ col.title | translate }}
+						</span>
+					</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body"
+						 let-rowNode
+						 let-rowData="rowData"
+						 let-columns="columns">
+				<tr [ttRow]="rowNode"
+					[ttSelectableRow]="rowNode"
+					[pEditableRow]="rowData"
+					[ngClass]="rowData.status !== 0 ? 'font-disabled' : ''"
+					(click)="onRowEditClick(rowData)">
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.itemType">{{rowData.itemType}}
+							<!-- Loại hàng hoá SRV thêm checkbox -->
+							<mat-checkbox name="{{ rowData.indexNo + 'srv' }}"
+										  *ngIf="rowData.itemType === 'SRV'"
+										  class="example-margin"
+										  [(ngModel)]="rowData.isUpdateSrv"
+										  (change)="ongChangeIsUpdateSrv(rowData, $event)"
+										  [color]="'primary'"
+										  disabled>
+							</mat-checkbox>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.unit">{{rowData.unit}}</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.currency">{{rowData.currency}}</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.quantity">{{rowData.quantity}}</div>
+					</td>
+
+					<td>
+						<div *ngIf="allowViewPrice"
+							 class="wrap-text-grid-item align-right"
+							 [title]="rowData.expectedPrice | currencyMask">
+
+							<input type="text"
+								   *ngIf="rowData.isShow"
+								   class="form-control"
+								   name="{{ 'expectedPrice' + rowData.indexNo}}"
+								   numberMask
+								   (change)="onChangeExpectedPrice(rowData)"
+								   [(ngModel)]="rowData.expectedPrice"
+								   placeholder="{{ 'PURCHASE_PLAN.ITEM.EXPECTED_PRICE' | translate }}">
+
+							<span *ngIf="!rowData.isShow">
+								{{rowData.expectedPrice | currencyMask}}
+							</span>
+
+						</div>
+					</td>
+
+					<td>
+						<div *ngIf="allowViewPrice"
+							 class="wrap-text-grid-item align-right"
+							 [title]="(rowData.expectedPrice * rowData.quantity) | currencyMask">
+							{{(rowData.expectedPrice * rowData.quantity) | currencyMask}}
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]=" rowData.expectedDate | date: mainConfig.formatDateList "
+							 *ngIf="isShowControl">
+							<input-date *ngIf="rowData.isShow && (rowData.expectedDateOrigin === null || rowData.expectedDateOrigin === undefined)"
+										name="{{ 'expectedDate' + rowData.indexNo }}"
+										dateMoreThanCurrentDateValidator
+										[(ngModel)]="rowData.expectedDate"
+										required>
+							</input-date>
+							<validate-message [form]="form"
+											  controlName="{{ 'expectedDate' + rowData.indexNo }}">
+							</validate-message>
+
+							<span
+								  *ngIf="!(rowData.isShow && (rowData.expectedDateOrigin === null || rowData.expectedDateOrigin === undefined))">
+								{{ rowData.expectedDate | date: mainConfig.formatDateList }}
+							</span>
+						</div>
+
+						<div class="wrap-text-grid-item"
+							 [title]=" rowData.expectedDate | date: mainConfig.formatDateList "
+							 *ngIf="!isShowControl">
+							<input-date *ngIf="rowData.isShow"
+										name="{{ 'expectedDate' + rowData.indexNo }}"
+										dateMoreThanCurrentDateValidator
+										[(ngModel)]="rowData.expectedDate"
+										required>
+							</input-date>
+							<validate-message [form]="form"
+											  controlName="{{ 'expectedDate' + rowData.indexNo }}">
+							</validate-message>
+
+							<span *ngIf="!rowData.isShow">
+								{{ rowData.expectedDate | date: mainConfig.formatDateList }}
+							</span>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.supplierName">
+							<select-sync-source *ngIf="rowData.isShow"
+												name="{{ 'supplierName' + rowData.indexNo}}"
+												placeholder="Nhà cung cấp"
+												header="MENU.CATEGORY.SUPPLIER"
+												bindValue="name"
+												suffixLabel="code"
+												searchField="generalFilter"
+												[columns]="headerSuppliers"
+												[width]="'70vw'"
+												[service]="supplierService"
+												[requestPayload]="supplierRequestPayload"
+												(change)="onChangeSupplier($event, rowData)"
+												[(ngModel)]="rowData.supplierName"
+												[isOnTable]="true">
+							</select-sync-source>
+							<span *ngIf="!rowData.isShow">
+								{{ rowData.supplierName }} </span>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.producerName">
+							<ng-select *ngIf="rowData.isShow"
+									   [items]="producerNameData"
+									   name="{{ 'producerName' + rowData.indexNo }}"
+									   bindLabel="acronymName"
+									   bindValue="acronymName"
+									   appendTo="body"
+									   (change)="onChangeProductName($event, rowData)"
+									   placeholder="{{ 'Hãng sản xuất' | translate }}"
+									   [ngModel]="rowData.producerName"
+									   required>
+							</ng-select>
+							<span *ngIf="!rowData.isShow">{{rowData.producerName}}</span>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.guarantee">
+							<input *ngIf="rowData.isShow && (rowData.guaranteeOrigin === null || rowData.guaranteeOrigin === undefined)"
+								   type="number"
+								   class="form-control"
+								   name="{{ 'guarantee' + rowData.indexNo }}"
+								   min="0"
+								   placeholder="{{ 'PURCHASE_REQUEST.ITEM.GUARANTEE' | translate }}"
+								   [(ngModel)]="rowData.guarantee"
+								   required>
+							<span
+								  *ngIf="!(rowData.isShow && (rowData.guaranteeOrigin === null || rowData.guaranteeOrigin === undefined))">
+								{{rowData.guarantee}}</span>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.deliveryLocation">
+							<config-list-control *ngIf="rowData.isShow && (rowData.deliveryLocationOrigin === null || rowData.deliveryLocationOrigin === undefined)"
+												 name="{{ 'deliveryLocation' + rowData.indexNo}}"
+												 type="DELIVERY_LOCATION"
+												 header="{{ 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' | translate }}"
+												 bindValue="code"
+												 [(ngModel)]="rowData.deliveryLocation">
+							</config-list-control>
+
+							<span
+								  *ngIf="!(rowData.isShow && (rowData.deliveryLocationOrigin === null || rowData.deliveryLocationOrigin === undefined))">
+								{{rowData.deliveryLocation}}
+							</span>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.note">
+							<input *ngIf="rowData.isShow"
+								   type="text"
+								   class="form-control"
+								   name="{{ 'note' + rowData.indexNo}}"
+								   placeholder="{{ 'PURCHASE_PLAN.ITEM.NOTE' | translate }}"
+								   [(ngModel)]="rowData.note">
+
+							<span *ngIf="!rowData.isShow">
+								{{rowData.note}}
+							</span>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item action align-center">
+							<button mat-icon-button
+									[matMenuTriggerFor]="menu"
+									matTooltip="More actions">
+								<mat-icon>more_vert</mat-icon>
+							</button>
+							<mat-menu #menu="matMenu">
+								<button mat-menu-item
+										(click)="onBtnEditClick(rowData, rowNode)">
+									<span>{{ 'COMMON.EDIT' | translate}}</span>
+								</button>
+							</mat-menu>
+						</div>
+					</td>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="frozenbody"
+						 let-rowNode
+						 let-rowData="rowData">
+				<tr [ttRow]="rowNode"
+					[ttSelectableRow]="rowNode"
+					[ngClass]="rowData.status !== 0 ? 'font-disabled' : ''"
+					(click)="onRowEditClick(rowData)">
+
+					<td>
+						<div class="wrap-text-grid-item">
+							<p-treeTableCheckbox [value]="rowNode"
+												 *ngIf="!rowNode.parent && !isNotShowTableCheckbox"
+												 [disabled]="rowData.status !== 0">
+							</p-treeTableCheckbox>
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.indexNo">
+							<p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+							{{rowData.indexNo}}
+						</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.itemCode">{{rowData.itemCode}}</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.partNo">{{rowData.partNo}}</div>
+					</td>
+
+					<td>
+						<div class="wrap-text-grid-item"
+							 [title]="rowData.itemName">{{rowData.itemName}}</div>
+					</td>
+				</tr>
+			</ng-template>
+		</p-treeTable>
+		<div *ngIf="dataSource.items && dataSource.items.length === 0">
+			<view-empty></view-empty>
+		</div>
+	</div>
+</form>
+
+
+<app-purchase-request-item-dialog [dialogRef]="dialogRefUpdateItems"
+								  [allowViewPrice]="allowViewPrice"
+								  (success)="onSuccess($event)"></app-purchase-request-item-dialog>

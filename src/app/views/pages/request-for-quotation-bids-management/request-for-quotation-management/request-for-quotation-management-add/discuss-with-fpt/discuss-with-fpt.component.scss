@@ -1,0 +1,75 @@
+.displayName {
+    color: #365899;
+    font-size: 14px;
+    padding-right: 20px;
+    padding-top: 8px;
+}
+.displayHour{
+    margin-left: 10px;
+    font-size: 12px!important; 
+    color: #0275d8!important;
+    padding-right: 20px;
+    padding-top: 8px;
+}
+
+.comment-box {
+    content: "";
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    position: relative;
+    padding: 0 10px 5px;
+    margin-bottom: -1px;
+    display: flex;
+    // justify-content: space-between;
+    flex: 1 0 91.66666667%;
+    max-width: 96.2%;
+}
+
+.comment-box-content {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 5px;
+    display: block;
+    flex: 1 0 91.66666667%;
+    max-width: 96.21%;
+    margin-left: 56px;
+}
+
+.user-icon {
+    text-align: center;
+    font-size: x-large;
+    flex: 0 0 8.33333333%;
+    max-width: 3.13%;
+    padding-left: 14px;
+}
+
+
+.comment-box-children {
+    content: "";
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    position: relative;
+    padding: 0 10px 5px;
+    margin-bottom: -1px;
+    display: flex;
+    flex: 1 0 91.66666667%;
+    max-width: 92.2%;
+}
+
+.comment-box-content-children {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 5px;
+    display: block;
+    flex: 1 0 91.66666667%;
+    max-width: 92.21%;
+    margin-left: 127px;
+}
+
+.user-icon-children {
+    text-align: center;
+    font-size: x-large;
+    flex: 0 0 8.33333333%;
+    max-width: 7.13%;
+    padding-left: 72px;
+}

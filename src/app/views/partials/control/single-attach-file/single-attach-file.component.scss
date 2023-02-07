@@ -1,0 +1,28 @@
+.control-container {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 7px 5px 6px 5px;
+}
+
+.btn-action {
+    border-radius: 2px;
+    background: #ebf5ff;
+    border: none;
+}
+
+::ng-deep single-attach-file .placeholder {
+    color: #9e9e9e;
+}
+
+::ng-deep single-attach-file .link:hover {
+    text-decoration: underline;
+}
+
+.link {
+    color: #0000ee;
+}
+
+.link:hover {
+    cursor: pointer;
+}

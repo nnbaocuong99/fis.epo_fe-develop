@@ -1,0 +1,21 @@
+<p-inputMask #control
+             mask="99/99/9999"
+             [(ngModel)]="viewValue"
+             (onFocus)="focus.emit($event); onTouched();"
+             (onBlur)="onBlurInputMask(); blur.emit($event);"
+             (onComplete)="onCompleteInputMask()"
+             (onInput)="onInput(control)"
+             placeholder="dd/mm/yyyy"
+             [disabled]="disabled"
+             [readonly]="readonly"
+             [style]="{width: (datePicker.offsetWidth - 35) + 'px'}"
+             slotChar="dd/mm/yyyy"></p-inputMask>
+<input #datePicker
+       ngClass="{{class}}"
+       class="form-control date-picker"
+       type="date"
+       tabindex="-1"
+       [disabled]="disabled"
+       (focusin)="control.focus()"
+       [(ngModel)]="value"
+       (click)="onClickOpenFormDate($event)">

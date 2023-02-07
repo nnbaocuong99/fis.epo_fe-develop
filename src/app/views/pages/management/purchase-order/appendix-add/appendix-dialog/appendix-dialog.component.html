@@ -1,0 +1,574 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+		  [modal]="true"
+		  [style]="{width: '90%', minWidth: '50%'}"
+		  [maximizable]="true"
+		  [draggable]="true"
+		  [baseZIndex]="9000"
+		  appendTo="body"
+		  [autoZIndex]="true"
+		  (onHide)="onBtnCancelClick()">
+	<p-header>
+		<i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+	</p-header>
+	<div class="row">
+		<div class="col-md-12">
+			<form autocomplete="off"
+				  #form="ngForm"
+				  id="id-form-appendix">
+				<div class="form-row">
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{ 'PURCHASE_ORDER.PO_HD_NO' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="code"
+							   maxlength="100"
+							   placeholder="{{ 'PURCHASE_ORDER.PO_HD_NO' | translate }}"
+							   [(ngModel)]="purchaseOrderData.code"
+							   codeExistValidator
+							   validateTooltip
+							   [validateForm]="form"
+							   [id]="dialogRef.input.id"
+							   required>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{ 'PURCHASE_ORDER.FORM_PURCHASE' | translate }}</label>
+						<ng-select [items]="areaTypes"
+								   bindLabel="label"
+								   bindValue="value"
+								   name="areaType"
+								   (change)="onChangeAreaType($event)"
+								   placeholder="{{ 'PURCHASE_ORDER.FORM_PURCHASE' | translate }}"
+								   [(ngModel)]="purchaseOrderData.areaType"
+								   validateTooltip
+								   [validateForm]="form"
+								   required>
+							<ng-template ng-label-tmp
+										 let-item="item">
+								{{ item.label | translate }}
+							</ng-template>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								{{ item.label | translate }}
+							</ng-template>
+						</ng-select>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{ 'PURCHASE_ORDER.SIGNING_DATE' | translate }}</label>
+						<input-date name="signDate"
+									validateTooltip
+									[validateForm]="form"
+									[(ngModel)]="purchaseOrderData.signDate"
+									required>
+						</input-date>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{ 'PURCHASE_ORDER.LEGAL' | translate }}</label>
+						<select-sync-source name="ouCode"
+											placeholder="{{ 'PURCHASE_ORDER.LEGAL' | translate }}"
+											header="MENU.CATEGORY.COMPANY"
+											bindValue="code"
+											[columns]="headerOperatingUnit"
+											[width]="'70vw'"
+											[service]="operatingUnitService"
+											(change)="onChangeLegal($event)"
+											[requestPayload]="operatingUnitRequestPayload"
+											[(ngModel)]="purchaseOrderData.ouNameDto"
+											validateTooltip
+											[validateForm]="form"
+											required>
+						</select-sync-source>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{ 'PURCHASE_ORDER.SUPPLIER' | translate }}</label>
+						<select-sync-source name="vendorId"
+											placeholder="{{ 'PURCHASE_ORDER.SUPPLIER' | translate }}"
+											header="MENU.CATEGORY.SUPPLIER"
+											bindValue="name"
+											suffixLabel="code"
+											searchField="generalFilter"
+											[columns]="headerSuppliers"
+											[width]="'70vw'"
+											[service]="supplierService"
+											[requestPayload]="supplierRequestPayload"
+											(change)="onChangeSupplierName()"
+											(ngModelChange)="onModelChangeSupplier()"
+											[(ngModel)]="purchaseOrderData.supplierNameDto"
+											validateTooltip
+											[validateForm]="form"
+											required>
+						</select-sync-source>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{ 'PURCHASE_ORDER.SUPPLIER_SITE' | translate}}</label>
+						<select-sync-source name="siteId"
+											placeholder="{{ 'PURCHASE_ORDER.SUPPLIER_SITE' | translate}}"
+											header="{{ 'PURCHASE_ORDER.SUPPLIER_SITE' | translate}}"
+											bindValue="name"
+											[columns]="headerSupplierSites"
+											[width]="'80vw'"
+											[service]="supplierSiteService"
+											(change)="onChangeSupplierSite()"
+											[requestPayload]="supplierSiteRequestPayload"
+											[(ngModel)]="purchaseOrderData.supplierSiteNameDto"
+											validateTooltip
+											[validateForm]="form"
+											required>
+						</select-sync-source>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.ORG_APPLY' | translate }}</label>
+						<select-sync-source name="subDepartmentId"
+											placeholder="PURCHASE_ORDER.ORG_APPLY"
+											header="Đơn vị sử dụng"
+											bindValue="name"
+											[columns]="headerDepartment"
+											[width]="'60vw'"
+											[service]="departmentService"
+											(change)="onChangeOrgApply($event)"
+											[requestPayload]="departmentRequestPayload"
+											[(ngModel)]="purchaseOrderData.orgApplyNameDto"
+											checkInvalidOrgApply
+											[subDepartmentId]="purchaseOrderData.subDepartmentId"
+											[ouId]="purchaseOrderData.ouCode"
+											validateTooltip
+											[validateForm]="form"
+											required>
+						</select-sync-source>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.PROJECT_CODE' |translate}}</label>
+						<select-sync-source name="projectCode"
+											placeholder="PURCHASE_ORDER.PROJECT_CODE"
+											header="MENU.CATEGORY.PROJECT"
+											bindValue="code"
+											[columns]="headerProject"
+											[width]="'80vw'"
+											[service]="projectService"
+											[requestPayload]="projectRequestPayload"
+											[(ngModel)]="purchaseOrderData.projectCodeDto"
+											(change)="onChangeProjectCode($event)"
+											[disabled]="false"
+											validateTooltip
+											[validateForm]="form"
+											required>
+						</select-sync-source>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.CURRENCY' | translate }}</label>
+						<ng-select-async name="currency"
+										 bindLabel="code"
+										 placeholder="{{ 'PURCHASE_ORDER.CURRENCY' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="currencyService"
+										 (change)="onChangeCurrency($event)"
+										 [(ngModel)]="purchaseOrderData.currencyDto"
+										 validateTooltip
+										 [validateForm]="form"
+										 required>
+						</ng-select-async>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="isInternal">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.PAYMENT_TERMS' | translate }}</label>
+						<select-sync-source name="paymentTerm"
+											placeholder="PURCHASE_ORDER.PAYMENT_TERMS"
+											header="{{ 'PURCHASE_ORDER.PAYMENT_TERMS' | translate }}"
+											bindValue="name"
+											[columns]="headerPaymentTerm"
+											[width]="'70vw'"
+											[service]="paymentTermService"
+											(change)="onChangePaymentTerm($event)"
+											[requestPayload]="paymentTermRequestPayload"
+											[(ngModel)]="purchaseOrderData.paymentTermDto"
+											validateTooltip
+											[validateForm]="form"
+											required>
+						</select-sync-source>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="!isInternal">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.COMMERCE_TERMS' | translate}}</label>
+						<config-list-control name="freightTerm"
+											 type="BUSINESS_TERM"
+											 header="{{ 'PURCHASE_ORDER.COMMERCE_TERMS' | translate}}"
+											 [hasEdit]="false"
+											 [items]="configListDataFreightTerm"
+											 [(ngModel)]="purchaseOrderData.freightTerm"
+											 validateTooltip
+											 [validateForm]="form"
+											 required>
+						</config-list-control>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="isInternal">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.PO_CONTRACT_TYPE' | translate }}</label>
+						<ng-select [items]="productTypes"
+								   bindLabel="label"
+								   bindValue="value"
+								   name="productType"
+								   placeholder="{{ 'PURCHASE_ORDER.PO_CONTRACT_TYPE' | translate }}"
+								   [(ngModel)]="purchaseOrderData.productType"
+								   required>
+							<ng-template ng-label-tmp
+										 let-item="item">
+								{{ item.label | translate }}
+							</ng-template>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								{{ item.label | translate }}
+							</ng-template>
+						</ng-select>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="!isInternal">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.MODE_TRANSPORTATION' | translate}}</label>
+						<config-list-control name="delivery"
+											 type="TRANSPORTATION_MODE"
+											 header="{{ 'PURCHASE_ORDER.MODE_TRANSPORTATION' | translate}}"
+											 [hasEdit]="false"
+											 [items]="configListDataDelivery"
+											 [(ngModel)]="purchaseOrderData.delivery"
+											 validateTooltip
+											 [validateForm]="form"
+											 required>
+						</config-list-control>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label>{{ 'PURCHASE_ORDER.ORG_CODE' | translate }}</label>
+						<select-sync-source name="orgCode"
+											placeholder="{{'PURCHASE_ORDER.ORG_CODE' | translate}}"
+											header="MENU.CATEGORY.ORGANIZATION"
+											bindValue="code"
+											[columns]="headerOrg"
+											[width]="'60vw'"
+											[service]="organizationService"
+											(change)="onChangeOrgCode($event)"
+											[requestPayload]="organizationRequestPayload"
+											[(ngModel)]="purchaseOrderData.orgCodeDto">
+						</select-sync-source>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-2 mb-3"
+						 [ngClass]="isInternal ? 'hide' : ''">
+						<label>
+							{{ 'PURCHASE_ORDER.ROOT_PO' | translate }}</label>
+						<!-- Chỉ show với đơn hàng ngoại -->
+						<select-sync-source name="referencePoId"
+											placeholder="{{ 'PURCHASE_ORDER.ROOT_PO' | translate }}"
+											header="PO"
+											bindValue="code"
+											[columns]="headerPo"
+											[service]="purchaseOrderService"
+											[requestPayload]="purchaseOrderRequestPayload"
+											(change)="onChangeReferPo($event)"
+											[(ngModel)]="purchaseOrderData.referencePoCodeDto">
+						</select-sync-source>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="!isInternal">
+						<label>
+							{{ 'PURCHASE_ORDER.SO_REF_NO' | translate}}
+						</label>
+						<input type="text"
+							   class="form-control"
+							   name="refNo"
+							   placeholder="{{ 'PURCHASE_ORDER.SO_REF_NO' | translate}}"
+							   [(ngModel)]="purchaseOrderData.refNo">
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="!isInternal">
+						<label class="lbl-required">
+							{{ 'PURCHASE_ORDER.BILL_FROM' | translate }}
+						</label>
+						<ng-select name="deliveryLocationGoOut"
+								   [items]="configListDataDeliveryLocationGoOut"
+								   bindLabel="name"
+								   bindValue="name"
+								   multiple="true"
+								   placeholder="{{ 'PURCHASE_ORDER.BILL_FROM' | translate }}"
+								   [ngModel]="purchaseOrderData.deliveryLocationGoOutTemp"
+								   (ngModelChange)="purchaseOrderData.deliveryLocationGoOut = $event.join(',')"
+								   validateTooltip
+								   [validateForm]="form"
+								   required>
+						</ng-select>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="!isInternal">
+						<label>
+							{{ 'PURCHASE_ORDER.BILL_TO' | translate }}</label>
+						<ng-select name="deliveryLocationComeIn"
+								   [items]="configListDataDeliveryLocationComeIn"
+								   bindLabel="name"
+								   bindValue="name"
+								   multiple="true"
+								   placeholder="{{ 'PURCHASE_ORDER.BILL_TO' | translate }}"
+								   [ngModel]="purchaseOrderData.deliveryLocationComeInTemp"
+								   (ngModelChange)="purchaseOrderData.deliveryLocationComeIn = $event.join(',')">
+						</ng-select>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="isShowTaxpayer">
+						<label>{{'PURCHASE_ORDER.CONTRACTORS_TAX' | translate }}</label>
+						<ng-select [items]="taxPayers"
+								   bindLabel="label"
+								   bindValue="value"
+								   name="taxpayer"
+								   placeholder="{{ 'PURCHASE_ORDER.CONTRACTORS_TAX' | translate }}"
+								   [(ngModel)]="purchaseOrderData.taxpayer">
+							<ng-template ng-label-tmp
+										 let-item="item">
+								{{ item.label | translate }}
+							</ng-template>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								{{ item.label | translate }}
+							</ng-template>
+						</ng-select>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label class="lbl-required">{{'PURCHASE_ORDER.NOTE' | translate}}</label>
+						<textarea type="text"
+								  class="form-control"
+								  name="note"
+								  maxlength="240"
+								  placeholder="{{'PURCHASE_ORDER.NOTE' | translate}}"
+								  [(ngModel)]="purchaseOrderData.note"
+								  required>
+					   </textarea>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label>
+							{{'PURCHASE_ORDER.PEOPLE_INVOLVEL' | translate}}
+						</label>
+						<ng-select-async name="userInform"
+										 bindLabel="userName"
+										 validateTooltip
+										 placeholder="{{'PURCHASE_ORDER.PEOPLE_INVOLVEL' | translate}}"
+										 [multiple]="true"
+										 [service]="userService"
+										 [(ngModel)]="purchaseOrderData.peopleInvolvedDto"
+										 (ngModelChange)="onChangePeopleInvolved($event)">
+						</ng-select-async>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label style="display: block;">
+							{{'PURCHASE_ORDER.BUY_INTERNAL_USE' | translate}}
+						</label>
+						<span class="ml-3">
+							<mat-checkbox name="buyInternalUse"
+										  class="example-margin"
+										  [(ngModel)]="purchaseOrderData.buyInternalUse"
+										  [color]="'primary'"
+										  [disabled]="true">
+							</mat-checkbox>
+						</span>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label style="display: block;">
+							{{'PURCHASE_ORDER.GOODS_PARTIAL' | translate}}
+						</label>
+						<span class="ml-3">
+							<mat-checkbox name="goodsPartial"
+										  class="example-margin"
+										  [(ngModel)]="purchaseOrderData.goodsPartial"
+										  [color]="'primary'"
+										  [disabled]="true">
+							</mat-checkbox>
+						</span>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="purchaseOrderData.goodsPartial">
+						<label style="display: block;">
+							{{'PURCHASE_ORDER.GOODS_ARRIVED_FULL' | translate}}
+						</label>
+						<span class="ml-3">
+							<mat-checkbox name="goodsArrivedFull"
+										  class="example-margin"
+										  [(ngModel)]="purchaseOrderData.goodsArrivedFull"
+										  [color]="'primary'">
+							</mat-checkbox>
+						</span>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-2 mb-3"
+						 *ngIf="isInternal">
+						<label style="display: block;">{{ 'PURCHASE_ORDER.PO_CONTRACT' | translate }}</label>
+						<mat-radio-group (change)="valueTypeChange($event)">
+							<mat-radio-button class="example-margin"
+											  [value]="poValue[0].value"
+											  [checked]="purchaseOrderData.valueType == valueTypes[0].value">
+								{{ poValue[0].label | translate}}
+							</mat-radio-button>
+							<mat-radio-button class="example-margin"
+											  [value]="poValue[1].value"
+											  [checked]="purchaseOrderData.valueType == valueTypes[1].value">
+								{{ poValue[1].label | translate}}
+							</mat-radio-button>
+						</mat-radio-group>
+					</div>
+					<div class="col-md-2 mb-3">
+						<label style="display: block;">{{ 'PURCHASE_ORDER.CERT_ORIGIN_QUALITY' | translate }}</label>
+						<span style="display: block;">
+							<mat-checkbox name="co"
+										  class="example-margin"
+										  [ngModel]="purchaseOrderData.hasCo"
+										  (ngModelChange)="purchaseOrderData.hasCo = $event ? 1 : 0"
+										  [checked]="purchaseOrderData.hasCo == 1"
+										  [color]="'primary'"> {{ 'PURCHASE_ORDER.CO' | translate }}
+							</mat-checkbox>
+						</span>
+						<span style="display: block;">
+							<mat-checkbox name="cq"
+										  class="example-margin"
+										  [ngModel]="purchaseOrderData.hasCq"
+										  (ngModelChange)="purchaseOrderData.hasCq = $event ? 1 : 0"
+										  [checked]="purchaseOrderData.hasCq == 1"
+										  [color]="'primary'"> {{ 'PURCHASE_ORDER.CQ' | translate }}
+							</mat-checkbox>
+						</span>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="isInternal">
+						<label style="display: block;">Rebate</label>
+						<mat-checkbox name="rebate"
+									  class="example-margin"
+									  [ngModel]="purchaseOrderData.hasRebate"
+									  (ngModelChange)="purchaseOrderData.hasRebate = $event ? 1 : 0"
+									  [checked]="purchaseOrderData.hasRebate == 1"
+									  [color]="'primary'">
+						</mat-checkbox>
+					</div>
+					<div class="col-md-2 mb-3"
+						 *ngIf="isInternal && purchaseOrderData.hasRebate">
+						<label>{{ 'PURCHASE_ORDER.REBATE_INFO' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="rebateInfo"
+							   placeholder="{{ 'PURCHASE_ORDER.REBATE_INFO' | translate }}"
+							   [(ngModel)]="purchaseOrderData.rebateInfo">
+					</div>
+					<div *ngIf="purchaseOrderData.status !== poStatus[2].value && purchaseOrderData.status !== poStatus[5].value && purchaseOrderData.id"
+						 class="col-md-4 mb-3">
+						<label>{{ 'PURCHASE_ORDER.ATTACH_PURCHASE_CONTRACT' | translate }}</label>
+						<single-attach-file module="Attachment\PurchaseOrder\{{purchaseOrderData.id}}"
+											(success)="onSuccessInitFile($event)">
+						</single-attach-file>
+					</div>
+				</div>
+				<app-purchase-order-item #purchaseOrderItem
+										 [purchaseOrderData]="purchaseOrderData"
+										 [viewFromAppendix]="purchaseOrderData.rootPoId ? true: false"
+										 (success)="onSuccess($event)"
+										 [editTable]="true"
+										 [noEdit]="false"
+										 (editRow)="editRow()"></app-purchase-order-item>
+				<div *ngIf="!isInternal">
+					<br>
+					<h5 class="kt-margin-b-15">
+						<i class="fab fa-envira"></i>
+						{{ 'PURCHASE_ORDER.ADDITIONAL_INFORMATION'| translate }}
+					</h5>
+					<div class="form-row">
+						<div class="col-md-3 mb-3">
+							<label>
+								{{ 'PURCHASE_ORDER.DELIVERY_FORM' | translate }}</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="deliveryDesc"
+									  placeholder="{{ 'PURCHASE_ORDER.DELIVERY_FORM' | translate }}"
+									  [(ngModel)]="purchaseOrderData.deliveryDesc"></textarea>
+						</div>
+						<div class="col-md-3 mb-3">
+							<label>Bill to/Marking</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="billTo"
+									  placeholder="Bill to/Marking"
+									  [(ngModel)]="purchaseOrderData.billTo"></textarea>
+						</div>
+						<div class="col-md-3 mb-3">
+							<label>Quality</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="quality"
+									  placeholder="Quality"
+									  [(ngModel)]="purchaseOrderData.quality"></textarea>
+						</div>
+						<div class="col-md-3 mb-3">
+							<label>Packing</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="packing"
+									  placeholder="Packing "
+									  [(ngModel)]="purchaseOrderData.packing"></textarea>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-md-3 mb-3">
+							<label>Shipping documents</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="shippingDocument"
+									  placeholder="Shipping documents"
+									  [(ngModel)]="purchaseOrderData.shippingDocument"></textarea>
+						</div>
+						<div class="col-md-3 mb-3">
+							<label>Claim</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="claim"
+									  placeholder="Claim"
+									  [(ngModel)]="purchaseOrderData.claim"></textarea>
+						</div>
+						<div class="col-md-3 mb-3">
+							<label>Warranty</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="warranty"
+									  placeholder="Warranty"
+									  [(ngModel)]="purchaseOrderData.warranty"></textarea>
+						</div>
+						<div class="col-md-3 mb-3">
+							<label>Additional Clause</label>
+							<textarea type="text"
+									  class="form-control"
+									  name="additionalClause"
+									  placeholder="Additional Clause"
+									  [(ngModel)]="purchaseOrderData.additionalClause"></textarea>
+						</div>
+					</div>
+				</div>
+			</form>
+
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<div class="mt-3">
+			<button class="btn btn-primary ml-3"
+					title="{{ 'COMMON.SAVE' | translate }}"
+					(click)="onBtnSaveClick()">
+				{{ 'COMMON.SAVE' | translate }}
+			</button>
+			<button class="btn btn-secondary ml-3"
+					title="{{ 'COMMON.CANCEL' | translate }}"
+					(click)="onBtnCancelClick()">
+				{{ 'COMMON.CANCEL' | translate }}
+			</button>
+		</div>
+	</ng-template>
+
+</p-dialog>

@@ -1,0 +1,57 @@
+<div class="input-group">
+    <!-- Trường hợp trên table thì hiển thị input text -->
+    <input *ngIf="isOnTable"
+           type="search"
+           class="form-control"
+           placeholder="{{ placeholder | translate }}"
+           [(ngModel)]="value"
+           placement="bottom-right"
+           ngbTooltip="{{ value }}"
+           [title]="value"
+           (ngModelChange)="onModelChangeInput($event)"
+           (keydown)="onChangeInput($event)"
+           (paste)="onChangeInput($event)"
+           (focusin)="focus.emit()"
+           (blur)="blur.emit()"
+           [required]="required"
+           [disabled]="disabled">
+    <ng-select-async *ngIf="!isOnTable"
+                     [bindLabel]="bindValue"
+                     [suffixLabel]="suffixLabel"
+                     [searchField]="searchField"
+                     placeholder="{{ placeholder | translate }}"
+                     [multiple]="false"
+                     [closeOnSelect]="true"
+                     [service]="service"
+                     [requestPayload]="requestPayload"
+                     [(ngModel)]="value"
+                     title="{{value ? value[bindValue] : ''}}"
+                     [required]="required"
+                     (change)="onChangeNgSelectAsync($event)"
+                     (focus)="focus.emit()"
+                     (blur)="blur.emit()"
+                     [canAdd]="canAdd"
+                     (addNew)="addNewItem()"
+                     [categoryType]="categoryType"
+                     [disabled]="disabled">
+    </ng-select-async>
+
+    <div class="input-group-append">
+        <button class="input-group-text input-group-right attach-button"
+                (click)="onBtnShowDialogListClick()"
+                tabindex="-1"
+                [disabled]="disabled"><i class="fal fa-ellipsis-v"></i></button>
+    </div>
+</div>
+
+<!-- List data đồng bộ -->
+<app-select-sync-source-list [dialogRef]="dialogRef"
+                             [requestPayload]="requestPayload"
+                             [categoryType]="categoryType"
+                             [actionGet]="actionGetName"
+                             [actionCount]="actionCountName"
+                             *ngIf="isShowDialog"
+                             (select)="onSelectRow($event)"></app-select-sync-source-list>
+
+<!-- Form thêm -->
+<app-select-sync-source-add [dialogRef]="dialogRefAdd"></app-select-sync-source-add>

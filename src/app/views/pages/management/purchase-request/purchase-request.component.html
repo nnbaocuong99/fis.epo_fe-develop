@@ -1,0 +1,396 @@
+<kt-portlet>
+	<kt-portlet-header icon="fal fa-shopping-cart"
+					   [title]="formTitle | translate"
+					   [class]="'kt-portlet__head--lg'"
+					   [viewLoading$]="purchaseRequestService.isLoading$">
+		<ng-container ktPortletTools>
+			<app-toolbar [model]="toolbarModel"
+						 [widthFromSearch]="850">
+				<form autocomplete="off"
+					  #form="ngForm">
+					<h5>{{ 'COMMON.FILTER' | translate }}</h5>
+					<div class="form-row">
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.ORG_APPLY' | translate }}</label>
+							<ng-select-async name="orgApply"
+											 bindLabel="name"
+											 suffixLabel="code"
+											 placeholder="{{'PURCHASE_REQUEST.ORG_APPLY'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="departmentService"
+											 (change)="request.orgApply = request.orgApplyDto?.code"
+											 [(ngModel)]="request.orgApplyDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'FISx' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="fisx"
+								   placeholder="{{ 'FISx' | translate }}"
+								   [(ngModel)]="request.fisx">
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.PROJECT_CODE' | translate }}</label>
+							<ng-select-async name="projectCode"
+											 bindLabel="code"
+											 suffixLabel="name"
+											 placeholder="{{'PURCHASE_REQUEST.PROJECT_CODE'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="projectService"
+											 (change)="request.projectCode = request.projectCodeDto?.code"
+											 [(ngModel)]="request.projectCodeDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.PR_NO' | translate }}</label>
+							<ng-select-async name="prNo"
+											 bindLabel="prNo"
+											 placeholder="{{'PURCHASE_REQUEST.PR_NO'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="purchaseRequestService"
+											 (change)="request.prNo = request.prNoDto?.prNo"
+											 [(ngModel)]="request.prNoDto">
+							</ng-select-async>
+						</div>
+
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.ORG_CODE' | translate }}</label>
+							<ng-select-async name="orgCode"
+											 bindLabel="code"
+											 suffixLabel="name"
+											 placeholder="{{'PURCHASE_REQUEST.ORG_CODE'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="organizationService"
+											 (change)="request.orgCode = request.orgCodeDto?.code"
+											 [(ngModel)]="request.orgCodeDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="contractNo"
+								   placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}"
+								   [(ngModel)]="request.contractNo"
+								   placement="bottom-right"
+								   ngbTooltip="{{ request.contractNo }}">
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_PLAN.CREATOR' | translate }}</label>
+							<ng-select-async name="createdByName"
+											 bindLabel="fullName"
+											 placeholder="{{'PURCHASE_PLAN.CREATOR'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="userService"
+											 (change)="request.createdByName = createdByNameDto?.userName"
+											 [(ngModel)]="createdByNameDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.LEGAL' | translate }}</label>.
+							<ng-select-async name="legal"
+											 bindLabel="code"
+											 placeholder="{{'PURCHASE_ORDER.LEGAL'| translate}}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="operatingUnitService"
+											 (change)="request.legal = request.legalDto?.ouId"
+											 [(ngModel)]="request.legalDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.PR_CONTRACT_INFO' | translate }}</label>
+							<select name="contractInfo"
+									class="form-control"
+									[(ngModel)]="request.prType">
+								<option [ngValue]="null"
+										selected>{{ 'COMMON.ALL' | translate }}</option>
+								<option value="1">
+									{{ 'PURCHASE_REQUEST.CONTRACT_OUTPUT_REGISTERED' | translate }}</option>
+								<option value="2">
+									{{ 'PURCHASE_REQUEST.CONTRACT_PRE_ORDER' | translate }}</option>
+								<option value="3">{{ 'PURCHASE_REQUEST.PURCHASE_APPROVAL' | translate }}
+								</option>
+							</select>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.FROM_DATE' | translate }}</label>
+							<input-date name="fromDate"
+										[(ngModel)]="request.fromDate">
+							</input-date>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.TO_DATE' | translate }}</label>
+							<input-date name="toDate"
+										[(ngModel)]="request.toDate">
+							</input-date>
+						</div>
+
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.PR_TYPE' | translate }}</label>
+							<select name="prType"
+									class="form-control"
+									[(ngModel)]="request.prType">
+								<option [ngValue]="null"
+										selected>{{ 'COMMON.ALL' | translate }}</option>
+								<option value="1">{{ 'PURCHASE_REQUEST.CONTRACT_OUTPUT' | translate }}
+								</option>
+								<option value="2">{{ 'PURCHASE_REQUEST.INTERNAL_USE' | translate }}
+								</option>
+							</select>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.ITEM.IPO_NUMBER' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="ipoNumber"
+								   placeholder="{{ 'PURCHASE_REQUEST.ITEM.IPO_NUMBER' | translate }}"
+								   [(ngModel)]="request.ipoNumber"
+								   placement="bottom-right"
+								   ngbTooltip="{{ request.ipoNumber }}">
+						</div>
+						<div class="col-md-4 mb-3">
+							<label>{{ 'PURCHASE_REQUEST.PR_STATUS' | translate }}</label>
+							<select name="prStatus"
+									class="form-control"
+									[(ngModel)]="request.prStatus">
+								<option [ngValue]="null"
+										selected>{{ 'COMMON.ALL' | translate }}</option>
+								<option value="1">{{ 'PURCHASE_REQUEST.TAB.DRAFT' | translate }}</option>
+								<option value="2">{{ 'PURCHASE_REQUEST.TAB.WAITING_APPROVAL' | translate }}</option>
+								<option value="3">{{ 'PURCHASE_REQUEST.TAB.APPROVED' | translate }}</option>
+								<option value="4">{{ 'PURCHASE_REQUEST.TAB.REJECT' | translate }}</option>
+								<option value="5">{{ 'PURCHASE_REQUEST.TAB.PROCESSING' | translate }}</option>
+								<option value="6">{{ 'PURCHASE_REQUEST.TAB.FINISH' | translate }}</option>
+								<option value="7">{{ 'PURCHASE_REQUEST.TAB.CANCEL' | translate }}</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-row">
+						<button type="submit"
+								class="btn btn-sm btn-label-brand ml-2"
+								(click)="toolbarModel?.search?.click()">{{ 'COMMON.GO' | translate }}</button>
+						<button type="reset"
+								(click)="onBtnResetSearchClick()"
+								class="btn btn-sm btn-label-brand ml-2">Reset</button>
+					</div>
+				</form>
+			</app-toolbar>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<ngb-tabset [justify]="'start'"
+					(tabChange)="setFragmentToRoute($event)"
+					[activeId]="activeIdTab">
+			<ngb-tab *ngFor="let tab of tabs"
+					 [id]="tab.value">
+				<ng-template ngbTabTitle>
+					<span>
+						{{ tab.label | translate }} <b>
+							<span [ngClass]="'badge badge-pill ' + tab.class"
+								  *ngIf="tab.count">{{ tab.count }}</span></b>
+					</span>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+
+		<div class="row kt-margin-b-15">
+			<div class="col-md-6 mb-3">
+				<app-select-subdepartment-tree [(ngModel)]="request.listSubDepartmentId"
+											   (selectionChange)="initData()">
+				</app-select-subdepartment-tree>
+			</div>
+			<div class="col-md-6 mb-3">
+
+			</div>
+			<div class="col-md-6">
+				<mat-form-field class="input-general-filter">
+					<input matInput
+						   #searchInput
+						   (keydown.enter)="initData()"
+						   [(ngModel)]="request.generalFilter"
+						   placeholder="Search ..."
+						   class="mat-form-field mat-form-field-fluid">
+					<mat-hint align="start">
+					</mat-hint>
+				</mat-form-field>
+				<br>
+				<small>Ex: Số YCMH, mã dự án, số hợp đồng đầu ra, mã KHMH, số iPO...</small>
+			</div>
+			<div class="col-md-6">
+				<div class="mat-table__bottom">
+					<mat-spinner [diameter]="20"
+								 *ngIf="purchaseRequestService.isLoading$ | async"></mat-spinner>
+					<mat-paginator [pageSize]="5"
+								   [pageSizeOptions]="[5,10,30,50]"
+								   [length]="dataSource.paginatorTotal"
+								   [showFirstLastButtons]="true"></mat-paginator>
+				</div>
+			</div>
+		</div>
+		<div class="mat-table__wrapper">
+			<p-table [value]="dataSource.items"
+					 tableStyleClass="table-no-wrap"
+					 [columns]="headers"
+					 [frozenColumns]="frozenCols"
+					 [scrollable]="true"
+					 scrollHeight="600px"
+					 frozenWidth="400px"
+					 [(contextMenuSelection)]="selectedRowData"
+					 [contextMenu]="btnContextMenu"
+					 dataKey="id">
+				<ng-template pTemplate="colgroup"
+							 let-columns>
+					<colgroup>
+						<ng-container *ngFor="let col of columns">
+							<col [ngStyle]="{width: col.width}"
+								 class="align-center">
+						</ng-container>
+					</colgroup>
+				</ng-template>
+				<ng-template pTemplate="header"
+							 let-columns>
+					<tr>
+						<th *ngFor="let header of columns"
+							[width]="header.width"
+							[ngClass]="header.class"
+							class="align-center header-height">{{ header.title | translate }}</th>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body"
+							 let-rowData
+							 let-columns="columns"
+							 let-rowIndex="rowIndex">
+					<tr [pContextMenuRow]="rowData">
+						<td *ngFor="let col of columns">
+							<div *ngIf="col.field === 'indexNo'"
+								 [title]="paginator.pageIndex * 10 + rowIndex + 1"
+								 class="wrap-text-grid align-center">
+								{{ paginator.pageIndex * 10 + rowIndex + 1 }}
+							</div>
+
+							<div *ngIf="col.field === 'contractNo'"
+								 [title]="rowData.contractNo"
+								 class="wrap-text-grid">{{ rowData.contractNo }}
+							</div>
+
+							<div *ngIf="col.field === 'prNo'"
+								 [title]="rowData.prNo"
+								 class="wrap-text-grid header-link">
+								<a (click)="onBtnViewDialog(rowData)">{{ rowData.prNo }}</a>
+							</div>
+
+							<div *ngIf="col.field === 'orgApplyName'"
+								 [title]="rowData.orgApplyName"
+								 class="wrap-text-grid">{{ rowData.orgApplyName }}
+							</div>
+
+							<div *ngIf="col.field === 'orgCode'"
+								 [title]="rowData.orgCode"
+								 class="wrap-text-grid">{{ rowData.orgCode }}
+							</div>
+
+							<div *ngIf="col.field === 'legalName'"
+								 [title]="rowData.legalName"
+								 class="wrap-text-grid">{{ rowData.legalName }}
+							</div>
+
+							<div *ngIf="col.field === 'createdAt'"
+								 [title]="rowData.createdAt | date: mainConfig.formatDateList"
+								 class="wrap-text-grid">
+								{{ rowData.createdAt | date: mainConfig.formatDateList }}
+							</div>
+
+							<div *ngIf="col.field === 'createdBy'"
+								 [title]="rowData.createdByName"
+								 class="wrap-text-grid">
+								{{ rowData.createdByName }}
+							</div>
+
+							<div *ngIf="col.field === 'projectCode'"
+								 [title]="rowData.projectCode"
+								 class="wrap-text-grid">{{ rowData.projectCode }}
+							</div>
+
+							<div *ngIf="col.field === 'prType'"
+								 [title]="((rowData.prType === 1 || rowData.prType === 2) ? 
+							'PURCHASE_REQUEST.CONTRACT_OUTPUT' : 'PURCHASE_REQUEST.INTERNAL_USE') | translate"
+								 class="wrap-text-grid">
+								{{ ((rowData.prType === 1 || rowData.prType === 2) ?
+								'PURCHASE_REQUEST.CONTRACT_OUTPUT' : 'PURCHASE_REQUEST.INTERNAL_USE') | translate }}
+							</div>
+
+							<div *ngIf="col.field === 'prContractInfo'"
+								 [title]="(rowData.prType | label:prContractInfo) | translate"
+								 class="wrap-text-grid">
+								{{(rowData.prType | label:prContractInfo) | translate}}
+							</div>
+
+							<div *ngIf="col.field === 'prStatus'"
+								 [title]="(rowData.prStatus | label:prStatus) | translate"
+								 class="wrap-text-grid">
+								{{(rowData.prStatus | label:prStatus) | translate}}
+							</div>
+
+							<div class="action align-center"
+								 *ngIf="col.field === 'action'">
+								<button mat-icon-button
+										[matMenuTriggerFor]="menu"
+										matTooltip="More actions">
+									<mat-icon>more_vert</mat-icon>
+								</button>
+								<mat-menu #menu="matMenu">
+									<button mat-menu-item
+											(click)="onBtnViewDialog(rowData)">
+										<span>{{'COMMON.VIEW'| translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.prStatus !== prStatus[5].value && rowData.prStatus !== prStatus[6].value"
+											(click)="onBtnEditClick(rowData.id)">
+										<span>{{'COMMON.EDIT'| translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.prStatus === 1 || rowData.prStatus === 4"
+											(click)="onBtnCancelClick(rowData)">
+										<span>{{'COMMON.CANCEL'| translate}}</span>
+									</button>
+									<!-- Yêu cầu mua hàng khác trạng thái đã tạo và đợi phê duyệt -->
+									<button mat-menu-item
+											*ngIf="rowData.prStatus !== 1 && rowData.prStatus !== 2"
+											(click)="onBtnPurchaseOrderClick(rowData)">
+										<span>{{'Đơn hàng'| translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.prStatus !== 1 && rowData.prStatus !== 2"
+											(click)="onBtnPurchaseInvoiceClick(rowData)">
+										<span>{{'Hóa đơn'| translate}}</span>
+									</button>
+									<button mat-menu-item
+											*ngIf="rowData.prStatus !== 1 && rowData.prStatus !== 2"
+											(click)="onBtnShipmentClick(rowData)">
+										<span>{{'Lô hàng'| translate}}</span>
+									</button>
+								</mat-menu>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+			<div *ngIf="dataSource.items && dataSource.items.length === 0">
+				<view-empty></view-empty>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>
+
+<p-contextMenu #btnContextMenu
+			   appendTo="body"
+			   [model]="btnItems"
+			   (onShow)="onShowContextMenu()"></p-contextMenu>

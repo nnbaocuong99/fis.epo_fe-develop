@@ -1,0 +1,31 @@
+<div class="input-group">
+    <input type="search"
+           class="form-control"
+           placeholder="{{ placeholder | translate }}"
+           [(ngModel)]="value"
+           [title]="value"
+           placement="bottom-right"
+           (ngModelChange)="onModelChangeInput($event)"
+           (focusout)="onFocusOutInput()"
+           [disabled]="disabled"
+           [required]="required"
+           emailTypeValidator>
+    <div class="input-group-append">
+        <button class="input-group-text input-group-right attach-button"
+                [matMenuTriggerFor]="menu"
+                (click)="searchEmail()"
+                [disabled]="disabled">
+            <i *ngIf="!showSpinner"
+               class="fas fa-caret-down"></i>
+            <i *ngIf="showSpinner"
+               class="pi pi-spin pi-spinner"></i>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item
+                    *ngFor="let item of arrEmail"
+                    (click)="chooseEmail(item)">
+                <span>{{ item }}</span>
+            </button>
+        </mat-menu>
+    </div>
+</div>

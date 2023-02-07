@@ -1,0 +1,46 @@
+<p-dialog #dlg
+          [(visible)]="dialogRef.isDisplay"
+          [baseZIndex]="11003"
+          [style]="{width: '750px'}"
+          [modal]="true"
+          [closable]="true"
+          appendTo="body"
+          (onHide)="initDefaultValue()">
+    <p-header>
+        <i class="fal fa-users-cog"></i> {{ 'Restrict access to resource' | translate }}
+    </p-header>
+
+    <p-table [value]="dataSouce.items"
+             [(selection)]="dataSouce.selectedItems"
+             (onRowSelect)="onSelectionChange($event, 1)"
+             (onRowUnselect)="onSelectionChange($event, 0)"
+             dataKey="id">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                </th>
+                <th style="min-width: 200px">Name</th>
+                <th style="min-width: 200px">Note</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                </td>
+                <td>{{ rowData.name }}</td>
+                <td>{{ rowData.note }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <ng-template pTemplate="footer">
+        <ng-container>
+            <button class="btn btn-sm btn-success"
+                    (click)="onBtnSetClick()">{{ 'COMMON.SET' | translate }}</button>
+            <button class="btn btn-sm btn-secondary"
+                    (click)="onBtnCancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+        </ng-container>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,457 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '90%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <h5 class="kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'COMMON.GENERAL_INFO'| translate}}
+            </h5>
+            <table class="table table-no-wrap">
+                <tbody>
+                    <tr>
+                        <td style="width: 25%">{{ 'Tên gói thầu' | translate }}:
+                            <b>{{ bidsData.name }}</b>
+                        </td>
+                        <td style="width: 25%">{{ 'Đơn vị mời thầu' | translate }}:
+                            <b>{{ bidsData.bidSolicitationUnit }}</b>
+                        </td>
+                        <td style="width: 25%">{{ 'Ngày mời thầu' | translate }}:
+                            <b>{{ bidsData.bidInvitationDate | date: mainConfig.formatJustDate }}</b>
+                        </td>
+                        <td style="width: 25%">{{ 'Hạn nộp hồ sơ thầu' | translate }}:
+                            <b>
+                                {{ bidsData.deadlineForSubmissionExtend ?
+                                (bidsData.deadlineForSubmissionExtend | date: mainConfig.formatFullDate) :
+                                (bidsData.deadlineForSubmission | date: mainConfig.formatFullDate) }}
+                            </b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%">{{ 'Ngày bắt đầu chào giá' | translate }}:
+                            <b>{{ bidsData.bidStartDate | date: mainConfig.formatFullDate }}</b>
+                        </td>
+                        <td style="width: 25%">{{ 'Ngày kết thúc chào giá' | translate }}:
+                            <b>{{ bidsData.bidEndDate | date: mainConfig.formatFullDate }}</b>
+                        </td>
+                        <td style="width: 25%">{{ 'Thông tin liên hệ' | translate }}:
+                            <b>{{ bidsData.contact }}</b>
+                        </td>
+                        <td style="width: 25%">{{ 'Nhà thầu dịch vụ' | translate }}:
+                            <b *ngIf="bidsSupplierProfileData.id">
+                                {{ bidsSupplierProfileData.contractor }}
+                            </b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%">{{ 'Người gửi' | translate }}:
+                            <b *ngIf="bidsSupplierProfileData.id">
+                                {{ bidsSupplierProfileData.peopleSubmit }}
+                            </b>
+                        </td>
+                        <td style="width: 25%">{{ 'Số điện thoại' | translate }}:
+                            <b *ngIf="bidsSupplierProfileData.id">
+                                {{ bidsSupplierProfileData.phoneNumber }}
+                            </b>
+                        </td>
+                        <td style="width: 25%"></td>
+                        <td style="width: 25%"></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%">{{ 'File báo giá' | translate }}:
+                            <single-attach-file *ngIf="bidsSupplierProfileData.id"
+                                                [edit]="false"
+                                                module="Attachment\SupplierProfile\{{bidsSupplierProfileData.id}}">
+                            </single-attach-file>
+                        </td>
+                        <td style="width: 25%"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5 class="kt-margin-t-30 kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'Hồ sơ năng lực yêu cầu'| translate}}
+            </h5>
+            <div class="mat-table__wrapper">
+                <p-table [value]="bidsData.listBidsCapacityProfileRequest"
+                         [columns]="arrHeaderBidsCapacityProfileRequest"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr [pEditableRow]="rowData">
+                            <td class="text-center"
+                                [title]="rowIndex + 1">
+                                {{ rowIndex + 1 }}
+                            </td>
+                            <td pInitEditableRow
+                                [title]="rowData.name">
+                                {{ rowData.name }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div
+                     *ngIf="bidsData.listBidsCapacityProfileRequest && bidsData.listBidsCapacityProfileRequest.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+            <h5 class="kt-margin-t-30 kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'Tiêu chí đánh giá'| translate}}
+            </h5>
+            <div class="mat-table__wrapper">
+                <p-table [value]="bidsData.listBidsEvaluationCriteria"
+                         [columns]="arrHeaderBidsEvaluationCriteria"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr [pEditableRow]="rowData">
+                            <td class="text-center"
+                                [title]="rowIndex + 1">
+                                {{ rowIndex + 1 }}
+                            </td>
+                            <td pInitEditableRow
+                                [title]="rowData.name">
+                                {{ rowData.name }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="bidsData.listBidsEvaluationCriteria && bidsData.listBidsEvaluationCriteria.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+            <h5 class="kt-margin-t-30 kt-margin-b-15"
+                *ngIf="bidsData.status && bidsData.status >= 3">
+                <i class="fab fa-envira"></i> {{'Danh sách nhà cung cấp'| translate}}
+            </h5>
+            <div class="mat-table__wrapper"
+                 *ngIf="bidsData.status && bidsData.status >= 3">
+                <p-table [value]="listBidsSupplierProfileViewAll"
+                         [columns]="arrHeaderSupplierProfileViewAll"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr [pEditableRow]="rowData">
+                            <td class="text-center"
+                                [title]="rowIndex + 1">
+                                {{ rowIndex + 1 }}
+                            </td>
+                            <td [title]="rowData.supplierName">
+                                {{ rowData.supplierName }}
+                            </td>
+                            <td [title]="rowData.supplierTaxCode">
+                                {{ rowData.supplierTaxCode }}
+                            </td>
+                            <td [title]="rowData.scores">
+                                {{ rowData.scores }}
+                            </td>
+                            <td [title]="rowData.status === 1 ? rowData.reasonReject : ''">
+                                <span [ngClass]="{'text-danger': rowData.status === 1}">
+                                    {{(rowData.status | label:arrSupplierProfileStatus) | translate}}
+                                </span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="listBidsSupplierProfileViewAll && listBidsSupplierProfileViewAll.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+            <h5 class="kt-margin-t-30 kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'Hồ sơ nhà thầu cung cấp'| translate}}
+            </h5>
+            <div class="mat-table__wrapper">
+                <p-table [value]="bidsData.listBidsSupplierProfile"
+                         [columns]="arrHeaderSupplierProfile"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr [pEditableRow]="rowData">
+                            <td class="text-center"
+                                [title]="rowIndex + 1">
+                                {{ rowIndex + 1 }}
+                            </td>
+                            <td [title]="rowData.description">
+                                {{ rowData.description }}
+                            </td>
+                            <td>
+                                <single-attach-file module="Attachment\SupplierProfile\{{rowData.id}}"
+                                                    [edit]="false">
+                                </single-attach-file>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="bidsData.listBidsSupplierProfile && bidsData.listBidsSupplierProfile.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+            <h5 class="kt-margin-t-30 kt-margin-b-15"
+                *ngIf="bidsSupplierProfileData.requestForQuotation === 1">
+                <i class="fab fa-envira"></i> {{'Báo giá'| translate}}
+            </h5>
+            <div class="mat-table__wrapper"
+                 *ngIf="bidsSupplierProfileData.requestForQuotation === 1">
+                <p-table [value]="bidsData.listBidsItem"
+                         [columns]="arrHeaderBidsItem"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr [pEditableRow]="rowData">
+                            <td class="text-center"
+                                [title]="rowIndex + 1">
+                                {{ rowIndex + 1 }}
+                            </td>
+                            <td [title]="rowData.itemName">
+                                {{ rowData.itemName }}
+                            </td>
+                            <td [title]="rowData.description">
+                                {{ rowData.description }}
+                            </td>
+                            <td [title]="rowData.quantity">
+                                {{ rowData.quantity }}
+                            </td>
+                            <td [title]="rowData.price">
+                                {{ rowData.price }}
+                            </td>
+                            <td [title]="rowData.unit">
+                                {{ rowData.unit }}
+                            </td>
+                            <td [title]="rowData.currency">
+                                {{ rowData.currency }}
+                            </td>
+                            <td [title]="rowData.taxType">
+                                {{ rowData.taxType }}
+                            </td>
+                            <td [title]="rowData.taxAmount">
+                                {{ rowData.taxAmount }}
+                            </td>
+                            <td [title]="(rowData.quantity && rowData.price) ? rowData.quantity * rowData.price : ''">
+                                {{ (rowData.quantity && rowData.price) ? rowData.quantity * rowData.price : '' }}
+                            </td>
+                            <td [title]="rowData.amount">
+                                {{ rowData.amount }}
+                            </td>
+                            <td class="text-center">
+                                {{ rowData.deliveryTime | date: mainConfig.formatJustDate }}
+                            </td>
+                            <td [title]="rowData.originGoods">
+                                {{ rowData.originGoods }}
+                            </td>
+                            <td [title]="(rowData.status | label:arrBidsItemStatus) | translate">
+                                {{(rowData.status | label:arrBidsItemStatus) | translate}}
+                            </td>
+                            <td [title]="rowData.warrantyTime">
+                                {{ rowData.warrantyTime }}
+                            </td>
+                            <td [title]="rowData.warrantyConditions">
+                                {{ rowData.warrantyConditions }}
+                            </td>
+                            <td [title]="rowData.otherRequest">
+                                {{ rowData.otherRequest }}
+                            </td>
+                            <td [title]="rowData.note">
+                                {{ rowData.note }}
+                            </td>
+                            <td class="text-center">
+                                {{ rowData.expirationDate | date: mainConfig.formatJustDate }}
+                            </td>
+                            <td class="text-center">
+                                <mat-checkbox class="example-margin"
+                                              (click)="$event.preventDefault()"
+                                              [checked]="rowData.outOfStock == 1"
+                                              [color]="'primary'">
+                                </mat-checkbox>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="bidsData.listBidsItem && bidsData.listBidsItem.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+            <h5 class="kt-margin-t-30 kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'Điều kiện thương mại'| translate}}
+            </h5>
+            <div class="mat-table__wrapper">
+                <p-table [value]="bidsData.listBidsTradeConditions"
+                         [columns]="arrHeaderBidsTradeConditions"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr [pEditableRow]="rowData">
+                            <td class="text-center"
+                                [title]="rowIndex + 1">
+                                {{ rowIndex + 1 }}
+                            </td>
+                            <td pInitEditableRow
+                                [title]="rowData.name">
+                                {{ rowData.name }}
+                            </td>
+                            <td pInitEditableRow
+                                [title]="rowData.description">
+                                {{ rowData.description }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div *ngIf="bidsData.listBidsTradeConditions && bidsData.listBidsTradeConditions.length === 0">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">{{
+            'COMMON.CLOSE' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>

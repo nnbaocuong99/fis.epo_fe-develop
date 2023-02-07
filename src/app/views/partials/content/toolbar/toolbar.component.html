@@ -1,0 +1,135 @@
+<ul class="kt-sticky-toolbar toolbar-row">
+	<li *ngIf="model?.add?.show"
+		class="kt-sticky-toolbar__item kt-sticky-toolbar__item--success"
+		[ngClass]="model?.add?.disabled ? 'cursor-not-allowed' : ''"
+		placement="bottom-right"
+		ngbTooltip="{{ 'COMMON.CRUD.ADD' | translate }}">
+		<a href="javascript:;"
+		   (click)="model?.add?.click()"
+		   [ngClass]="model?.add?.disabled ? 'disabled' : ''"
+		   [routerLink]="model?.add?.routerLink">
+			<i class="flaticon2-add-1"></i>
+		</a>
+	</li>
+	<li *ngIf="model?.option?.show"
+		class="kt-sticky-toolbar__item kt-sticky-toolbar__item--primary"
+		[ngClass]="model?.option?.disabled ? 'cursor-not-allowed' : ''"
+		placement="bottom-right"
+		ngbTooltip="{{ 'COMMON.ADVANCE_OPTION' | translate }}">
+		<div ngbDropdown
+			 [placement]="'bottom-right'"
+			 class="dropdown">
+			<div ngbDropdownToggle>
+				<a href="javascript:;"
+				   [ngClass]="model?.option?.disabled ? 'disabled' : ''"><i class="flaticon2-gear"></i></a>
+			</div>
+			<div ngbDropdownMenu
+				 *ngIf="!model?.option?.disabled"
+				 Style="width: 200px"
+				 class="dropdown-menu dropdown-menu-fit">
+				<ul class="kt-nav">
+					<li class="kt-nav__section kt-nav__section--first">
+						<span class="kt-nav__section-text">{{ 'COMMON.ADVANCE_OPTION' | translate }}:</span>
+					</li>
+					<li *ngIf="model?.option?.export?.show"
+						[ngClass]="model?.option?.export?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.export?.click()"
+							  [ngClass]="model?.option?.export?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="kt-nav__link-icon flaticon2-graph-1"></i>
+							<span class="kt-nav__link-text">Export</span>
+						</span>
+					</li>
+					<li *ngIf="model?.option?.save?.show"
+						[ngClass]="model?.option?.save?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.save?.click()"
+							  [ngClass]="model?.option?.save?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="kt-nav__link-icon flaticon2-calendar-4"></i>
+							<span class="kt-nav__link-text">Save</span>
+						</span>
+					</li>
+					<li *ngIf="model?.option?.import?.show"
+						[ngClass]="model?.option?.import?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.import?.click()"
+							  [ngClass]="model?.option?.import?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="kt-nav__link-icon flaticon2-layers-1"></i>
+							<span class="kt-nav__link-text">Import</span>
+						</span>
+					</li>
+					<li *ngIf="model?.option?.update?.show"
+						[ngClass]="model?.option?.update?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.update?.click()"
+							  [ngClass]="model?.option?.update?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="kt-nav__link-icon flaticon2-calendar-4"></i>
+							<span class="kt-nav__link-text">Update</span>
+						</span>
+					</li>
+					<li *ngIf="model?.option?.customize?.show"
+						[ngClass]="model?.option?.customize?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.customize?.click()"
+							  [ngClass]="model?.option?.customize?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="{{model?.option?.customize?.icons}}"></i>
+							<span class="kt-nav__link-text">{{ model?.option?.customize?.title | translate }}</span>
+						</span>
+					</li>
+					<li *ngIf="model?.option?.clone?.show"
+						[ngClass]="model?.option?.clone?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.clone?.click()"
+							  [ngClass]="model?.option?.clone?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="{{model?.option?.clone?.icons}}"></i>
+							<span class="kt-nav__link-text">{{ model?.option?.clone?.title | translate }}</span>
+						</span>
+					</li>
+					<li *ngIf="model?.option?.add?.show"
+						[ngClass]="model?.option?.add?.disabled ? 'cursor-not-allowed' : ''"
+						class="kt-nav__item">
+						<span href="javascript:;"
+							  (click)="model?.option?.add?.click()"
+							  [ngClass]="model?.option?.add?.disabled ? 'disabled' : ''"
+							  class="kt-nav__link">
+							<i class="kt-nav__link-icon flaticon2-add-1"></i>
+							<span class="kt-nav__link-text">{{ model?.option?.add?.title | translate }}</span>
+						</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</li>
+	<li *ngIf="model?.search?.show"
+		class="kt-sticky-toolbar__item"
+		[ngClass]="!isDropdown ? 'kt-sticky-toolbar__item--brand' : 'kt-sticky-toolbar__item--danger'"
+		placement="bottom-right"
+		ngbTooltip="{{ !isDropdown ? ('COMMON.FILTER' | translate) : '' }}">
+		<div ngbDropdown
+			 [autoClose]="false"
+			 placement="bottom-right">
+			<div ngbDropdownToggle
+				 (click)="isDropdown = !isDropdown">
+				<a href="javascript:;"><i [ngClass]="!isDropdown ? 'fal fa-funnel-dollar' : 'fal fa-times'"></i></a>
+			</div>
+			<div ngbDropdownMenu
+				 class="dropdown-menu dropdown-menu-right dropdown-menu-form dropdown-menu-anim dropdown-menu-xl hold-on-click"
+				 [ngStyle]="{'min-width.px': widthFromSearch}"
+				 style="overflow: scroll; max-height: 500px !important;">
+				<ng-content></ng-content>
+			</div>
+		</div>
+	</li>
+</ul>

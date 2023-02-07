@@ -1,0 +1,114 @@
+<kt-portlet>
+  <kt-portlet-header icon="fal fa-shopping-cart"
+                     [title]="'Danh sách temp mail' | translate"
+                     [class]="'kt-portlet__head--lg'"
+                     [viewLoading$]="tempMailService.isLoading$">
+    <ng-container ktPortletTools>
+      <app-toolbar [model]="toolbarModel"
+                   [widthFromSearch]="600">
+        <h5 class="mb-3">{{ 'COMMON.FILTER' | translate }} </h5>
+        <form autocomplete="off"
+              #formFilter="ngForm">
+          <div id="filter-merchandiseService">
+            <div class="form-row">
+              <div class="col-md-6 mb-3">
+                <label>{{ 'Diễn giải' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="description"
+                       placeholder="{{ 'Nhập mô tả diễn giải' | translate }}"
+                       [(ngModel)]="request.description">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label>{{ 'Trạng thái' | translate }}</label>
+                <select class="form-control"
+                        name="status"
+                        [(ngModel)]="request.status">
+                  <option [ngValue]="undefined"
+                          selected>{{ 'COMMON.ALL' | translate }}</option>
+                  <option *ngFor="let item of status"
+                          [value]="item.value">{{item.label | translate }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-row mt-1">
+            <button type="submit"
+                    class="btn btn-sm btn-label-brand ml-2"
+                    (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+            <button type="reset"
+                    class="btn btn-sm btn-label-brand ml-2"
+                    (click)="onReset()">{{ 'COMMON.RESET' | translate }}
+            </button>
+          </div>
+        </form>
+      </app-toolbar>
+    </ng-container>
+  </kt-portlet-header>
+  <kt-portlet-body>
+    <div class="row kt-margin-b-15">
+      <div class="col-md-6">
+      </div>
+      <div class="col-md-6">
+        <div class="mat-table__bottom">
+          <mat-spinner [diameter]="20"
+                       *ngIf="tempMailService.isLoading$ | async"></mat-spinner>
+          <mat-paginator [pageSize]="5"
+                         [pageSizeOptions]="[5, 10, 30, 50]"
+                         [length]="dataSource.paginatorTotal"
+                         [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+      </div>
+    </div>
+    <div class="mat-table__wrapper">
+      <p-table [value]="dataSource.items"
+               tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+          <tr>
+            <th *ngFor="let col of cols"
+                [width]="col.width"
+                class="table-no-wrap"
+                [ngClass]="col.class">
+              {{ col.header | translate }}
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+          <tr>
+            <td [title]="paginator.pageIndex * paginator.pageSize + rowIndex + 1">
+              {{ paginator.pageIndex * paginator.pageSize + rowIndex + 1 }}
+            </td>
+            <td [title]="rowData.code">{{ rowData.code }}</td>
+            <td [title]="rowData.description">
+              <a href="javascript:;"
+                 (click)="onBtnAddCLick(rowData.id)">{{ rowData.description }}</a>
+            </td>
+            <td [title]="(rowData.status | label: status) | translate">
+              {{ (rowData.status | label: status) | translate}}
+            </td>
+            <td class="action">
+              <button mat-icon-button
+                      [matMenuTriggerFor]="menu"
+                      matTooltip="More actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item
+                        (click)="onBtnAddCLick(rowData.id)"
+                        title="{{'COMMON.EDIT' | translate}}">
+                  <span>{{'COMMON.EDIT'| translate}}</span>
+                </button>
+              </mat-menu>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div *ngIf="dataSource.items && dataSource.items.length === 0">
+        <view-empty></view-empty>
+      </div>
+    </div>
+  </kt-portlet-body>
+
+</kt-portlet>

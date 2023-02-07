@@ -1,0 +1,56 @@
+<p-dialog [(visible)]="dialogNotification.isDisplay"
+          [style]="{width: '40vw'}"
+          [modal]="true"
+          appendTo="body">
+    <p-header>
+        <i class="fal fa-info-circle"></i>
+        {{ title| translate }}
+    </p-header>
+
+    <form autocomplete="off"
+          #form="ngForm"
+          id="notificationDialogRef">
+        <label>{{ 'Người nhận thông báo' | translate }}</label>
+        <select-sync-source name="recipientId"
+                            placeholder="{{ 'Người nhận thông báo' | translate }}"
+                            header="{{ 'Người nhận thông báo' | translate }}"
+                            bindValue="fullName"
+                            [columns]="headerUser"
+                            [width]="'50vw'"
+                            [service]="userService"
+                            (change)="onChangeRecipientId($event)"
+                            [requestPayload]="userRequestPayLoad"
+                            [(ngModel)]="notificationData.recipientDto">
+        </select-sync-source>
+        <!-- <label>{{ 'Nội dung thông báo' | translate }}</label>
+		<textarea type="text"
+				  class="form-control"
+				  name="messageContent"
+				  placeholder="{{ '' | translate }}"
+				  [(ngModel)]="notificationData.messageContent">
+				</textarea> -->
+
+        <label>{{ 'Ghi chú' | translate }}</label>
+        <textarea type="text"
+                  class="form-control"
+                  name="description"
+                  placeholder="{{ '' | translate }}"
+                  [(ngModel)]="notificationData.description">
+				</textarea>
+
+    </form>
+    <br>
+    <br>
+    <br>
+    <p-footer>
+        <button class="btn btn-label-success btn-sm"
+                title="{{ 'COMMON.SAVE' | translate }}"
+                (click)="onSaveNotification()">
+            {{ 'COMMON.SAVE' | translate }}</button>
+        <button class="btn btn-label-dark btn-sm mr-3"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="dialogNotification.hide()">
+            {{ 'COMMON.CANCEL' | translate }}
+        </button>
+    </p-footer>
+</p-dialog>

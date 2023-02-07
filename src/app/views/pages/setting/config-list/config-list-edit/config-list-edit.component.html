@@ -1,0 +1,88 @@
+<crud-dialog [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()"
+             (delete)="onBtnDeleteClick()"
+             (cancel)="onBtnCancelClick()">
+    <form autocomplete="off"
+          #form="ngForm"
+          id="role-edit">
+        <div class="form-row">
+            <div class="col-md-3 mb-3">
+                <label class="lbl-required">{{ 'CONFIG_LIST.TYPE' | translate }}</label>
+                <validate-message [form]="form"
+                                  controlName="type"></validate-message>
+                <ng-select [items]="dialogRef.input.types"
+                           bindLabel="key"
+                           bindValue="key"
+                           name="type"
+                           placeholder="{{ 'CONFIG_LIST.TYPE' | translate }}"
+                           [(ngModel)]="dialogRef.input.type"
+                           [addTag]="true"
+                           required>
+                </ng-select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="lbl-required">{{ 'CONFIG_LIST.CODE' | translate }}</label>
+                <validate-message [form]="form"
+                                  controlName="code"></validate-message>
+                <input type="text"
+                       class="form-control"
+                       name="code"
+                       placeholder="{{ 'CONFIG_LIST.CODE' | translate }}"
+                       [(ngModel)]="dialogRef.input.code"
+                       required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="lbl-required">{{ 'CONFIG_LIST.NAME' | translate }}</label>
+                <validate-message [form]="form"
+                                  controlName="name"></validate-message>
+                <input type="text"
+                       class="form-control"
+                       name="name"
+                       placeholder="{{ 'CONFIG_LIST.NAME' | translate }}"
+                       [(ngModel)]="dialogRef.input.name"
+                       required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'CONFIG_LIST.NOTE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="note"
+                       placeholder="{{ 'CONFIG_LIST.NOTE' | translate }}"
+                       [(ngModel)]="dialogRef.input.note">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'CONFIG_LIST.ATTR1' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="attr1"
+                       placeholder="{{ 'CONFIG_LIST.ATTR1' | translate }}"
+                       [(ngModel)]="dialogRef.input.attr1">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'CONFIG_LIST.ATTR2' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="attr2"
+                       placeholder="{{ 'CONFIG_LIST.ATTR2' | translate }}"
+                       [(ngModel)]="dialogRef.input.attr2">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'CONFIG_LIST.ATTR3' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="attr3"
+                       placeholder="{{ 'CONFIG_LIST.ATTR3' | translate }}"
+                       [(ngModel)]="dialogRef.input.attr3">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'CONFIG_LIST.ATTR4' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="attr4"
+                       placeholder="{{ 'CONFIG_LIST.ATTR4' | translate }}"
+                       [(ngModel)]="dialogRef.input.attr4">
+            </div>
+        </div>
+    </form>
+</crud-dialog>

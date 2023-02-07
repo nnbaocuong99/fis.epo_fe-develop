@@ -1,0 +1,24 @@
+.wrap-text-grid-contact {
+	white-space: normal !important;
+	// max-height: 92px !important;
+	overflow: hidden !important;
+	-webkit-box-orient: vertical !important;
+	text-overflow: ellipsis !important;
+	display: -webkit-box !important;
+	-webkit-line-clamp: 5 !important;
+	// height: 100px !important;
+}
+
+.button-icon {
+    width: 2rem;
+    height: 2rem;
+    background: none !important;
+    border: none;
+}
+
+.button-icon:hover {
+    width: 2rem;
+    height: 2rem;
+    background-color: #e9ecef !important;
+    border-radius: 50%;
+}

@@ -1,0 +1,111 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '90%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+    </p-header>
+
+    <h5 class="kt-margin-b-15">
+        <i class="fab fa-envira"></i> {{ 'PURCHASE_PLAN.GENERAL_INFO'| translate }}
+    </h5>
+
+    <table class="table table-no-wrap">
+        <tbody>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CODE'| translate }}:
+                    <b>{{ purchasePlanHistory?.code }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.PROJECT_CODE' | translate }}:
+                    <b>{{ purchasePlanHistory?.projectCode }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_NO' | translate }}:
+                    <b>{{ purchasePlanHistory?.contractNo }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_TYPE' | translate }}:
+                    <b>{{ purchasePlanHistory?.contractType }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_DESCRIPTION' | translate }}:
+                    <b>{{ purchasePlanHistory?.contractDescription }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}:
+                    <b>{{ purchasePlanHistory?.customer }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.AM_ACCOUNT' | translate }}:
+                    <b>{{ purchasePlanHistory?.amAccount }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.PM_ACCOUNT' | translate }}:
+                    <b>{{ purchasePlanHistory?.pmAccount }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CEO_COO' | translate }}:
+                    <b>{{ purchasePlanHistory?.ceoCoo }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.SIGN_DATE' | translate }}:
+                    <b>{{ purchasePlanHistory?.signDate | date: mainConfig.formatDateList }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.END_DATE' | translate }}:
+                    <b>{{ purchasePlanHistory?.endDate | date: mainConfig.formatDateList }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.NOTE' | translate }}:
+                    <b>{{ purchasePlanHistory?.note }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'CO'| translate }}:
+                    <b>{{(purchasePlanHistory?.hasCo ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO')| translate }}</b>
+                </td>
+                <td style="width: 25%"> {{ 'CQ'| translate }}:
+                    <b>{{ (purchasePlanHistory?.hasCq ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO')| translate}}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CREATOR'| translate }}:
+                    <b>{{ purchasePlanHistory?.createdByName }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CURRENCY' | translate }}:
+                    <b>{{ purchasePlanHistory?.currency }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_TOTAL_AMOUNT' | translate }}:
+                    <b>{{ purchasePlanHistory?.contractTotalAmount }}</b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.OVER_SIX_WEEKS' | translate }}:
+                    <b>{{ purchasePlanHistory?.overSixWeeks ?
+                        ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                    </b>
+                </td>
+                <td style="width: 25%">{{ 'PURCHASE_PLAN.PEOPLE_INVOLVEL' | translate }}:
+                    <b>{{ purchasePlanHistory?.peopleInvolved }}</b>
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+    <h5 class="kt-margin-b-15">
+        <i class="fab fa-envira"></i> {{ 'PURCHASE_PLAN.ITEM_INFO'| translate }}
+    </h5>
+    <app-purchase-plan-item #purchasePlanItem
+                            [editTable]="false"
+                            [purchasePlanHistory]="purchasePlanHistory"
+                            [allowViewPrice]="allowViewPrice"></app-purchase-plan-item>
+
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">{{
+            'COMMON.CLOSE' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>

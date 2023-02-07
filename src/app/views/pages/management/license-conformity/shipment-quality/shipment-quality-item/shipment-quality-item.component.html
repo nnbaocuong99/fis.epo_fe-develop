@@ -1,0 +1,218 @@
+<p-dialog appendTo="body"
+          [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [maximizable]="true"
+          [style]="{width: '92vw'}"
+          [baseZIndex]="1000"
+          [draggable]="false"
+          [resizable]="false">
+    <!-- appendTo="body"> -->
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Lựa chọn item hàng hóa' | translate }}
+    </p-header>
+    <h5 class="kt-margin-t-15 kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{'Thông tin chung'| translate}}
+    </h5>
+
+    <form autocomplete="off"
+          #form="ngForm"
+          id="role-edit">
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <label class="lbl-required">{{ 'Ngày đăng ký' | translate }}</label>
+                <input-date name="submitDate"
+                            required
+                            validateTooltip
+                            [validateForm]="form"
+                            [(ngModel)]="dialogRef.input.rowData.submitDate">
+                </input-date>
+                <!-- <input type="date"
+                       class="form-control"
+                       name="submitDate"
+                       placeholder="{{ 'Ngày đăng ký' | translate }}"
+                       [ngModel]="dialogRef.input.rowData.submitDate | date: mainConfig.formatDate"
+                       (blur)="dialogRef.input.rowData.submitDate=$event.target.value"
+                       required>
+                <validate-message [form]="form"
+                                  controlName="submitDate"></validate-message> -->
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="lbl-required">{{ 'Cán bộ thực hiện' | translate }}</label>
+                <select-sync-source name="processBy"
+                                    placeholder="Cán bộ thực hiện"
+                                    header="Cán bộ thực hiện"
+                                    bindValue="fullName"
+                                    [columns]="headerUser"
+                                    [width]="'50vw'"
+                                    [service]="userService"
+                                    [requestPayload]="userRequestPayload"
+                                    (change)="onChangeAccount($event)"
+                                    [(ngModel)]="dialogRef.input.rowData.processByDto"
+                                    required>
+                </select-sync-source>
+                <validate-message [form]="form"
+                                  controlName="processBy"></validate-message>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>{{ 'Ngày được cấp phép' | translate }}</label>
+                <input-date name="finishDate"
+                            [(ngModel)]="dialogRef.input.rowData.finishDate"
+                            [disabled]="!currentShipmentQualityId">
+                </input-date>
+                <!-- <input type="date"
+                       class="form-control"
+                       name="finishDate"
+                       placeholder="{{ 'Ngày được cấp phép' | translate }}"
+                       [ngModel]="dialogRef.input.rowData.finishDate | date: mainConfig.formatDate"
+                       (blur)="dialogRef.input.rowData.finishDate=$event.target.value"
+                       [disabled]="!currentShipmentQualityId">
+                <validate-message [form]="form"
+                                  controlName="finishDate"></validate-message> -->
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-4 mb-3"
+                 *ngIf="currentShipmentQualityId">
+                <label>{{ 'Hồ sơ hoàn thành đăng ký' | translate }}</label>
+                <single-attach-file module="Attachment\LicenseConformity\{{currentShipmentQualityId}}"
+                                    (success)="loadDataAttachment($event)"></single-attach-file>
+            </div>
+            <div class="col-md-4 mb-3"
+                 *ngIf="!currentShipmentQualityId">
+                <label>{{ 'Hồ sơ hoàn thành đăng ký' | translate }}</label>
+                <div style="display: flex;">
+                    <input type="text"
+                           class="form-control"
+                           name="docnumber"
+                           placeholder="{{ 'Hồ sơ hoàn thành đăng ký' | translate }}"
+                           [(ngModel)]="dialogRef.input.rowData.docnumber"
+                           disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>{{ 'Ghi chú' | translate }}</label>
+                <textarea type="text"
+                          class="form-control"
+                          name="note"
+                          placeholder="Ghi chú gửi AF"
+                          [(ngModel)]="dialogRef.input.rowData.note"></textarea>
+                <validate-message [form]="form"
+                                  controlName="note"></validate-message>
+            </div>
+        </div>
+    </form>
+    <h5 class="kt-margin-t-15 kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{'Thông tin Item hàng hóa'| translate}}
+    </h5>
+    <div class="mat-table__wrapper">
+        <p-treeTable class="table-no-wrap"
+                     [value]="dataSource.items"
+                     [columns]="cols"
+                     [paginator]="true"
+                     [rows]="10"
+                     [lazy]="true"
+                     [totalRecords]="dataSource.paginatorTotal"
+                     [loading]="false"
+                     selectionMode="checkbox"
+                     [(selection)]="selectedPurchaseOrderItems">
+            <ng-template pTemplate="header"
+                         let-columns>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index"
+                        [width]="col.width"
+                        [ngClass]="col.class">
+                        <!-- <p-treeTableHeaderCheckbox *ngIf="col.field == 'indexNo'">
+                        </p-treeTableHeaderCheckbox> -->
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowNode
+                         let-rowData="rowData"
+                         let-columns="columns">
+                <tr *ngIf="rowData.itemName"
+                    [ngClass]="(rowData.isDisabled) ? 'font-disabled' : ''">
+                    <td *ngFor="let col of columns; let i = index"
+                        [ngClass]="{'align-right': (col.field === 'price' || col.field === 'intoMoney')}">
+                        <p-treeTableToggler [rowNode]="rowNode"
+                                            *ngIf="i == 0"></p-treeTableToggler>
+                        <p-treeTableCheckbox [value]="rowNode"
+                                             *ngIf="i == 0 && !rowData.isDisabled">
+                        </p-treeTableCheckbox>
+                        <span *ngIf="col.field == 'indexNo'"
+                              [title]="rowData.indexNo">{{ rowData.indexNo }}</span>
+                        <span *ngIf="col.field == 'partNo'"
+                              [title]="rowData.partNo">{{rowData.partNo}}</span>
+                        <span *ngIf="col.field == 'code'"
+                              [title]="rowData.code">{{rowData.code}}</span>
+                        <span *ngIf="col.field == 'itemCode'"
+                              [title]="rowData.itemCode">{{rowData.itemCode}}</span>
+                        <span *ngIf="col.field == 'itemName'"
+                              [title]="rowData.itemName">{{rowData.itemName}}</span>
+                        <span *ngIf="col.field == 'hasEnergyEfficiency'"
+                              [title]="rowData.hasEnergyEfficiency ? 'YES' : 'NO'">{{rowData.hasEnergyEfficiency ?
+                            'YES': 'NO'}}</span>
+                        <span *ngIf="col.field == 'hasImportLicense'"
+                              [title]="rowData.hasImportLicense ? 'YES' : 'NO'">{{rowData.hasImportLicense ? 'YES'
+                            :'NO'}}</span>
+                        <span *ngIf="col.field == 'isConformity'"
+                              [title]="rowData.isConformity ? 'YES' : 'NO'">{{rowData.isConformity ? 'YES'
+                            :'NO'}}</span>
+
+                        <span *ngIf="col.field == 'itemType'"
+                              [title]="rowData.itemType">{{rowData.itemType}}</span>
+                        <span *ngIf="col.field == 'unit'"
+                              [title]="rowData.unit">{{rowData.unit}}</span>
+                        <span *ngIf="col.field == 'quantity'"
+                              [title]="rowData.quantity">{{rowData.quantity}}</span>
+                        <span *ngIf="col.field == 'price'"
+                              [title]="rowData.price | currencyMask">
+                            {{rowData.price | currencyMask}}</span>
+                        <span *ngIf="col.field == 'intoMoney'"
+                              [title]="rowData.price ? ((rowData.price*rowData.quantity) | currencyMask) : ''">
+                            {{rowData.price ? ((rowData.price*rowData.quantity) | currencyMask) : ''}}</span>
+                        <span *ngIf="col.field == 'itemOrigin'"
+                              [title]="rowData.itemOrigin">{{rowData.itemOrigin}}</span>
+                        <span *ngIf="col.field == 'producerName'"
+                              [title]="rowData.producerName">{{rowData.producerName}}</span>
+                        <span *ngIf="col.field == 'note'"
+                              [title]="rowData.note">{{rowData.note}}</span>
+
+                        <!-- <span>{{rowData[col.field]}}</span> -->
+                    </td>
+                </tr>
+                <tr *ngIf="!rowData.itemName">
+                    <td colspan="6">
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                        <p-treeTableCheckbox [value]="rowNode"
+                                             *ngIf="!rowData.isDisabled"></p-treeTableCheckbox>
+                        <i class="fas fa-folder folder-explorer"></i>&nbsp;<b>{{ rowData.code }}</b>&nbsp;<span
+                              class="total-item">({{rowData.count}}
+                            item(s))</span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-treeTable>
+    </div>
+    <br>
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-primary mr-2"
+                title="{{ 'COMMON.SAVE' | translate }}"
+                (click)="onBtnSaveClick()">
+            <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}</button>
+        <button class="btn btn-secondary mr-2"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="onBtnCancelClick()">
+            <!-- <i class="la la-arrow-left"></i>  -->
+            {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button *ngIf="this.dialogRef.input.type === 2"
+                class="btn btn-secondary mr-2"
+                title="{{ 'Xuất file GPNK' | translate }}"
+                (click)="onBtnExportFileClick()">
+            <i class="fal fa-file-export"></i> {{ 'Xuất file' | translate }}</button>
+    </div>
+</p-dialog>

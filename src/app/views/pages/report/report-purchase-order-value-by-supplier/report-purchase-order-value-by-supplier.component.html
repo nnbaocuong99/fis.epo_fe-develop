@@ -1,0 +1,122 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.PURCHASE_ORDER_VALUE_BY_SUPPLIER.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportXNKService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_ORDER.PO_HD_NO' | translate }}</label>
+                <input name="poCode"
+                       type="text"
+                       class="form-control"
+                       maxlength="255"
+                       placeholder="{{ 'PURCHASE_ORDER.PO_HD_NO' | translate }}"
+                       [(ngModel)]="request.poCode">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}</label>
+                <input name="piCode"
+                       type="text"
+                       class="form-control"
+                       maxlength="255"
+                       placeholder="{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}"
+                       [(ngModel)]="request.piCode">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.LEGAL' | translate }}</label>
+                <select-sync-source name="ouCode"
+                                    placeholder="{{ 'REPORT.LEGAL' | translate }}"
+                                    header="{{ 'REPORT.LEGAL' | translate }}"
+                                    bindValue="code"
+                                    [width]="'60vw'"
+                                    [columns]="headerOperatingUnit"
+                                    [service]="operatingUnitService"
+                                    [(ngModel)]="request.operatingUnitDto"
+                                    (change)="onChangeOperatingUnitDto()">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.SUB_DEPARTMENT' | translate }}</label>
+                <select-sync-source name="subDepartmentId"
+                                    placeholder="{{ 'REPORT.SUB_DEPARTMENT' | translate }}"
+                                    header="{{ 'REPORT.SUB_DEPARTMENT' | translate }}"
+                                    bindValue="name"
+                                    [width]="'60vw'"
+                                    [columns]="headerSubDepartment"
+                                    [service]="subDepartmentService"
+                                    [requestPayload]="{ouId: request.ouId}"
+                                    [(ngModel)]="request.subDepartmentDto"
+                                    (change)="onChangeSubDepartmentDto()"
+                                    [disabled]="!request.ouId">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.SUPPLIER' | translate }}</label>
+                <select-sync-source name="vendorId"
+                                    placeholder="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    header="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    bindValue="name"
+                                    suffixLabel="code"
+                                    searchField="generalFilter"
+                                    [width]="'60vw'"
+                                    [columns]="headerSupplier"
+                                    [service]="supplierService"
+                                    [(ngModel)]="request.supplierDto"
+                                    (change)="onChangeSupplier()">
+                </select-sync-source>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Người tạo PO' | translate }}</label>
+                <ng-select-async name="createdByName"
+                                 bindLabel="userName"
+                                 placeholder="{{'Người tạo'| translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="userService"
+                                 (change)="request.createdBy = createdByNameDto?.id"
+                                 [(ngModel)]="createdByNameDto">
+                </ng-select-async>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportPurchaseOrderValueBySupplier()">
+                    {{ 'REPORT.PURCHASE_ORDER_VALUE_BY_SUPPLIER.EXPORT_PURCHASE_ORDER_VALUE_BY_SUPPLIER' | translate }}
+                </button>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

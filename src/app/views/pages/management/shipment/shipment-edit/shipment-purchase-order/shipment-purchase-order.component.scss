@@ -1,0 +1,32 @@
+::ng-deep {
+	.p-fieldset {
+		border: none;
+		margin-top: 0px;
+	}
+
+	.p-fieldset .p-fieldset-legend {
+		margin-bottom: 0;
+		border: none;
+		background: none;
+		width: 175px;
+	}
+
+	.p-fieldset.p-fieldset-toggleable .p-fieldset-legend:hover {
+		background: #e9ecef;
+		border-color: #dee2e6;
+		color: #495057;
+	}
+
+	.p-fieldset.p-fieldset-toggleable .p-fieldset-legend a .p-fieldset-toggler {
+		color: #0c4da2;
+	}
+
+	.p-fieldset-legend-text {
+		color: #0c4da2;
+		font-size: 1.25rem;
+		font-weight: 500;
+		font-family: "Quicksand", -apple-system, BlinkMacSystemFont, "Segoe UI",
+			Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
+			"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	}
+}

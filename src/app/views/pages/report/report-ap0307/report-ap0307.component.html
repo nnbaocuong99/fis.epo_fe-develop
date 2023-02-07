@@ -1,0 +1,95 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.AP0307.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportAFService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.SUPPLIER' | translate }}</label>
+                <select-sync-source placeholder="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    header="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    bindValue="name"
+                                    suffixLabel="code"
+                                    searchField="generalFilter"
+                                    [width]="'60vw'"
+                                    [columns]="headerSupplier"
+                                    [service]="supplierService"
+                                    [(ngModel)]="request.supplierDto"
+                                    (change)="onChangeSupplier()">
+                </select-sync-source>
+            </div>
+            <!-- <div class="col-md-2 mb-3">
+                <label>{{ 'Tài khoản' | translate}}</label>
+                <select-sync-source placeholder="{{ 'Tài khoản' | translate}}"
+                                    header="{{ 'Tài khoản' | translate}}"
+                                    bindValue="accountNumber"
+                                    suffixLabel="name"
+                                    [columns]="headerSupplierBank"
+                                    [width]="'60vw'"
+                                    [service]="supplierBankService"
+                                    (change)="onChangeSupplierBank()"
+                                    [requestPayload]="{supplierId: request.supplierDto?.id}"
+                                    [(ngModel)]="request.supplierBankDto">
+                </select-sync-source>
+            </div> -->
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Account name' | translate }}</label>
+                <ng-select [items]="arrAccountName"
+                           bindLabel="label"
+                           bindValue="value"
+                           name="accountName"
+                           placeholder="{{ 'Account name' | translate }}"
+                           [(ngModel)]="request.accountName">
+                    <ng-template ng-label-tmp
+                                 let-item="item">
+                        {{ item | translate }}
+                    </ng-template>
+                    <ng-template ng-option-tmp
+                                 let-item="item">
+                        {{ item | translate }}
+                    </ng-template>
+                </ng-select>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportAP0307()">
+                    {{ 'REPORT.AP0307.EXPORT_AP0307' | translate }}
+                </button>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

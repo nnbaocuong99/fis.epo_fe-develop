@@ -1,0 +1,153 @@
+<kt-portlet>
+    <kt-portlet-header [title]="formTitle | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="exchangeRateService.isLoading$">
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="setFragmentToRoute()">
+            <ngb-tab *ngFor="let tab of tabs"
+                     [id]="tab.value">
+                <ng-template ngbTabTitle>
+                    <span>
+                        {{ tab.label | translate }}
+                    </span>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+        <div class="row kt-margin-b-15"
+             [ngClass]="{'hide': !isChangeTab}">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initDataExchangeRate()"
+                           [(ngModel)]="requestExchangeRate.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="exchangeRateService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator #mpExchangeRate
+                                   [pageSize]="10"
+                                   [pageSizeOptions]="[10,30,50]"
+                                   [length]="dataSourceExchangeRate.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+        <div class="mat-table__wrapper"
+             [ngClass]="{'hide': !isChangeTab}">
+            <p-table [value]="dataSourceExchangeRate.items"
+                     [columns]="headersExchangeRate"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="requestExchangeRate.pageSize * requestExchangeRate.pageIndex + rowIndex + 1">
+                            {{ requestExchangeRate.pageSize * requestExchangeRate.pageIndex + rowIndex + 1 }}
+                        </td>
+                        <td>{{ rowData.type }}</td>
+                        <td>{{ rowData.date | date: mainConfig.formatJustDate }}</td>
+                        <td>{{ rowData.currencyFrom }}</td>
+                        <td>{{ rowData.currencyTo }} </td>
+                        <td>{{ rowData.conversionRate }} </td>
+                        <td>{{ rowData.syncSource }} </td>
+                        <td>{{ rowData.syncAt | date: mainConfig.formatFullDate }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSourceExchangeRate.items && dataSourceExchangeRate.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+        <div class="row kt-margin-b-15"
+             [ngClass]="{'hide': isChangeTab}">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initDataCurrency()"
+                           [(ngModel)]="requestCurrency.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="currencyService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator #mpCurrency
+                                   [pageSize]="10"
+                                   [pageSizeOptions]="[10,30,50]"
+                                   [length]="dataSourceCurrency.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+        <div class="mat-table__wrapper"
+             [ngClass]="{'hide': isChangeTab}">
+            <p-table [value]="dataSourceCurrency.items"
+                     [columns]="headersCurrency"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="requestCurrency.pageSize * requestCurrency.pageIndex + rowIndex + 1">
+                            {{ requestCurrency.pageSize * requestCurrency.pageIndex + rowIndex + 1 }}
+                        </td>
+                        <td>{{ rowData.code }}</td>
+                        <td style="text-align: left !important;">{{ rowData.name }}</td>
+                        <td>{{ rowData.issuingTerritory }}</td>
+                        <td>{{ rowData.syncSource }} </td>
+                        <td>{{ rowData.syncAt | date: mainConfig.formatFullDate }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSourceCurrency.items && dataSourceCurrency.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

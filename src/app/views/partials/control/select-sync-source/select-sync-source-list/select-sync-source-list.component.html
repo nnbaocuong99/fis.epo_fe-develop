@@ -1,0 +1,102 @@
+<p-dialog header="Tìm kiếm {{dialogRef.input.header | translate}}"
+          [(visible)]="dialogRef.isDisplay"
+          styleClass="p-dialog-md"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [style]="{width: dialogRef.input.width}"
+          [modal]="true"
+          appendTo="body">
+    <mat-form-field>
+        <input matInput
+               #searchInput
+               (keyup)="initData()"
+               [(ngModel)]="requestPayload.generalFilter"
+               placeholder="Search ..."
+               class="mat-form-field mat-form-field-fluid">
+        <mat-hint align="start">
+            <!-- <strong>Search in {{ 'Loại hóa đơn' | translate }}</strong> -->
+        </mat-hint>
+    </mat-form-field>
+    <form autocomplete="off"
+          #form="ngForm"
+          *ngIf="dialogRef.input.name === 'exchangeRateType'"
+          id="search-contract">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label>{{ 'EXCHANGE_RATE_CURRENCY.TYPE' | translate }}</label>
+                <ng-select-async name="currency"
+                                 bindLabel="name"
+                                 placeholder="{{ 'EXCHANGE_RATE_CURRENCY.TYPE' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="exchangeRateTypeService"
+                                 (change)="requestPayload.type = requestPayload.typeDto?.name"
+                                 [(ngModel)]="requestPayload.typeDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'EXCHANGE_RATE_CURRENCY.DATE' | translate }}</label>
+                <input-date name="date"
+                            [(ngModel)]="requestPayload.date">
+                </input-date>
+            </div>
+            <div class="col-md-3 mb-3">
+                <br>
+                <button class="btn btn-sm btn-primary mt-3"
+                        (click)="initData()">
+                    <i class="fal fa-file-search"></i>
+                    {{ 'COMMON.SEARCH' | translate }}</button>
+            </div>
+        </div>
+    </form>
+    <div class="mat-table__wrapper">
+        <p-table [value]="dataSource.items"
+                 selectionMode="single"
+                 [(selection)]="selectedRow"
+                 dataKey="{{ categoryType !== 'item' ? 'id' : 'code' }}"
+                 tableStyleClass="table-no-wrap"
+                 [columns]="dialogRef.input.columns">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th *ngFor="let col of dialogRef.input.columns"
+                        [width]="col.width">{{ col.title | translate }}</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-rowIndex="rowIndex">
+                <tr [pSelectableRow]="rowData">
+                    <td *ngFor="let col of columns; let i = index">
+                        <span *ngIf="i === 0">{{ paginator.pageIndex * 10 + rowIndex + 1 }}</span>
+                        <span *ngIf="i !== 0 && !col.hasFormatDate"
+                              ngbTooltip="{{ isString(rowData[col.field]) ?
+                                ((rowData[col.field] | label:col.dictionary) | translate) : rowData[col.field] }}">
+                            {{ isString(rowData[col.field]) ?
+                            ((rowData[col.field] | label:col.dictionary) | translate) : rowData[col.field] }}
+                        </span>
+                        <span *ngIf="i !== 0 && col.hasFormatDate"
+                              ngbTooltip="{{ rowData[col.field] | date: mainConfig.formatFullDate }}">
+                            {{rowData[col.field] | date: mainConfig.formatFullDate}}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div class="mat-table__bottom">
+        <mat-spinner [diameter]="20"
+                     *ngIf="dialogRef.input?.service?.isLoading$ | async"></mat-spinner>
+        <mat-paginator #paginator
+                       [pageSize]="10"
+                       [length]="dataSource.paginatorTotal"
+                       [hidePageSize]="true"
+                       [showFirstLastButtons]="true"></mat-paginator>
+    </div>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-sm btn-label-brand mt-3"
+                (click)="onSelectRow()">{{ 'COMMON.SELECT' | translate }}</button>
+        <button class="btn btn-sm btn-label-dark mt-3"
+                (click)="dialogRef.hide()">{{ 'COMMON.CLOSE' | translate }}</button>
+    </ng-template>
+</p-dialog>

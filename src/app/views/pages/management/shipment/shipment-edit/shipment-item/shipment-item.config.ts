@@ -1,0 +1,20 @@
+export const HEADERS = [
+  { width: '70px', header: 'COMMON.NO', field: 'indexNo' },
+  { width: '100px', header: 'SHIPMENT.PROJECT_CODE', field: 'projectCode' },
+  { width: '100px', header: 'SHIPMENT.PO_CODE', field: 'poCode' },
+  { width: '100px', header: 'SHIPMENT.INVOICE_NUMBER', field: 'piCode' },
+  { width: '150px', header: 'SHIPMENT.ITEM.ITEM_CODE', field: 'itemCode' },
+  { width: '100px', header: 'SHIPMENT.ITEM.PART_NO', field: 'partNo' },
+  { width: '250px', header: 'SHIPMENT.ITEM.ITEM_NAME', field: 'itemName' },
+  { width: '100px', header: 'SHIPMENT.ITEM.ITEM_TYPE', field: 'itemType' },
+  { width: '100px', header: 'SHIPMENT.ITEM.NOTE', field: 'note' },
+  { width: '100px', header: 'SHIPMENT.ITEM.UOM', field: 'unit' },
+  { width: '100px', header: 'SHIPMENT.ITEM.QUANTITY', field: 'quantity' },
+  { width: '200px', header: 'SHIPMENT.ITEM.PRICE', field: 'price' },
+  { width: '200px', header: 'SHIPMENT.ITEM.INTO_MONEY', field: 'intoMoney' },
+  { width: '155px', header: 'SHIPMENT.ITEM.ORINGIN', field: 'itemOrigin', isRequired: 'true' },
+  { width: '100px', header: 'SHIPMENT.ITEM.ORG_CODE', field: 'orgCode' },
+  { width: '200px', header: 'SHIPMENT.ITEM.TERM_ACCOUNT', field: 'termAccount' },
+  { width: '200px', header: 'SHIPMENT.ITEM.PROJECT_MILESTONE', field: 'projectMilestone' },
+  { width: '100px', title: '', class: 'action', field: 'action' }
+];

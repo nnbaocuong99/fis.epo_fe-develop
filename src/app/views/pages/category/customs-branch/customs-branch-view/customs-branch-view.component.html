@@ -1,0 +1,183 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'COMMON.DETAILS' | translate"
+                       [viewLoading$]="customsBranchService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goToEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'COMMON.GENERAL_INFO'| translate}}
+        </h5>
+        <table class="table table-no-wrap">
+            <tbody>
+                <tr>
+                    <td style="width: 25%">{{ 'MDT' | translate }}:
+                        <b>{{ customsBranchData.mdt }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.CODE' | translate }}:
+                        <b>{{ customsBranchData.code }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.NAME' | translate }}:
+                        <b>{{ customsBranchData.name }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.ACRONYM' | translate }}:
+                        <b>{{ customsBranchData.acronym }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.TAX_CODE' | translate }}:
+                        <b>{{ customsBranchData.taxCode }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.BANK_NAME' | translate }}:
+                        <b>{{ customsBranchData.bankName }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.ACCOUNT_NUMBER' | translate }}:
+                        <b>{{ customsBranchData.accountNumber }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.TREASURY_NAME' | translate }}:
+                        <b>{{ customsBranchData.treasuryName }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.ADDRESS' | translate }}:
+                        <b>{{ customsBranchData.address }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CUSTOMS_BRANCH.PROVINCE' | translate }}:
+                        <b>{{ customsBranchData.province }}</b>
+                    </td>
+                    <td style="width: 25%"></td>
+                    <td style="width: 25%"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h5 class="kt-margin-t-30 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Loại hình XNK'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="customsBranchData.listCustomsType"
+                     [columns]="arrHeaderCustomsType"
+                     dataKey="id"
+                     editMode="row"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.code">
+                            {{ rowData.code }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.name">
+                            {{ rowData.name }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="customsBranchData.listCustomsType && customsBranchData.listCustomsType.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <h5 class="kt-margin-t-30 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Các khoản phải nộp NS'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="customsBranchData.listCustomsFees"
+                     [columns]="arrHeaderCustomsFees"
+                     dataKey="id"
+                     editMode="row"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.name">
+                            {{ rowData.name }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.chapterCode">
+                            {{ rowData.chapterCode }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.economicContentCode">
+                            {{ rowData.economicContentCode }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.ma">
+                            {{ rowData.ma }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.feePaymentAccount">
+                            {{ rowData.feePaymentAccount }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="customsBranchData.listCustomsFees && customsBranchData.listCustomsFees.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>

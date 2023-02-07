@@ -1,0 +1,502 @@
+<kt-portlet>
+    <kt-portlet-header icon="fas fa-user-friends"
+                       [title]="'BRAND.HEADER_LIST' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="brandService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'Tìm kiếm chi tiết thông tin hãng sản xuất' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.CODE' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="code"
+                                   placeholder="{{ 'BRAND.CODE' | translate }}"
+                                   [(ngModel)]="request.code">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.NAME_BRAND' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="name"
+                                   placeholder="{{ 'BRAND.NAME_BRAND' | translate }}"
+                                   [(ngModel)]="request.name">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.REVENUE' | translate }}</label>
+                            <input type="number"
+                                   class="form-control"
+                                   name="revenue"
+                                   placeholder="{{ 'BRAND.REVENUE' | translate }}"
+                                   [(ngModel)]="request.revenue">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.PARADIGM' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="model"
+                                   placeholder="{{ 'BRAND.PARADIGM' | translate }}"
+                                   [(ngModel)]="request.model">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.NEW_PRODUCT' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="newProduct"
+                                   placeholder="{{ 'BRAND.NEW_PRODUCT' | translate }}"
+                                   [(ngModel)]="request.newProduct">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.BENEFIT' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="benefit"
+                                   placeholder="{{ 'BRAND.BENEFIT' | translate }}"
+                                   [(ngModel)]="request.benefit">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.DISTRIBUTOR_RETAILER' | translate }}</label>
+                            <ng-select [items]="brandType"
+                                       bindLabel="label"
+                                       bindValue="value"
+                                       name="distributorOrRetailer"
+                                       placeholder="{{ 'BRAND.DISTRIBUTOR_RETAILER' | translate }}"
+                                       [(ngModel)]="request.distributorOrRetailer">
+                            </ng-select>
+                            <!-- <input type="text"
+                                   class="form-control"
+                                   name="distributorOrRetailer"
+                                   placeholder="{{ 'BRAND.DISTRIBUTOR_RETAILER' | translate }}"
+                                   [(ngModel)]="request.distributorOrRetailer"> -->
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.PARTNER_RATING' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="partnerRating"
+                                   placeholder="{{ 'BRAND.PARTNER_RATING' | translate }}"
+                                   [(ngModel)]="request.partnerRating">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.DEFAULT_DISCOUNT' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="defaultDiscount"
+                                   placeholder="{{ 'BRAND.DEFAULT_DISCOUNT' | translate }}"
+                                   [(ngModel)]="request.defaultDiscount">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Chiết khấu đặc biệt' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="specialDiscount"
+                                   placeholder="{{ 'Chiết khấu đặc biệt' | translate }}"
+                                   [(ngModel)]="request.specialDiscount">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.PAYMENT_TERMS' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="termsOfPayment"
+                                   placeholder="{{ 'BRAND.PAYMENT_TERMS' | translate }}"
+                                   [(ngModel)]="request.termsOfPayment">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.PAYMENT_METHODS' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="paymentMethods"
+                                   placeholder="{{ 'BRAND.PAYMENT_METHODS' | translate }}"
+                                   [(ngModel)]="request.paymentMethods">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.INCENTIVE' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="incentive"
+                                   placeholder="{{ 'BRAND.INCENTIVE' | translate }}"
+                                   [(ngModel)]="request.incentive">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.POLICY' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="policy"
+                                   placeholder="{{ 'BRAND.POLICY' | translate }}"
+                                   [(ngModel)]="request.policy">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.CONTRACTOR_TAX' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="fct"
+                                   placeholder="{{ 'BRAND.CONTRACTOR_TAX' | translate }}"
+                                   [(ngModel)]="request.fct">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.POSTPAID' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="postpaid"
+                                   placeholder="{{ 'BRAND.POSTPAID' | translate }}"
+                                   [(ngModel)]="request.postpaid">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.TRANSPORT_FEE' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="freightFee"
+                                   placeholder="{{ 'BRAND.TRANSPORT_FEE' | translate }}"
+                                   [(ngModel)]="request.freightFee">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.MDF' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="mdf"
+                                   placeholder="{{ 'BRAND.MDF' | translate }}"
+                                   [(ngModel)]="request.mdf">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.FROM_DATE' | translate }}</label>
+                            <input-date name="fromDate"
+                                        [(ngModel)]="request.fromDate">
+                            </input-date>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.TO_DATE' | translate }}</label>
+                            <input-date name="toDate"
+                                        [(ngModel)]="request.toDate">
+                            </input-date>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'BRAND.CREATOR' | translate }}</label>
+                            <ng-select-async name="createdBy"
+                                             bindLabel="userName"
+                                             suffixLabel="fullName"
+                                             placeholder="{{ 'BRAND.CREATOR' | translate }}"
+                                             [multiple]="false"
+                                             [closeOnSelect]="true"
+                                             [service]="userService"
+                                             (change)="request.createdBy = request.createdByDto?.id"
+                                             [(ngModel)]="request.createdByDto">
+                            </ng-select-async>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-row">
+                        <button type="button"
+                                class="btn btn-sm btn-label-brand ml-2"
+                                (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                (click)="onBtnResetSearchClick()"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate}}</button>
+                    </div>
+                </form>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="brandService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator [pageSize]="10"
+                                   [pageSizeOptions]="[10,30,50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <p-table [value]="dataSource.items"
+                     class="table-no-wrap"
+                     [(contextMenuSelection)]="selectedRowData"
+                     [contextMenu]="btnContextMenu"
+                     dataKey="id"
+                     [columns]="headers">
+                <ng-template pTemplate="header">
+                    <tr style="background: #f8f9fa;">
+                        <th *ngFor="let col of headers"
+                            [width]="col.width"
+                            [ngClass]="col.class">
+                            {{ col.title | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-columns="columns"
+                             let-rowIndex="rowIndex">
+                    <tr [pContextMenuRow]="rowData">
+                        <td *ngFor="let col of columns">
+                            <div *ngIf="col.field === 'indexNo'"
+                                 class="wrap-text-grid-brand align-center">
+                                {{ paginator.pageIndex * paginator.pageSize + rowIndex + 1}}
+                            </div>
+
+                            <div *ngIf="col.field === 'code'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.code }}">
+                                {{ rowData.code}}
+                            </div>
+
+                            <div *ngIf="col.field === 'name'"
+                                 class="wrap-text-grid-brand header-link"
+                                 title="{{ rowData.name }}">
+                                <a (click)="viewBrandFollowYear(rowData)">
+                                    {{ rowData.name }}</a>
+                            </div>
+
+                            <div *ngIf="col.field === 'revenueTotal'"
+                                 class="wrap-text-grid-brand align-right"
+                                 title="{{ convertCurrencyMask(rowData.revenueTotal) }}">
+                                {{ convertCurrencyMask(rowData.revenueTotal) }}
+                            </div>
+
+                            <!-- <div *ngIf="col.field === 'level'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.level }}">
+                                {{ rowData.level }}
+                            </div>
+
+                            <div *ngIf="col.field === 'distributorOrRetailer'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.distributorOrRetailer | label: brandType }}">
+                                {{ rowData.distributorOrRetailer | label: brandType}}
+                            </div>
+
+                            <div *ngIf="col.field === 'partnerRating'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.partnerRating }}">
+                                {{ rowData.partnerRating }}
+                            </div>
+
+                            <div *ngIf="col.field === 'paymentMethods'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.paymentMethods }}">
+                                {{ rowData.paymentMethods }}
+                            </div> -->
+
+                            <div *ngIf="col.field === 'priority'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.priority }}">
+                                {{ rowData.priority }}
+                            </div>
+
+
+                            <!-- <div *ngIf="col.field === 'fisPartnerLevel'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.fisPartnerLevel }}">
+                                {{ rowData.fisPartnerLevel }}
+                            </div> -->
+
+                            <div *ngIf="col.field === 'fisPartnerId'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.fisPartnerId }}">
+                                {{ rowData.fisPartnerId }}
+                            </div>
+
+                            <div *ngIf="col.field === 'dealRegistration'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.dealRegistration }}">
+                                {{ rowData.dealRegistration }}
+                            </div>
+
+                            <div *ngIf="col.field === 'caseStudies'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.caseStudies }}">
+                                {{ rowData.caseStudies }}
+                            </div>
+
+                            <div *ngIf="col.field === 'coreSolutions'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.coreSolutions }}">
+                                {{ rowData.coreSolutions }}
+                            </div>
+
+                            <div *ngIf="col.field === 'distributor'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.distributor }}">
+                                {{ rowData.distributor }}
+                            </div>
+
+                            <div *ngIf="col.field === 'pamer'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.pamer }}">
+                                {{ rowData.pamer }}
+                            </div>
+
+                            <div *ngIf="col.field === 'createdByName'"
+                                 class="wrap-text-grid-createdByName"
+                                 title="{{ rowData.createdByName }}">
+                                {{ rowData.createdByName }}
+                            </div>
+
+                            <!-- <div *ngIf="col.field === 'evaluate'"
+                                 class="wrap-text-grid-brand"
+                                 title="{{ rowData.evaluate }}">
+                                {{ rowData.evaluate }}
+                            </div> -->
+
+                            <div class="action align-center"
+                                 *ngIf="col.field === 'action'">
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        matTooltip="More actions">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item
+                                            (click)="onBtnViewClick(rowData.id)">
+                                        <span>{{'COMMON.VIEW'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnEditClick(rowData.id)">
+                                        <span>{{'COMMON.EDIT'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnDeleteClick(rowData.id)">
+                                        <span>{{ 'COMMON.DELETE' | translate}}</span>
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>
+
+<!-- Download template file -->
+<download-file style="display: none;"
+               label="Template file"
+               module="Template\Brand"
+               #downloadFileTemplateComponent></download-file>
+
+<!-- Upload file template -->
+<upload-file #importFile
+             [multiple]="false"
+             [accept]="'.xlsx'"
+             (onupload)="onBtnUploadClick()"></upload-file>
+
+<app-brand-view-year #brandViewYear></app-brand-view-year>
+
+<!-- Dialog export-->
+<p-dialog header="Export data"
+          [(visible)]="exportDialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [maximizable]="true"
+          [modal]="true"
+          [maximizable]="true"
+          [style]="{width: '42vw'}"
+          [baseZIndex]="1000"
+          [draggable]="false"
+          [resizable]="true"
+          appendTo="body">
+
+    <div class="row kt-margin-b-15">
+        <div class="col-md-6">
+            <label>{{ 'Năm hãng sản xuất' | translate }}</label>
+            <select class="form-control"
+                    name="brandYear"
+                    [(ngModel)]="exportRequest.brandYear">
+                <option [ngValue]="undefined"
+                        selected>{{ 'COMMON.SELECT' | translate }}</option>
+                <option *ngFor="let item of brandListYear"
+                        [value]="item.label">{{item.label | translate }}</option>
+            </select>
+        </div>
+    </div>
+    <br>
+    <div class="row kt-margin-b-30">
+        <button class="btn btn-sm btn-label-brand mr-2"
+                title="{{ 'Export thông tin hãng' | translate }}"
+                (click)="exportBrandInfo()">
+            {{ 'Export thông tin hãng' | translate }}
+        </button>
+
+        <button class="btn btn-sm btn-label-brand mr-2"
+                title="{{ 'Export marketingFund' | translate }}"
+                (click)="exportBrandMarketingFund()">
+            {{ 'Export marketing fund' | translate }}
+        </button>
+    </div>
+
+</p-dialog>
+
+<!-- Dialog clone data-->
+<p-dialog header="Clone all data thông tin hãng"
+          [(visible)]="cloneDataDialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [maximizable]="true"
+          [modal]="true"
+          [maximizable]="true"
+          [style]="{width: '42vw'}"
+          [baseZIndex]="1000"
+          [draggable]="false"
+          [resizable]="true"
+          appendTo="body">
+
+    <div class="row kt-margin-b-15">
+        <div class="col-md-6">
+            <label>{{ 'Năm hãng sản xuất' | translate }}</label>
+            <select class="form-control"
+                    name="brandYear"
+                    [(ngModel)]="cloneRequest.brandYear">
+                <option [ngValue]="undefined"
+                        selected>{{ 'COMMON.SELECT' | translate }}</option>
+                <option *ngFor="let item of brandListYear"
+                        [value]="item.label">{{item.label | translate }}</option>
+            </select>
+        </div>
+    </div>
+    <br>
+    <div class="row kt-margin-b-30">
+        <button class="btn btn-sm btn-label-brand mr-2"
+                title="{{ 'Clone all thông tin hãng' | translate }}"
+                (click)="btnCloneBrandData()">
+            {{ 'Clone all hãng' | translate }}
+        </button>
+    </div>
+
+</p-dialog>

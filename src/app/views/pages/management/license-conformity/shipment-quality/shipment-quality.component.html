@@ -1,0 +1,89 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="formTitle | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="shipmentQualityService.isLoading$">
+        <ng-container ktPortletTools>
+            <a (click)="onBtnCancelClick()"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               *ngIf="formData.isCancel">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <h5 class="kt-margin-t-15 kt-margin-b-15">
+            <i class="fal fa-money-check-edit"></i> {{'Lịch sử đăng ký'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     tableStyleClass="table-no-wrap">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th *ngFor="let col of headers"
+                            [width]="col.width"
+                            [ngClass]="col.class">{{ col.title | translate }}<span *ngIf="col.isRequired" class="lbl-required"></span>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr>
+                        <td [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <!-- <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                            {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                        </td> -->
+                        <td [title]="rowData.docnumber"
+                            class="btn-link"
+                            (click)="onBtnDownloadClick(rowData)">{{ rowData.docnumber }}</td>
+                        <td [title]="rowData.submitDate | date: mainConfig.formatDateList">
+                            {{ rowData.submitDate | date:mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.finishDate | date: mainConfig.formatDateList">
+                            {{ rowData.finishDate | date: mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.processBy">{{ rowData.processBy }}</td>
+                        <td [title]="rowData.status | label : statusRegisted">
+                            {{ rowData.status | label : statusRegisted}}
+                        </td>
+                        <td [title]="rowData.note">{{ rowData.note }}</td>
+                        <td style="text-align: center;">
+                            <button *ngIf="rowData.status === 2"
+                                    class="btn btn-label-dark btn-sm mt-2 mr-3"
+                                    title="{{ 'COMMON.VIEW'| translate }}"
+                                    (click)="onBtnViewClick(rowData)">
+                                {{ 'COMMON.VIEW'| translate }}
+                            </button>
+                            <button *ngIf="rowData.status === 2"
+                                    class="btn btn-label-success btn-sm mt-2"
+                                    title="{{ 'Download attachment'| translate }}"
+                                    (click)="onBtnDownloadClick(rowData)">
+                                {{ 'Download'| translate }}
+                            </button>
+                            <button *ngIf="rowData.status === 1"
+                                    class="btn btn-label-success btn-sm mt-2"
+                                    title="{{ 'Hoàn thành đăng ký'| translate }}"
+                                    (click)="onBtnCompleteClick(rowData)">
+                                {{ 'Hoàn thành đăng ký'| translate }}
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <br>
+        <div class="mat-table__bottom"
+             style="text-align:left; margin-top: 15px;">
+            <button class="btn btn-label-success btn-sm mt-2"
+                    title="{{ 'Thêm đăng ký' | translate }}"
+                    (click)="onBtnRegisteredClick()">{{ 'Thêm đăng ký' | translate }}
+            </button>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+<app-shipment-quality-item *ngIf="isShowDialogRef"
+                           [dialogRef]="dialogRef"
+                           (success)="loadItems($event)"></app-shipment-quality-item>

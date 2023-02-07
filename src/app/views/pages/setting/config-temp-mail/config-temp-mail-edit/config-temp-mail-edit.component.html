@@ -1,0 +1,125 @@
+<kt-portlet>
+  <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                     [icon]="'fal fa-info-circle'"
+                     [title]="'SUPPLIER.SUPPLIER_INFO' | translate"
+                     [viewLoading$]="tempMailService.isLoading$">
+    <ng-container ktPortletTools>
+      <a class="btn btn-secondary kt-margin-r-10"
+         mat-raised-button
+         (click)="goBack()">
+        <i class="la la-arrow-left"></i>
+        <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+      </a>
+    </ng-container>
+  </kt-portlet-header>
+  <kt-portlet-body>
+
+    <div class="kt-grid__item">
+
+      <form autocomplete="off"
+            #form="ngForm"
+            id="id-form-temp-mail">
+
+        <h5 class="kt-margin-b-15">
+          <i class="fab fa-envira"></i> {{'COMMON.DETAILS'| translate}}
+        </h5>
+
+        <div class="form-row">
+
+          <div class="col-md-4 mb-3">
+            <label class="lbl-required">{{ 'Mã mail' | translate }}</label>
+            <input type="text"
+                   class="form-control"
+                   name="code"
+                   maxlength="255"
+                   placeholder="{{ 'Mã mail' | translate }}"
+                   [(ngModel)]="tempMailData.code"
+                   readonly
+                   required>
+            <validate-message [form]="form"
+                              controlName="code"></validate-message>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="lbl-required">{{ 'Diễn giải' | translate }}</label>
+            <input type="text"
+                   class="form-control"
+                   name="description"
+                   placeholder="{{ 'Nhập diễn giải' | translate }}"
+                   [(ngModel)]="tempMailData.description"
+                   required>
+            <validate-message [form]="form"
+                              controlName="description"></validate-message>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="lbl-required">{{ 'Tiêu đề mail' | translate }}</label>
+            <input type="text"
+                   class="form-control"
+                   name="subject"
+                   placeholder="{{ 'Nhập tiêu đề' | translate }}"
+                   [(ngModel)]="tempMailData.subject"
+                   readonly
+                   required>
+            <validate-message [form]="form"
+                              controlName="subject"></validate-message>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label>{{'Role' | translate}}</label>
+            <ng-select-async name="roles"
+                             bindLabel="code"
+                             suffixLabel="name"
+                             placeholder="{{'Role' | translate}}"
+                             [multiple]="true"
+                             [service]="roleService"
+                             [(ngModel)]="tempMailData.rolesDto"
+                             (ngModelChange)="onChangeRoles($event)">
+            </ng-select-async>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label>{{'Những người liên quan' | translate}}</label>
+            <ng-select-async name="receivers"
+                             bindLabel="email"
+                             suffixLabel="fullName"
+                             placeholder="{{'Những người liên quan' | translate}}"
+                             [multiple]="true"
+                             [service]="userService"
+                             [(ngModel)]="tempMailData.receiversDto"
+                             (ngModelChange)="onChangeReceivers($event)">
+            </ng-select-async>
+          </div>
+
+          <div class="col-md-8 mb-3">
+            <label class="lbl-required">{{ 'Nội dung' | translate }}</label>
+            <ck-editor name="body"
+                       [(ngModel)]="tempMailData.body"
+                       skin="moono-lisa"
+                       language="en"
+                       [fullPage]="true">
+            </ck-editor>
+          </div>
+
+        </div>
+
+      </form>
+
+      <div class="mt-5">
+        <button class="btn btn-sm btn-success mr-2"
+                title="{{ 'COMMON.SAVE' | translate }}"
+                (click)="onBtnSaveClick()">
+          <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+        </button>
+
+        <button class="btn btn-sm btn-secondary mr-2"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="goBack()">
+          <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+        </button>
+
+      </div>
+    </div>
+
+  </kt-portlet-body>
+</kt-portlet>

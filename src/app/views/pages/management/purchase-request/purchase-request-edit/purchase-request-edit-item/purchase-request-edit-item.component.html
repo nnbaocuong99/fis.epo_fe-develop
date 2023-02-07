@@ -1,0 +1,144 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '60%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="onBtnCancelClick()">
+    <p-header>
+        <i class="fal fa-list-ul"></i> {{ 'PURCHASE_REQUEST.LIST_ITEM_INFO'| translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row kt-margin-b-15">
+                <div class="col-md-6">
+                    <mat-form-field class="input-general-filter">
+                        <input matInput
+                               #searchInput
+                               (keydown.enter)="loadNodes()"
+                               [(ngModel)]="request.generalFilter"
+                               placeholder="Search ..."
+                               class="mat-form-field mat-form-field-fluid">
+                        <mat-hint align="start">
+                            <strong>Search in {{ 'PURCHASE_REQUEST.ITEM.NAME' | translate }}</strong>
+                        </mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="mat-table__wrapper">
+                <p-treeTable class="table-no-wrap"
+                             [value]="dataSource.items"
+                             [columns]="headers"
+                             [paginator]="true"
+                             [rows]="10"
+                             [lazy]="true"
+                             (onLazyLoad)="loadNodes($event)"
+                             [totalRecords]="dataSource.paginatorTotal"
+                             [loading]="false"
+                             selectionMode="checkbox"
+                             [(selection)]="selectedPurchasePlanItems"
+                             (onNodeSelect)="nodeSelect($event)"
+                             (onNodeUnselect)="nodeUnselect($event)">
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr>
+                            <th *ngFor="let col of columns; let i = index"
+                                [width]="col.width"
+                                [ngClass]="col.isRequired ? (col.class + 'lbl-required') : col.class">
+                                <p-treeTableHeaderCheckbox *ngIf="i == 0 && isShowCheckBoxHeader">
+                                </p-treeTableHeaderCheckbox>
+                                {{ col.title | translate}}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowNode
+                                 let-rowData="rowData">
+                        <tr [ttRow]="rowNode"
+                            [ttRow]="rowNode"
+                            [ttSelectableRow]="rowNode"
+                            [ngClass]="rowData.status !== 0 && rowData.isDisabled ? 'font-disabled' : ''">
+                            <td [title]="rowData.indexNo">
+                                <p-treeTableCheckbox [value]="rowNode"
+                                                     *ngIf="!rowNode.parent"
+                                                     [disabled]="rowData.status !== 0 && rowData.isDisabled">
+                                </p-treeTableCheckbox>
+                                <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                                {{rowData.indexNo}}
+                            </td>
+                            <td [title]="rowData.itemCode">{{rowData.itemCode}}</td>
+                            <td [title]="rowData.partNo">{{rowData.partNo}}</td>
+                            <td [title]="rowData.itemName">{{rowData.itemName}}</td>
+                            <td [title]="rowData.itemType">{{rowData.itemType}}</td>
+                            <td [title]="rowData.unit">{{rowData.unit}}</td>
+                            <td [title]="rowData.currency">{{rowData.currency}}</td>
+                            <td [title]="rowData.quantity">{{rowData.quantity}}</td>
+                            <td>
+                                <div *ngIf="allowViewPrice"
+                                     class="wrap-text-grid-item align-right"
+                                     [title]="rowData.expectedPrice | currencyMask">
+                                    {{rowData.expectedPrice | currencyMask}}
+                                </div>
+                            </td>
+                            <td>
+                                <div *ngIf="allowViewPrice"
+                                     class="wrap-text-grid-item align-right"
+                                     [title]="(rowData.expectedPrice * rowData.quantity) | currencyMask">
+                                    {{ (rowData.expectedPrice * rowData.quantity) | currencyMask }}
+                                </div>
+                            </td>
+                            <td [title]=" rowData.expectedDate | date: mainConfig.formatDateList ">
+                                {{ rowData.expectedDate | date: mainConfig.formatDateList }}
+                            </td>
+                            <td [title]="rowData.supplierName">{{rowData.supplierName}}</td>
+                            <td [title]="rowData.producerName">{{rowData.producerName}}</td>
+                            <td [title]="rowData.guarantee">{{rowData.guarantee}}</td>
+                            <td [title]="rowData.deliveryLocation">{{rowData.deliveryLocation}}</td>
+                            <td [title]="rowData.note">{{rowData.note}}</td>
+                            <td [title]="rowData.conversionRate"
+                                class="align-right">
+                                {{rowData.conversionRate}}
+                            </td>
+                            <td>
+                                <div *ngIf="allowViewPrice"
+                                     class="wrap-text-grid-item align-right"
+                                     [title]="rowData.priceBp | currencyMask">
+                                    {{ rowData.priceBp | currencyMask }}
+                                </div>
+                            </td>
+                            <td>
+                                <div *ngIf="allowViewPrice"
+                                     class="wrap-text-grid-item align-right"
+                                     [title]="rowData.priceBp ? ((rowData.priceBp* rowData.quantity) | currencyMask) : null">
+                                    {{ rowData.priceBp ? ((rowData.priceBp* rowData.quantity) | currencyMask) : null }}
+                                </div>
+                            </td>
+                            <td [title]=" rowData.responseDate | date: mainConfig.formatDateList ">
+                                {{ rowData.responseDate | date: mainConfig.formatDateList }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-treeTable>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="mt-3">
+            <button class="btn btn-sm btn-success"
+                    title="{{ 'COMMON.SAVE' | translate }}"
+                    (click)="onBtnSaveClick()">
+                {{ 'COMMON.SAVE' | translate }}
+            </button>
+            <button class="btn btn-sm btn-secondary"
+                    title="{{ 'COMMON.CANCEL' | translate }}"
+                    (click)="onBtnCancelClick()">
+                {{ 'COMMON.CANCEL' | translate }}
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>

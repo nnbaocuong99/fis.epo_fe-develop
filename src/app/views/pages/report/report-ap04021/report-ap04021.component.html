@@ -1,0 +1,49 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.AP04021.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportAFService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportAP04021()">
+                    {{ 'REPORT.AP04021.EXPORT_AP04021' | translate }}
+                </button>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

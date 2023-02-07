@@ -1,0 +1,137 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.SYNC_ERP.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="epoPoHeaderInService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+                    <!-- <div class="col-md-2 mb-3">
+                        <label>Tháng</label>
+                        <select class="form-control">
+                            <option *ngFor="let item of listMonthSelect"
+                                    [value]="item.value">{{item.key}}</option>
+                        </select>
+                    </div> -->
+
+                    <!-- <div class="col-md-2 mb-3">
+                        <label>Năm</label>
+                        <select class="form-control">
+                            <option *ngFor="let item of listYearSelect"
+                                    [value]="item.key">{{item.key}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <br>
+                        <button type="button"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                class="btn btn-sm btn-label-brand ml-2">Reset</button>
+                    </div> -->
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.SUPPLIER' | translate }}</label>
+                <select-sync-source name="vendorId"
+                                    placeholder="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    header="{{ 'REPORT.SUPPLIER' | translate }}"
+                                    bindValue="name"
+                                    suffixLabel="code"
+                                    searchField="generalFilter"
+                                    [width]="'60vw'"
+                                    [columns]="headerSuppliers"
+                                    [service]="supplierService"
+                                    [requestPayload]="supplierRequestPayload"
+                                    [(ngModel)]="request.supplierDto"
+                                    (change)="onChangeSupplier()">
+                </select-sync-source>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportPO()">
+                    {{ 'REPORT.SYNC_ERP.EXPORT_PO' | translate }}
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportPI()">
+                    {{ 'REPORT.SYNC_ERP.EXPORT_PI' | translate }}
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportUpdateCost()">
+                    {{ 'REPORT.SYNC_ERP.EXPORT_UPDATE_COST' | translate }}
+                </button>
+            </div>
+        </div>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'Tìm kiếm' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.SYNC_ERP.YEAR' | translate }}</label>
+                <select class="form-control"
+                        (change)="changeYear($event.target.value)">
+                    <option *ngFor="let item of listYearSelect"
+                            [value]="item.value"
+                            [selected]="item.value === selectedYear">{{item.value}}</option>
+                </select>
+            </div>
+            <div class="col-md-12 mb-3">
+                <br>
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                <button type="reset"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="onResetFormSearch()">Reset</button>
+            </div>
+        </div>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-4">
+                <h5>{{ 'REPORT.SYNC_ERP.REPORT_PO' | translate }}</h5>
+                <p-chart type="bar"
+                         [data]="basicChartDataPo"></p-chart>
+            </div>
+            <div class="col-md-4">
+                <h5>{{ 'REPORT.SYNC_ERP.REPORT_PI' | translate }}</h5>
+                <p-chart type="bar"
+                         [data]="basicChartDataPi"></p-chart>
+            </div>
+            <div class="col-md-4">
+                <h5>{{ 'REPORT.SYNC_ERP.REPORT_UPDATE_COST' | translate }}</h5>
+                <p-chart type="bar"
+                         [data]="basicChartDataUpdateCost"></p-chart>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

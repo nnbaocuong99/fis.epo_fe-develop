@@ -1,0 +1,69 @@
+<ng-select #select
+           [bindLabel]="bindLabel"
+           [bindValue]="bindValue"
+           [suffixLabel]="suffixLabel"
+           [suffixValue]="suffixValue"
+           [items]="listBuffer"
+           [selectedItems]="selectedItems"
+           [multiple]="multiple"
+           [disabled]="disabled"
+           [placeholder]="placeholder"
+           [requestPayload]="requestPayload"
+           [(ngModel)]="value"
+           [loading]="isLoading"
+           [virtualScroll]="true"
+           [keyDownFn]="keyDownFn"
+           [dropdownPosition]="dropdownPosition"
+           [closeOnSelect]="closeOnSelect === undefined ? true : closeOnSelect"
+           [searchFn]="searchFn"
+           [clearable]="clearable === undefined ? true : closeOnSelect"
+           (focus)="focus.emit($event); onTouched();"
+           (blur)="blur.emit($event);"
+           (open)="onOpen()"
+           (close)="onClose()"
+           (scrollToEnd)="onScrollToEnd()"
+           (search)="onSearch($event)"
+           (change)="onChangeNgSelect($event)"
+           (clear)="onClear()"
+           appendTo="{{appendTo}}">
+    <ng-template ng-header-tmp>
+        <small class="form-text text-muted">
+            <span *ngIf="!searchControl">{{ isLoading ? 'Loading' : 'Loaded' }} {{ listBuffer.length }} <span
+                      *ngIf="categoryType !== 'item'"> of {{ count }}</span></span>
+            <span *ngIf="searchControl">Please enter 1 more characters.</span>
+            <button *ngIf="canAdd == true"
+                    class="link"
+                    (click)="addNew.emit()">Add new</button>
+            <button *ngIf="selectAll == true"
+                    class="link"
+                    (click)="onBtnSelectAll()">Select all</button>
+            <i style="font-size: 1.2rem;"
+               class="fal fa-copy fa-btn float-right"
+               title="Copy value to clipboard"
+               (click)="copyToClipboard(value)"></i>
+        </small>
+    </ng-template>
+    <ng-template *ngIf="suffixLabel"
+                 ng-option-tmp
+                 let-item="item">
+        <span title="{{ getLabel(item, bindLabel) }} {{ ' - ' + getLabel(item, suffixLabel) }}">
+            <b>{{ getLabel(item, bindLabel) }} </b>
+            <span style="font-style: italic;">{{ ' - ' + getLabel(item, suffixLabel) }}</span>
+        </span>
+    </ng-template>
+    <ng-template *ngIf="suffixValue"
+                 ng-label-tmp
+                 let-item="item">
+        <b>{{ getLabel(item, bindLabel) }} </b> {{ getLabel(item, suffixValue) }}
+    </ng-template>
+    <ng-template ng-label-tmp
+                 let-item="item">
+        <span title="{{ item[bindLabel] | translate }}">{{ item[bindLabel] | translate }}</span>
+    </ng-template>
+    <ng-template ng-option-tmp
+                 let-item="item">
+        <span title="{{ item[bindLabel] | translate }}">{{ item[bindLabel] | translate }}</span>
+    </ng-template>
+    <ng-template ng-loadingspinner-tmp>
+    </ng-template>
+</ng-select>

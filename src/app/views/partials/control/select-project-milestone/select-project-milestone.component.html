@@ -1,0 +1,101 @@
+<div class="input-group">
+    <input type="search"
+           class="form-control"
+           placeholder="{{ placeholder | translate }}"
+           [(ngModel)]="value"
+           placement="bottom-right"
+           ngbTooltip="{{ value }}"
+           (ngModelChange)="onModelChangeInput($event)"
+           (keydown)="$event.preventDefault()"
+           (paste)="$event.preventDefault()"
+           [disabled]="disabled">
+    <div class="input-group-append">
+        <button class="input-group-text input-group-right attach-button"
+                (click)="onBtnShowDialogListClick()"
+                tabindex="-1"
+                [disabled]="disabled"><i class="fal fa-ellipsis-v"></i></button>
+    </div>
+</div>
+
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '600px', minWidth: '200px'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Cập nhật Project milestone'}}
+    </p-header>
+
+    <div class="mat-table__wrapper">
+        <p-table [value]="dataSource.items"
+                 selectionMode="single"
+                 [(selection)]="selectedProjectMilestone"
+                 dataKey="id"
+                 tableStyleClass="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr class="wrap-text">
+                    <th *ngFor="let col of headers"
+                        [width]="col.width">
+                        {{ col.header | translate }}
+                    </th>
+                </tr>
+                <tr class="wrap-text">
+                    <th></th>
+                    <th>
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input type="text"
+                                   pInputText
+                                   placeholder="Search"
+                                   [(ngModel)]="request.outlineNumber"
+                                   (keyup)="searchData()" />
+                        </span>
+                    </th>
+                    <th>
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input type="text"
+                                   pInputText
+                                   placeholder="Search"
+                                   [(ngModel)]="request.taskName"
+                                   (keyup)="searchData()" />
+                        </span>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr [pSelectableRow]="rowData">
+                    <td>{{ request.pageSize * request.pageIndex + rowIndex + 1 }}</td>
+                    <td [title]="rowData.outlineNumber">{{ rowData.outlineNumber }}</td>
+                    <td [title]="rowData.taskName">{{ rowData.taskName }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div class="mat-table__bottom">
+        <mat-spinner [diameter]="20"
+                     *ngIf="baseService.isLoading$ | async"></mat-spinner>
+        <mat-paginator [pageSize]="10"
+                       [pageSizeOptions]="[10, 30, 50]"
+                       [length]="dataSource.paginatorTotal"
+                       [showFirstLastButtons]="true"></mat-paginator>
+    </div>
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-primary"
+                title="{{ 'COMMON.CHOOSE' | translate }}"
+                (click)="onBtnSaveClick()">{{ 'COMMON.CHOOSE' | translate }}</button>
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="onBtnCancelClick()">{{ 'COMMON.CLOSE' | translate }}</button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>

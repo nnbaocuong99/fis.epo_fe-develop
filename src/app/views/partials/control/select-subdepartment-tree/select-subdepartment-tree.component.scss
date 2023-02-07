@@ -1,0 +1,24 @@
+::ng-deep {
+    .p-tree {
+        border: none;
+    }
+}
+
+.border-p-tree {
+    border: 1px solid #dee2e6;
+    background: #fff;
+    color: #495057;
+    border-radius: 3px;
+}
+
+.padding-search {
+    padding: 1rem 1rem 0 1rem;
+}
+
+.p-input-icon-right {
+    width: 100%;
+}
+
+.p-inputtext {
+    width: 100%;
+}

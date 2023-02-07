@@ -1,0 +1,141 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'Báo cáo hỗ trợ BP - Bảo hành' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="form-row">
+            <!-- <div class="col-md-12 mb-3">
+                <h5>{{ 'Xuất báo cáo BPImportNewPO_bao-hanh' | translate }} </h5>
+            </div> -->
+            <div class="col-md-2 mb-3">
+                <label>{{'Số_hợp_đồng_đặt_hàng' | translate}}</label>
+                <ng-select-async name="code"
+                                 bindLabel="code"
+                                 suffixLabel=""
+                                 placeholder="{{'Số_hợp_đồng_đặt_hàng'| translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [requestPayload]="purchaseOrderRequestPayload"
+                                 [service]="purchaseOrderService"
+                                 (change)="request.code = request.codeDto?.code"
+                                 [(ngModel)]="request.codeDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Tên_thiết_bị' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="itemName"
+                       placeholder="{{ 'Tên_thiết_bị' | translate }}"
+                       [(ngModel)]="request.itemName">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Tên_PartNumber' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="partNo"
+                       placeholder="{{ 'Tên_PartNumber' | translate }}"
+                       [(ngModel)]="request.partNo">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Tên_hãng_sản_xuất' | translate}}</label>
+                <ng-select-async name="producerName"
+                                 bindLabel="name"
+                                 suffixLabel="acronymName"
+                                 placeholder="{{ 'PURCHASE_PLAN.ITEM.PRODUCER_NAME' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="brandService"
+                                 (change)="onChangeProductName($event)"
+                                 [(ngModel)]="request.producerNameDto">
+                </ng-select-async>
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label>{{'Tên_nhà_cung_cấp'| translate}}</label>
+                <ng-select-async name="supplierName"
+                                 bindLabel="name"
+                                 suffixLabel="code"
+                                 searchField="generalFilter"
+                                 placeholder="{{'Tên_nhà_cung_cấp'| translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="supplierService"
+                                 (change)="onChangeSupplier($event)"
+                                 [(ngModel)]="request.supplierNameDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Địa_chỉ_nhà_cung_cấp' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="supplierAddress"
+                       placeholder="{{ 'Địa_chỉ_nhà_cung_cấp' | translate }}"
+                       [(ngModel)]="request.supplierAddress">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Hợp_đồng_đầu_ra' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="contractNo"
+                       placeholder="{{ 'Hợp_đồng_đầu_ra' | translate }}"
+                       [(ngModel)]="request.contractNo">
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Hạn_BH' | translate }}</label>
+                <input type="number"
+                       class="form-control"
+                       name="guarantee"
+                       placeholder="{{ 'Hạn_BH' | translate }}"
+                       [(ngModel)]="request.guarantee">
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Tên_tài_khoản_BP_đặt_hàng' | translate }}</label>
+                <ng-select-async name="createdByName"
+                                 bindLabel="fullName"
+                                 placeholder="{{'Tên_tài_khoản_BP_đặt_hàng'| translate}}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="userService"
+                                 (change)="request.createdByName = createdByNameDto?.userName"
+                                 [(ngModel)]="createdByNameDto">
+                </ng-select-async>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Từ ngày' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Đến ngày' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="exportPoIForGuarantee()">
+                    {{ 'Xuất báo cáo' | translate }}
+                </button>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

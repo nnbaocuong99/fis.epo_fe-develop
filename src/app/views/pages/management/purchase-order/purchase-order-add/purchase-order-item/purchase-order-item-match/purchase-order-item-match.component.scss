@@ -1,0 +1,13 @@
+.matched {
+    border-left: 1px ridge green !important;
+}
+
+.un-matched {
+    border-left: 1px ridge red !important;
+}
+
+.table-no-wrap-match {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}

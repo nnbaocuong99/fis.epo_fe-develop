@@ -1,0 +1,289 @@
+<kt-portlet>
+    <kt-portlet-header icon="far fa-address-card"
+                       [title]="'Theo dõi thanh toán' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="epoPaymentService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goView()">
+                <i class="pi pi-fw pi-search"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.VIEW' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <p style="font-size: 1.2rem; font-weight: 500; color: #48465b;">
+            Hợp đồng: <b>{{ purchaseOrderData.code }}</b> (Giá trị HĐ trước VAT:
+            {{ (purchaseOrderData.totalAmount | currencyMask) }}
+            {{ purchaseOrderData.currency }} / Giá trị HĐ sau VAT:
+            {{ (purchaseOrderData.totalAmountWithTax | currencyMask) }}
+            {{ purchaseOrderData.currency }})
+        </p>
+        <p style="font-size: 1.2rem; font-weight: 500; color: #48465b;">
+            Nhà cung cấp: <b>{{ purchaseOrderData.supplierName }}</b>
+        </p>
+
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     [(contextMenuSelection)]="selectedRowData"
+                     [contextMenu]="btnContextMenu"
+                     class="table-no-wrap">
+                <ng-template pTemplate="header">
+                    <tr *ngFor="let row of headers"
+                        class="background-table-header">
+                        <th *ngFor="let col of row"
+                            [rowSpan]="col.rowSpan ? col.rowSpan : 1"
+                            [colSpan]="col.colSpan ? col.colSpan : 1"
+                            [width]="col.width"
+                            [ngClass]="col.class"
+                            class="align-center">
+                            {{ col.title | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr [pContextMenuRow]="rowData">
+                        <td [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.currency">
+                            {{ rowData.currency }}
+                        </td>
+                        <td [title]="rowData.date | date:mainConfig.formatDateList">
+                            {{ rowData.date | date:mainConfig.formatDateList}}
+                        </td>
+                        <td
+                            [title]="(rowData.epoPaymentUtilsType === 'PURCHASE_ORDER' ? rowData.poTotalAmount : null) | currencyMask">
+                            {{ (rowData.epoPaymentUtilsType === 'PURCHASE_ORDER' ? rowData.poTotalAmount : null)
+                            | currencyMask }}
+                        </td>
+                        <td
+                            [title]="(rowData.epoPaymentUtilsType === 'PURCHASE_INVOICE' ? rowData.piTotalAmount : null) | currencyMask">
+                            {{ (rowData.epoPaymentUtilsType === 'PURCHASE_INVOICE' ? rowData.piTotalAmount : null)
+                            | currencyMask }}
+                        </td>
+                        <td [title]="rowData.paymentAmount | currencyMask">
+                            {{ rowData.paymentAmount | currencyMask }}
+                        </td>
+                        <!-- <td [title]="rowData.paymentDate | date:mainConfig.formatDateList">
+                            {{ rowData.paymentDate | date:mainConfig.formatDateList}}
+                        </td> -->
+                        <td [title]="rowData.amountRemain | currencyMask">
+                            {{ rowData.amountRemain | currencyMask }}
+                        </td>
+                        <td [title]="rowData.debtRemain | currencyMask">
+                            {{ rowData.debtRemain | currencyMask }}
+                        </td>
+                        <td [title]="rowData.epoPaymentUtilsAmount | currencyMask">
+                            {{ rowData.epoPaymentUtilsAmount | currencyMask }}
+                        </td>
+                        <td [title]="rowData.epoPaymentUtilsNote">
+                            {{ rowData.epoPaymentUtilsNote }}
+                        </td>
+                        <td [title]="rowData.description">
+                            {{ rowData.description }}
+                        </td>
+                        <td [title]="">
+                            <div class="action align-center">
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        matTooltip="More actions">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button *ngIf="rowData.epoPaymentUtilsType !== 'PURCHASE_ORDER'"
+                                            mat-menu-item
+                                            (click)="onBtnViewClick(rowData)">
+                                        <span>{{'COMMON.VIEW'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnEditClick(rowData)">
+                                        <span>{{'COMMON.EDIT'| translate}}</span>
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td class="p-text-right"
+                            colspan="4">{{ 'COMMON.TOTAL' | translate }}</td>
+                        <td [title]="">{{ sum.piTotalAmount | currencyMask }}</td>
+                        <td [title]="">{{ sum.paymentAmount | currencyMask }}</td>
+                        <!-- <td [title]=""></td> -->
+                        <td [title]="">{{ sum.amountRemain | currencyMask }}</td>
+                        <td [title]="">{{ sum.debtRemain | currencyMask }}</td>
+                        <td [title]=""
+                            colspan="4"></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>
+
+
+<p-dialog [(visible)]="showDialogEdit"
+          [style]="{width: '30vw'}"
+          [modal]="true"
+          [baseZIndex]="9999"
+          appendTo="body"
+          (onHide)="onCancelDialogEditClick()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS'| translate }}
+    </p-header>
+    <form autocomplete="off"
+          #formEdit="ngForm"
+          id="form-edit">
+        <div class="form-row">
+            <div class="col-md-12 mb-3">
+                <label>{{ 'Tiền điều chỉnh' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="amount"
+                       numberMask
+                       placeholder="Tiền điều chỉnh"
+                       [(ngModel)]="epoPaymentUtilsData.amount"
+                       validateTooltip
+                       [validateForm]="formEdit">
+            </div>
+            <div class="col-md-12 mb-3">
+                <label>{{ 'Cập nhật thông tin' | translate }}</label>
+                <input name="note"
+                       type="text"
+                       class="form-control"
+                       placeholder="{{ 'Cập nhật thông tin' | translate}}"
+                       [(ngModel)]="epoPaymentUtilsData.note">
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-label-success btn-sm"
+                title="{{'COMMON_MSG.CONFIRM_TITLE' | translate}}"
+                (click)="onSaveDialogEditClick()">{{'COMMON.SAVE' | translate}}
+        </button>
+        <button class="btn btn-label-dark btn-sm"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="onCancelDialogEditClick()">{{ 'COMMON.CANCEL' | translate }}
+        </button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="showDialogView"
+          [style]="{width: '90%'}"
+          [modal]="true"
+          [baseZIndex]="9999"
+          appendTo="body">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS'| translate }}
+    </p-header>
+
+    <div class="mat-table__wrapper">
+        <p-table [value]="dataSourceView.items"
+                 class="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr class="background-table-header">
+                    <th *ngFor="let col of headersView"
+                        [width]="col.width"
+                        class="align-center"
+                        [ngClass]="col.class">
+                        {{col.title | translate}}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td [title]="rowIndex + 1">
+                        {{ rowIndex + 1 }}
+                    </td>
+                    <td [title]="rowData.checkId">
+                        {{ rowData.checkId }}
+                    </td>
+                    <td [title]="rowData.prepayNumber">
+                        {{ rowData.prepayNumber }}
+                    </td>
+                    <td [title]="rowData.date | date:mainConfig.formatDateList">
+                        {{ rowData.date | date:mainConfig.formatDateList}}
+                    </td>
+                    <td [title]="rowData.paymentAmount | currencyMask">
+                        {{ rowData.paymentAmount | currencyMask }}
+                    </td>
+                    <td [title]="rowData.description">
+                        {{ rowData.description }}
+                    </td>
+                    <td [title]="rowData.bankAccountName">
+                        {{ rowData.bankAccountName }}
+                    </td>
+                    <td [title]="rowData.exchangeRate ? rowData.exchangeRate : null">
+                        {{ rowData.exchangeRate ? rowData.exchangeRate : null }}
+                    </td>
+                    <td [title]="rowData.currency">
+                        {{ rowData.currency }}
+                    </td>
+                    <td [title]="rowData.invoiceId">
+                        {{ rowData.invoiceId }}
+                    </td>
+                    <td [title]="rowData.invoiceDate | date:mainConfig.formatDateList">
+                        {{ rowData.invoiceDate | date:mainConfig.formatDateList}}
+                    </td>
+                    <td [title]="rowData.piTotalAmount | currencyMask">
+                        {{ rowData.piTotalAmount | currencyMask }}
+                    </td>
+                    <td [title]="rowData.invoiceDesc">
+                        {{ rowData.invoiceDesc }}
+                    </td>
+                    <td [title]="rowData.invoiceConversionRate">
+                        {{ rowData.invoiceConversionRate }}
+                    </td>
+                    <td [title]="rowData.invoiceCurrency">
+                        {{ rowData.invoiceCurrency }}
+                    </td>
+                    <td [title]="rowData.amountRemain | currencyMask">
+                        {{ rowData.amountRemain | currencyMask }}
+                    </td>
+                </tr>
+            </ng-template>
+
+        </p-table>
+        <div *ngIf="dataSourceView.items && dataSourceView.items.length === 0">
+            <view-empty></view-empty>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button class="btn btn-secondary btn-sm"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="onCancelDialogViewClick()">
+            {{ 'COMMON.CLOSE' | translate }}
+        </button>
+    </ng-template>
+</p-dialog>

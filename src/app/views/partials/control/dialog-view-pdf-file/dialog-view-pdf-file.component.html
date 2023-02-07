@@ -1,0 +1,63 @@
+<button *ngIf="file && src"
+        style="float: right; background: none;"
+        class="btn-action mr-1"
+        [title]="'COMMON.VIEW' | translate"
+        (click)="onBtnViewFile()">
+    <span class="material-icons"
+          style="padding-top: 3px"> remove_red_eye </span>
+</button>
+
+<p-dialog [(visible)]="dialogRefViewFile.isDisplay"
+          [modal]="true"
+          [style]="{width: '80%', minWidth: '50%'}"
+          [maximizable]="true"
+          [draggable]="true"
+          [baseZIndex]="9000"
+          appendTo="body"
+          [autoZIndex]="true"
+          (onHide)="closeDialogViewFile()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'COMMON.DETAILS' | translate }}
+    </p-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- <ngx-extended-pdf-viewer *ngIf="dialogRefViewFile.isDisplay && src"
+                                     [zoom]="100"
+                                     [contextMenuAllowed]="false"
+                                     [showBookmarkButton]="false"
+                                     [showDownloadButton]="false"
+                                     [showOpenFileButton]="false"
+                                     [showPresentationModeButton]="true"
+                                     [showPrintButton]="true"
+                                     [showRotateButton]="true"
+                                     [showSecondaryToolbarButton]="true"
+                                     [showSidebarButton]="false"
+                                     [textLayer]="true"
+                                     [src]="src"
+                                     height="450px"
+                                     useBrowserLocale="true"
+                                     theme="dark">
+            </ngx-extended-pdf-viewer> -->
+
+            <iframe #iframeViewPdf
+                    src=""
+                    type="application/pdf"
+                    width="100%"
+                    height="500px">
+            </iframe>
+
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="mt-3">
+            <button class="btn btn-secondary ml-3"
+                    title="{{ 'COMMON.CLOSE' | translate }}"
+                    (click)="closeDialogViewFile()">
+                {{ 'COMMON.CLOSE' | translate }}
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

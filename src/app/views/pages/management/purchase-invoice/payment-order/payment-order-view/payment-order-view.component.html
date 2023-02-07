@@ -1,0 +1,341 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'Xem thông tin đề nghị thanh toán' | translate"
+                       [viewLoading$]="expenseService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goToEdit()"
+               *ngIf="!paymentOrderData.epayId || paymentOrderData.status === 1">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <ngb-tabset>
+            <!-- tab Thanh toán -->
+            <ngb-tab *ngIf="paymentOrderData?.type === 'PAYMENT'">
+                <ng-template ngbTabTitle>
+                    <h5>{{'Thanh toán'| translate}}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="kt-grid__item">
+                        <form autocomplete="off"
+                              #form="ngForm"
+                              id="id-form-brand">
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin chung'| translate}}
+                                </h5>
+                                <table class="table table-no-wrap">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Ngày gửi' | translate }}:
+                                                <b>
+                                                    {{ paymentOrderData.submitDate | date: mainConfig.formatDateList}}
+                                                </b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Người tạo đề nghị' | translate }}:
+                                                <b>{{ paymentOrderData.userName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Hình thức thanh toán' | translate }}:
+                                                <b>{{ paymentOrderData.method | label :paymentMethod }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Bên nhận' | translate }}:
+                                                <b>{{ paymentOrderData.beneficiaryType |label: beneficiaryType }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="width: 25%">{{ 'Đơn vị phê duyệt' | translate }}:
+                                                <b>{{ paymentOrderData.organizationName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Kỳ ngân sách' | translate }}:
+                                                <b>{{ paymentOrderData.budgetPeriod }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Tư cách pháp nhân' | translate }}:
+                                                <b>{{ paymentOrderData.legalStandingName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Thời hạn thanh toán' | translate }}:
+                                                <b>{{ paymentOrderData.deadlineName }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="paymentOrderData.beneficiaryType !== 'SUPPLIER'">
+                                            <td style="width: 25%">{{ 'Diễn giải chi phí' | translate }}:
+                                                <b>{{ paymentOrderData.title }}</b>
+                                            </td>
+
+                                            <td style="width: 25%">{{ 'Ghi chú' | translate}}:
+                                                <b>{{ paymentOrderData.note }}</b>
+                                            </td>
+                                            <!-- <td style="width: 25%">{{ 'File đề nghị thanh toán' | translate }}:
+                                                <single-attach-file *ngIf="paymentOrderData.id"
+                                                                    [edit]="false"
+                                                                    module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+                                                </single-attach-file>
+                                            </td> -->
+
+                                            <td style="width: 25%"></td>
+                                            <td style="width: 25%"></td>
+                                            <!-- <td style="width: 25%">{{ 'CC Email' | translate}}:
+                                                <b>{{ paymentOrderData.email }}</b>
+                                            </td> -->
+                                        </tr>
+
+                                        <tr *ngIf="paymentOrderData.beneficiaryType === 'SUPPLIER'">
+                                            <td style="width: 25%">{{ 'Diễn giải chi phí' | translate }}:
+                                                <b>{{ paymentOrderData.title }}</b>
+                                            </td>
+                                            <td style="width: 25%">
+                                                {{ 'Tên nhà cung ứng' | translate }}:
+                                                <b> {{ paymentOrderData.supplierName }}</b>
+                                            </td>
+                                            <td style="width: 25%">
+                                                {{ 'Mã số thuế NCC' | translate }}:
+                                                <b>{{ paymentOrderData.supplierTax }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Ghi chú' | translate}}:
+                                                <b>{{ paymentOrderData.note }}</b>
+                                            </td>
+                                        </tr>
+                                        <!-- <tr *ngIf="paymentOrderData.beneficiaryType === 'SUPPLIER'">
+
+                                            <td style="width: 25%">{{ 'File đề nghị thanh toán' | translate }}:
+                                                <single-attach-file *ngIf="paymentOrderData.id"
+                                                                    [edit]="false"
+                                                                    module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+                                                </single-attach-file>
+                                            </td>
+                                            <td style="width: 25%">{{ 'CC Email' | translate}}:
+                                                <b>{{ paymentOrderData.email }}</b>
+                                            </td>
+                                            <td style="width: 25%"></td>
+                                            <td style="width: 25%"></td>
+                                            <td style="width: 25%"></td>
+                                        </tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+
+                            <!-- Danh sách Hóa đơn -->
+                            <app-payment-order-item [form]="form"
+                                                    [paymentOrderData]="paymentOrderData"
+                                                    [organizationsData]="organizationsData"
+                                                    [hasEdit]="false"></app-payment-order-item>
+                            <br>
+                            <div class="float-right"
+                                 *ngIf="currentExpenseId && paymentOrderData.status === 1 && !paymentOrderData.hidebtnCreateDraftEpayment">
+                                <button class="btn btn-sm btn-brand mr-2"
+                                        title="{{ 'Create ticket Draft' | translate }}"
+                                        (click)="onBtnCreateDraftEpaymentTicketClick()">
+                                    {{ 'Create ticket Draft ePayment' | translate }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+
+            <!-- tab Thanh toán trả trước -->
+            <ngb-tab *ngIf="paymentOrderData?.type === 'PREPAYMENT'">
+                <ng-template ngbTabTitle>
+                    <h5>{{'Thanh toán trả trước'| translate}}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="kt-grid__item">
+                        <form autocomplete="off"
+                              #form="ngForm"
+                              id="id-form-brand">
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin chung'| translate}}
+                                </h5>
+                                <table class="table table-no-wrap">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Ngày gửi' | translate }}:
+                                                <b>
+                                                    {{ paymentOrderData.submitDate | date: mainConfig.formatDateList}}
+                                                </b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Người tạo đề nghị' | translate }}:
+                                                <b>{{ paymentOrderData.userName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Đơn vị phê duyệt' | translate }}:
+                                                <b>{{ paymentOrderData.organizationName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Tư cách pháp nhân' | translate }}:
+                                                <b>{{ paymentOrderData.legalStandingName }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Kỳ ngân sách' | translate }}:
+                                                <b>{{ paymentOrderData.budgetPeriod }}</b>
+                                            </td>
+
+                                            <td style="width: 25%">{{ 'Diễn giải chi phí' | translate }}:
+                                                <b>{{ paymentOrderData.title }}</b>
+                                            </td>
+
+                                            <td style="width: 25%">{{ 'Ghi chú' | translate}}:
+                                                <b>{{ paymentOrderData.note }}</b>
+                                            </td>
+                                            <!-- <td style="width: 25%">{{ 'File đề nghị thanh toán' | translate }}:
+                                                <single-attach-file *ngIf="paymentOrderData.id"
+                                                                    [edit]="false"
+                                                                    module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+                                                </single-attach-file>
+                                            </td> -->
+                                            <td style="width: 25%"></td>
+                                        </tr>
+                                        <tr>
+                                            <!-- <td style="width: 25%">{{ 'CC Email' | translate}}:
+                                                <b>{{ paymentOrderData.email }}</b>
+                                            </td> -->
+                                            <td style="width: 25%"
+                                                *ngIf="paymentOrderData.beneficiaryType === 'SUPPLIER'">
+                                                {{ 'Tên nhà cung ứng' | translate }}:
+                                                <b> {{ paymentOrderData.supplierName }}</b>
+                                            </td>
+                                            <td style="width: 25%"
+                                                *ngIf="paymentOrderData.beneficiaryType === 'SUPPLIER'">
+                                                {{ 'Mã số thuế NCC' | translate }}:
+                                                <b>{{ paymentOrderData.supplierTax }}</b>
+                                            </td>
+
+                                            <td style="width: 25%"
+                                                *ngIf="paymentOrderData.beneficiaryType !== 'SUPPLIER'"></td>
+                                            <td style="width: 25%"
+                                                *ngIf="paymentOrderData.beneficiaryType !== 'SUPPLIER'"></td>
+                                            <td style="width: 25%"></td>
+                                            <td style="width: 25%"></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+
+                            <!-- Thông tin khoản thanh toán trả trước -->
+                            <app-payment-order-prepay [hasEdit]="false"
+                                                      [form]="form"
+                                                      [paymentOrderData]="paymentOrderData"
+                                                      [type]="1"></app-payment-order-prepay>
+                            <br>
+                            <div class="float-right"
+                                 *ngIf="currentExpenseId && paymentOrderData.status === 1 && !paymentOrderData.hidebtnCreateDraftEpayment">
+                                <button class="btn btn-sm btn-brand mr-2"
+                                        title="{{ 'Create ticket Draft' | translate }}"
+                                        (click)="onBtnCreateDraftEpaymentTicketClick()">
+                                    {{ 'Create ticket Draft ePayment' | translate }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+
+            <!-- tab Tạm ứng -->
+            <ngb-tab *ngIf="paymentOrderData?.type === 'ADVANCEPAYMENT'">
+                <ng-template ngbTabTitle>
+                    <h5>{{'Tạm ứng'| translate}}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="kt-grid__item">
+                        <form autocomplete="off"
+                              #form="ngForm"
+                              id="id-form-brand">
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin chung'| translate}}
+                                </h5>
+                                <table class="table table-no-wrap">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Ngày gửi' | translate }}:
+                                                <b>
+                                                    {{ paymentOrderData.submitDate | date: mainConfig.formatDateList}}
+                                                </b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Người tạo đề nghị' | translate }}:
+                                                <b>{{ paymentOrderData.userName }}</b>
+                                            </td>
+
+                                            <td style="width: 25%">{{ 'Đơn vị phê duyệt' | translate }}:
+                                                <b>{{ paymentOrderData.organizationName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Tư cách pháp nhân' | translate }}:
+                                                <b>{{ paymentOrderData.legalStandingName }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Kỳ ngân sách' | translate }}:
+                                                <b>{{ paymentOrderData.budgetPeriod }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Hình thức tạm ứng' | translate }}:
+                                                <b>{{ paymentOrderData.method | label :paymentMethod }}</b>
+                                            </td>
+
+                                            <td style="width: 25%">{{ 'Diễn giải chi phí' | translate }}:
+                                                <b>{{ paymentOrderData.title }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Ghi chú' | translate}}:
+                                                <b>{{ paymentOrderData.note }}</b>
+                                            </td>
+                                        </tr>
+
+                                        <!-- <tr>
+                                            <td style="width: 25%">{{ 'File đề nghị thanh toán' | translate }}:
+                                                <single-attach-file *ngIf="paymentOrderData.id"
+                                                                    [edit]="false"
+                                                                    module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+                                                </single-attach-file>
+                                            </td>
+                                            <td style="width: 25%">{{ 'CC Email' | translate}}:
+                                                <b>{{ paymentOrderData.email }}</b>
+                                            </td>
+                                            <td style="width: 25%"></td>
+                                            <td style="width: 25%"></td>
+                                            <td style="width: 25%"></td>
+                                        </tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+
+                            <!-- Khoản tạm ứng -->
+                            <app-payment-order-prepay [hasEdit]="false"
+                                                      [form]="form"
+                                                      [paymentOrderData]="paymentOrderData"
+                                                      [type]="2"></app-payment-order-prepay>
+                            <br>
+                            <div class="float-right"
+                                 *ngIf="currentExpenseId && paymentOrderData.status === 1 && !paymentOrderData.hidebtnCreateDraftEpayment">
+                                <button class="btn btn-sm btn-brand mr-2"
+                                        title="{{ 'Create ticket Draft' | translate }}"
+                                        (click)="onBtnCreateDraftEpaymentTicketClick()">
+                                    {{ 'Create ticket Draft ePayment' | translate }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+
+        </ngb-tabset>
+
+    </kt-portlet-body>
+</kt-portlet>

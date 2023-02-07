@@ -1,0 +1,289 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '90%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Danh sách hoá đơn' | translate }}
+    </p-header>
+
+
+    <!--begin: Wizard -->
+    <div #wizard
+         class="kt-wizard-v4"
+         id="kt_wizard_v4"
+         data-ktwizard-state="step-first">
+
+        <!--begin: Form Wizard Nav -->
+        <div class="kt-wizard-v4__nav">
+            <div class="kt-wizard-v4__nav-items">
+                <a class="kt-wizard-v4__nav-item"
+                   *ngFor="let s of steps;"
+                   href="javascript:;"
+                   data-ktwizard-type="step"
+                   [attr.data-ktwizard-state]="step == s.value?'current':''"
+                   (click)="onChangeStepClick(s.value)">
+                    <div class="kt-wizard-v4__nav-body">
+                        <div class="kt-wizard-v4__nav-number">
+                            {{s.value}}
+                        </div>
+                        <div class="kt-wizard-v4__nav-label">
+                            <div class="kt-wizard-v4__nav-label-title"
+                                 [title]="s.label | translate">
+                                {{s.label | translate}}
+                            </div>
+                            <div class="kt-wizard-v4__nav-label-desc"
+                                 [title]="s.description | translate">
+                                {{s.description | translate}}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <!--end: Form Wizard Nav -->
+
+        <div class="kt-portlet__body kt-portlet__body--fit">
+            <div class="kt-grid">
+
+                <div class="kt-wizard-v4__content"
+                     data-ktwizard-type="step-content"
+                     [attr.data-ktwizard-state]="step === 1 ? 'current' : ''">
+                    <br>
+                    <div class="row kt-margin-b-15">
+                        <div class="col-md-6">
+                            <mat-form-field class="input-general-filter">
+                                <input matInput
+                                       #searchInput
+                                       (keydown.enter)="onSearch()"
+                                       [(ngModel)]="request.generalFilter"
+                                       placeholder="Search ..."
+                                       class="mat-form-field mat-form-field-fluid">
+                                <mat-hint align="start"></mat-hint>
+                            </mat-form-field>
+                            <br>
+                            <small>Ex: Số hóa đơn, loại hóa đơn, Nhà cung cấp, mã dự án, số hợp đồng đầu
+                                ra,…...</small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mat-table__bottom">
+                                <mat-spinner [diameter]="20"
+                                             *ngIf="purchaseInvoiceService.isLoading$ | async">
+                                </mat-spinner>
+                                <mat-paginator #paginator
+                                               [pageSize]="10"
+                                               [length]="dataSource.paginatorTotal"
+                                               [showFirstLastButtons]="true"></mat-paginator>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mat-table__wrapper">
+                        <p-table [value]="dataSource.items"
+                                 tableStyleClass="table-no-wrap"
+                                 dataKey="id"
+                                 [(selection)]="selectedPurchaseInvoice"
+                                 [columns]="cols"
+                                 [frozenColumns]="frozenCols"
+                                 [scrollable]="true"
+                                 frozenWidth="300px">
+                            <ng-template pTemplate="colgroup"
+                                         let-columns>
+                                <colgroup>
+                                    <ng-container *ngFor="let col of columns">
+                                        <col [ngStyle]="{width: col.width}"
+                                             class="align-center">
+                                    </ng-container>
+                                </colgroup>
+                            </ng-template>
+                            <ng-template pTemplate="header"
+                                         let-columns>
+                                <tr>
+                                    <th *ngFor="let header of columns"
+                                        [width]="header.width"
+                                        [ngClass]="header.class"
+                                        class="align-center">
+                                        <div class="header-height"
+                                             *ngIf="header.field !== 'action'">
+                                            {{ header.title | translate }}
+                                        </div>
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body"
+                                         let-rowData
+                                         let-columns="columns"
+                                         let-rowIndex="rowIndex">
+                                <tr>
+                                    <td *ngFor="let col of columns">
+
+                                        <div *ngIf="col.field === 'selected'"
+                                             class="wrap-text-grid align-center">
+                                            <p-tableRadioButton [value]="rowData"></p-tableRadioButton>
+                                        </div>
+
+                                        <div *ngIf="col.field === 'indexNo'"
+                                             class="wrap-text-grid align-center">
+                                            {{ paginator.pageIndex * paginator.pageSize + rowIndex + 1}}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'code'"
+                                             class="wrap-text-grid header-link"
+                                             title="{{ rowData.code }}">
+                                            <a [routerLink]="['../../list/view/', rowData.id]"
+                                               target="_blank">
+                                                {{ rowData.code }}</a>
+                                        </div>
+
+                                        <div *ngIf="col.field === 'invoiceType'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.invoiceType }}">
+                                            {{ rowData.invoiceType }}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'costType'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.costType }}">
+                                            {{ rowData.costType }}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'date'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.date | date: mainConfig.formatDateList }}">
+                                            {{ rowData.date | date:mainConfig.formatDateList}}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'totalAmount'"
+                                             class="wrap-text-grid align-right"
+                                             title="{{ rowData.totalAmount | currencyMask }}">
+                                            {{ rowData.totalAmount | currencyMask}}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'totalActual'"
+                                             class="wrap-text-grid align-right"
+                                             title="{{ rowData.totalActual | currencyMask }}">
+                                            {{ rowData.totalActual | currencyMask}}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'invoiceDesc'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.invoiceDesc }}">
+                                            {{ rowData.invoiceDesc }}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'status'"
+                                             class="wrap-text-grid"
+                                             [title]="(rowData.status| label:statusInvoices) | translate">
+                                            {{(rowData.status | label:statusInvoices) | translate}}
+                                            <p
+                                               *ngIf="rowData.costType === getCostTypeName(this.arrCostTypes, '1') && (!rowData.countPoXNK || rowData.countPoXNK === 0)">
+                                                ({{(rowData.importStatus | label:checkImportGoods) |
+                                                translate}})
+                                            </p>
+                                        </div>
+
+                                        <div *ngIf="col.field === 'syncStatus'"
+                                             class="wrap-text-grid"
+                                             [title]="(rowData.syncStatus| label:syncErpList) | translate">
+                                            {{(rowData.syncStatus | label:syncErpList) | translate}}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'supplierName'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.supplierName }}">
+                                            {{ rowData.supplierName }}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'waybillNumber'"
+                                             class="wrap-text-grid header-link"
+                                             title="{{ rowData.waybillNumber }}">
+                                            <a [routerLink]="['../../../shipment/list/view/', rowData.shipmentId]"
+                                               target="_blank">
+                                                {{ rowData.waybillNumber }}</a>
+                                        </div>
+
+                                        <div *ngIf="col.field === 'erpInvoiceId'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.erpInvoiceId && rowData.erpInvoiceId != 0 ? rowData.erpInvoiceId : null }}">
+                                            {{ rowData.erpInvoiceId && rowData.erpInvoiceId != 0
+                                            ? rowData.erpInvoiceId : null }}
+                                        </div>
+
+                                        <div *ngIf="col.field === 'CreatorName'"
+                                             class="wrap-text-grid"
+                                             title="{{ rowData.creatorByName }}">
+                                            {{ rowData.creatorByName }}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                            <view-empty></view-empty>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="kt-wizard-v4__content"
+             data-ktwizard-type="step-content"
+             [attr.data-ktwizard-state]="step === 2 ? 'current' : ''">
+            <br>
+            <!-- Danh sách HH/DV  -->
+            <app-purchase-invoice-item #vcPurchaseInvoiceItem
+                                       [editTable]="false"
+                                       [headerItemsTreeTable]="headerItemsTreeTable"
+                                       [headerItemsTable]="headerItemsTable"
+                                       [isShowTreeTable]="isShowTreeTable"
+                                       [purchaseInvoiceData]="selectedPurchaseInvoice"
+                                       [purchaseInvoiceItemsData]="purchaseInvoiceItem"
+                                       [showTreeTableCheckbox]="true">
+            </app-purchase-invoice-item>
+        </div>
+
+        <div class="kt-wizard-v4__content"
+             data-ktwizard-type="step-content"
+             [attr.data-ktwizard-state]="step === 3 ? 'current' : ''">
+            <br>
+
+        </div>
+
+    </div>
+
+    <!--end: Wizard -->
+
+
+    <ng-template pTemplate="footer">
+
+        <button *ngIf="step && step > 1"
+                class="btn btn-secondary btn-sm"
+                title="{{ 'COMMON.PREVIOUSZ' | translate }}"
+                (click)="onChangeStepClick(step - 1)">
+            <i class="la la-arrow-left"></i>
+            <span class="kt-hidden-mobile">{{ 'COMMON.PREVIOUS' | translate }}</span>
+        </button>
+
+        <button class="btn btn-brand btn-sm"
+                title="{{ 'COMMON.NEXT' | translate }}"
+                color="primary"
+                (click)="onChangeStepClick(step + 1)">
+            <i class="la la-arrow-right"></i>
+            <span class="kt-hidden-mobile">{{ 'COMMON.NEXT' | translate }}</span>
+        </button>
+
+        <button class="btn btn-secondary btn-sm"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">
+            {{ 'COMMON.CLOSE' | translate }}
+        </button>
+
+    </ng-template>
+
+</p-dialog>

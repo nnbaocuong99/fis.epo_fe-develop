@@ -1,0 +1,70 @@
+<div class="mat-table__bottom"
+     style="margin-bottom: 15px;">
+    <button class="btn btn-sm btn-simple"
+            title="{{ 'COMMON.CRUD.ADD' | translate }}"
+            (click)="onBtnAddClick()"
+            *ngIf="!purchaseRequestData.rootPrId"><i class="fal fa-plus"></i>
+        {{ 'COMMON.CRUD.ADD' | translate }}</button>
+</div>
+
+<div class="mat-table__wrapper"
+     style="margin-bottom: 15px;">
+    <p-table [value]="dataSource.items"
+             tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <!-- <th *ngFor="let header of headers"
+					[width]="header.width"
+					[ngClass]="header.class">{{ header.title | translate }}</th> -->
+                <th [width]="headers[0].width"
+                    [ngClass]="headers[0].class">{{ headers[0].title | translate }}</th>
+                <th [width]="headers[1].width"
+                    [ngClass]="headers[1].class">{{ headers[1].title | translate }}</th>
+                <th [width]="headers[2].width"
+                    [ngClass]="headers[2].class">{{ headers[2].title | translate }}</th>
+                <th [width]="headers[3].width"
+                    [ngClass]="headers[3].class">{{ headers[3].title | translate }}</th>
+                <th [width]="headers[4].width"
+                    [ngClass]="headers[4].class"
+                    *ngIf="!purchaseRequestData.rootPrId">{{ headers[4].title | translate }}</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr>
+                <td [title]="rowIndex + 1">
+                    {{ rowIndex + 1 }} </td>
+                <td [title]="rowData.valueType"> Phụ lục {{ rowIndex + 1 }} </td>
+                <td class="header-link"
+                    [title]="rowData.prNo"><a [routerLink]="['/management/purchase-request/list/edit/', rowData.id]"
+                       target="_blank">
+                        {{ rowData.prNo }}</a>
+                </td>
+                <td></td>
+                <td class="action"
+                    *ngIf="!purchaseRequestData.rootPrId">
+                    <button mat-icon-button
+                            [matMenuTriggerFor]="menu"
+                            matTooltip="More actions">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item
+                                (click)="onBtnEditClick(rowData)">
+                            <span>{{ 'COMMON.EDIT' | translate}}</span>
+                        </button>
+                        <button mat-menu-item
+                                (click)="onBtnDeleteClick(rowData)">
+                            <span>{{ 'COMMON.DELETE' | translate}}</span>
+                        </button>
+                    </mat-menu>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<app-purchase-request-appendix-dialog #appendixDialog
+                                      [dialogRef]="dialogRef"
+                                      (success)="onSuccess($event)"></app-purchase-request-appendix-dialog>

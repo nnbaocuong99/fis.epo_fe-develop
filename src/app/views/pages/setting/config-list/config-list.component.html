@@ -1,0 +1,169 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-tasks"
+                       [class]="'kt-portlet__head--lg'"
+                       [title]="formTitle | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="configListService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel">
+                <ng-template></ng-template>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="mat-table__wrapper">
+            <p-treeTable class="table-no-wrap"
+                         [value]="treeData"
+                         [columns]="cols"
+                         [paginator]="false"
+                         [rows]="rows"
+                         [lazy]="true"
+                         (onLazyLoad)="loadNodes($event)"
+                         (onNodeExpand)="onNodeExpand($event)"
+                         [(contextMenuSelection)]="selectedNode"
+                         [contextMenu]="btnContextMenu">
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr>
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.header | translate}}
+                        </th>
+                        <th width="50px"
+                            class="align-center action">
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowNode
+                             let-rowData="rowData"
+                             let-columns="columns">
+                    <tr *ngIf="!rowData.code"
+                        [ttContextMenuRow]="rowNode">
+                        <td colspan="9">
+                            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                            <i class="fas fa-folder folder-explorer"></i>&nbsp;<b>{{ rowData.type }}</b>&nbsp;<span
+                                  class="total-item">({{rowData.count}}
+                                item(s))</span>
+                        </td>
+                        <td class="action">
+                            <button mat-icon-button
+                                    [matMenuTriggerFor]="menu"
+                                    matTooltip="More actions">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                                <button mat-menu-item
+                                        (click)="onBtnEditClick(rowNode)">
+                                    <span>{{ 'COMMON.ADD_TO' | translate}}</span>
+                                </button>
+                                <button mat-menu-item
+                                        (click)="onBtnReorderClick(rowNode)">
+                                    <span>{{ 'COMMON.REORDER' | translate}}</span>
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </tr>
+                    <tr *ngIf="rowData.code"
+                        [ttContextMenuRow]="rowNode">
+                        <td *ngFor="let col of columns; let i = index;">
+                            {{ rowData[col.field] }}
+                        </td>
+                        <td class="action">
+                            <button mat-icon-button
+                                    [matMenuTriggerFor]="menu"
+                                    matTooltip="More actions">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                                <button mat-menu-item
+                                        (click)="onBtnEditClick(rowNode)">
+                                    <span>{{ 'COMMON.EDIT' | translate}}</span>
+                                </button>
+                                <button mat-menu-item
+                                        (click)="onBtnDeleteClick(rowNode)">
+                                    <span>{{ 'COMMON.DELETE' | translate}}</span>
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-treeTable>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-config-list-edit #dlgEdit
+                      [dialogRef]="dialogRef"
+                      (success)="onSuccess($event)"></app-config-list-edit>
+
+<p-dialog [header]="formTitle | translate"
+          appendTo="body"
+          [(visible)]="showDialogReorder"
+          [style]="{width: '80%', minWidth: '50%'}">
+    <div class="mat-table__wrapper">
+        <p-table [value]="configListDataSub"
+                 [columns]="cols"
+                 [reorderableColumns]="true">
+            <ng-template pTemplate="header"
+                         let-columns>
+                <tr>
+                    <th width="50px"
+                        class="align-center action">
+                    </th>
+                    <th *ngFor="let col of columns"
+                        [width]="col.width"
+                        class="align-center"
+                        [ngClass]="col.class">
+                        {{col.header | translate}}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-index="rowIndex">
+                <tr [pReorderableRow]="index">
+                    <td>
+                        <span class="pi pi-bars"
+                              pReorderableRowHandle> </span>
+                    </td>
+                    <td *ngFor="let col of columns;">
+                        {{rowData[col.field]}}
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="mt-3">
+            <button class="btn btn-primary ml-3"
+                    title="{{ 'COMMON.SAVE' | translate }}"
+                    (click)="onBtnSaveDialogClick()">
+                {{ 'COMMON.SAVE' | translate }}
+            </button>
+            <button class="btn btn-secondary ml-3"
+                    title="{{ 'COMMON.CANCEL' | translate }}"
+                    (click)="onBtnCancelDialogClick()">
+                {{ 'COMMON.CANCEL' | translate }}
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>
+
+<p-confirmDialog #dlgConfirm
+                 header="Confirmation"
+                 appendTo="body"
+                 [baseZIndex]="10001"
+                 [key]="key"
+                 position="top"
+                 icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

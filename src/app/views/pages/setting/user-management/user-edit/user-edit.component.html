@@ -1,0 +1,234 @@
+<form-dynamic [formData]="formData"
+			  [form]="form"
+			  (save)="onBtnSaveClick()"
+			  (cancel)="onBtnCancelClick()">
+	<div>
+		<div class="row">
+			<div class="col-lg-7">
+				<form autocomplete="off"
+					  #form="ngForm"
+					  id="{{formData.formId}}">
+					<h5 class="mb-3">{{ 'USER.USER_INFO' | translate }}</h5>
+					<div class="form-row">
+						<div class="col-md-6 mb-3">
+							<label class="lbl-required">{{ 'USER.TITLE' | translate }}</label>
+							<validate-message [form]="form"
+											  controlName="title"></validate-message>
+							<ng-select [items]="titles"
+									   bindLabel="name"
+									   bindValue="name"
+									   name="title"
+									   placeholder="{{ 'USER.TITLE' | translate }}"
+									   [(ngModel)]="userData.title"
+									   validateTooltip
+									   [validateForm]="form"
+									   required
+									   autofocus>
+							</ng-select>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.FIRST_NAME' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="firstName"
+								   placeholder="{{ 'USER.FIRST_NAME' | translate }}"
+								   [(ngModel)]="userData.firstName">
+						</div>
+
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.MID_NAME' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="midname"
+								   placeholder="{{ 'USER.MID_NAME' | translate }}"
+								   [(ngModel)]="userData.midName">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.LAST_NAME' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="lastname"
+								   placeholder="{{ 'USER.LAST_NAME' | translate }}"
+								   [(ngModel)]="userData.lastName">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.FULL_NAME' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="fullName"
+								   placeholder="{{ 'USER.FULL_NAME' | translate }}"
+								   [(ngModel)]="userData.fullName">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label class="lbl-required">{{ 'USER.EMAIL' | translate }}</label>
+							<validate-message [form]="form"
+											  controlName="email"></validate-message>
+							<input type="text"
+								   class="form-control"
+								   name="email"
+								   placeholder="{{ 'USER.EMAIL' | translate }}"
+								   [(ngModel)]="userData.email"
+								   emailTypeValidator
+								   validateTooltip
+								   [validateForm]="form"
+								   required>
+
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.MOBILE' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="mobile"
+								   placeholder="{{ 'USER.MOBILE' | translate }}"
+								   [(ngModel)]="userData.mobile">
+						</div>
+					</div>
+					<br>
+					<h5 class="mb-3">{{ 'USER.USER_LOGIN' | translate }}</h5>
+					<div class="form-row">
+						<div class="col-md-6 mb-3">
+							<label class="lbl-required">{{ 'USER.USER_NAME' | translate }}</label>
+							<validate-message [form]="form"
+											  controlName="username"></validate-message>
+							<input type="text"
+								   class="form-control"
+								   name="username"
+								   placeholder="{{ 'USER.USER_NAME' | translate }}"
+								   validateTooltip
+								   [validateForm]="form"
+								   [(ngModel)]="userData.userName"
+								   userNameExistValidator
+								   [id]="userData.id"
+								   required>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.USER_ID_ERP' | translate }}</label>
+							<input type="number"
+								   class="form-control"
+								   name="userId"
+								   placeholder="{{ 'USER.USER_ID_ERP' | translate }}"
+								   [(ngModel)]="userData.userId">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.BUYER_NAME_CONTROL' | translate }}</label>
+							<select-sync-source name="buyer"
+												placeholder="{{ 'USER.BUYER_NAME_CONTROL' | translate }}"
+												header="{{ 'USER.BUYER_NAME_CONTROL' | translate }}"
+												bindValue="userName"
+												[width]="'60vw'"
+												[columns]="buyerHeader"
+												[service]="buyerService"
+												[(ngModel)]="userData.buyerNameDto"
+												(change)="onChangeBuyer($event)">
+							</select-sync-source>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.LAST_LOGIN' | translate }}</label>
+							<span class="form-control disabled">
+								{{ userData.lastLoginAt ? (userData.lastLoginAt | date: mainConfig.formatFullDate) :
+								'N/A'}}</span>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.TEL' | translate }}</label>
+							<input type="text"
+								   class="form-control"
+								   name="tel"
+								   placeholder="{{ 'USER.TEL' | translate }}"
+								   [(ngModel)]="userData.tel">
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.GROUP' | translate }}</label>
+							<ng-select-async name="groupId"
+											 bindLabel="orgCode"
+											 suffixLabel="orgName"
+											 placeholder="{{ 'USER.GROUP'| translate }}"
+											 [multiple]="false"
+											 [closeOnSelect]="true"
+											 [service]="orgService"
+											 (change)="userData.groupId = userData.groupDto?.id"
+											 [(ngModel)]="userData.groupDto">
+							</ng-select-async>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.ROLE' | translate }}</label>
+							<ng-select-async name="role"
+											 bindLabel="code"
+											 suffixLabel="name"
+											 placeholder="{{ 'USER.ROLE' | translate }}"
+											 [multiple]="true"
+											 [closeOnSelect]="true"
+											 [service]="roleService"
+											 (change)="isChangeRole = true"
+											 [(ngModel)]="userData.userRole"
+											 (ngModelChange)="setCheckRole()">
+							</ng-select-async>
+							<app-role-operation [dialogRef]="operationDialogRef"></app-role-operation>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label class="lbl-required">{{ 'Chi nhánh' | translate }}</label>
+							<validate-message [form]="form"
+											  controlName="branch"></validate-message>
+							<app-user-branch #userBrach
+											 name="branch"
+											 (change)="markFormTouched()"
+											 [(ngModel)]="userData.strBranch"
+											 [required]="true">
+							</app-user-branch>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-md-6 mb-3">
+							<label>{{ 'USER.ACTIVE' | translate }}</label>
+							<div>
+								<p-inputSwitch name="status"
+											   [ngModel]="userData.status"
+											   (ngModelChange)="userData.status = $event ? 1 : 0">
+								</p-inputSwitch>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-lg-5">
+				<h5 class="mb-3">{{ 'USER.USER_ORG' | translate }}</h5>
+				<label>{{ 'USER.SELECT_USER_ORG' | translate }}</label>
+				<div style="max-height: 350px; overflow: auto;">
+					<app-user-org #userOrg
+								  *ngIf="userData.userOrganization"
+								  (change)="markFormTouched()"
+								  (afterTreeInit)="onAfterTreeInit()">
+					</app-user-org>
+				</div>
+				<br>
+				<h5 *ngIf="roleCheck.isAfRole || roleCheck.isBpRole"
+					class="mb-3">{{ 'Role advance configuration' | translate }}
+				</h5>
+				<div class="form-row"
+					 *ngIf="roleCheck.isAfRole">
+					<div class="col-md-6 mb-3">
+						<label>{{ 'Phân công sub department cho AF' | translate }}
+							<i class="fal fa-wrench ml-2"></i>
+							<a [routerLink]="[userData.id ? '../../af-group' : '../af-group']"
+							   target="_blank"> Edit tree </a>
+						</label>
+						<app-user-af-group #userAfGroup
+										   [dialogRef]="userAfDialogRef"
+										   [userData]="userData"
+										   (change)="markFormTouched()">
+						</app-user-af-group>
+					</div>
+				</div>
+				<div class="form-row"
+					 *ngIf="roleCheck.isBpRole">
+					<div class="col-md-6 mb-3">
+						<label>{{ 'Phân công hãng cho BP' | translate }}</label>
+						<app-user-producer #userProducer
+										   [dialogRef]="userProducerDialogRef"
+										   (change)="markFormTouched()">
+						</app-user-producer>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form-dynamic>

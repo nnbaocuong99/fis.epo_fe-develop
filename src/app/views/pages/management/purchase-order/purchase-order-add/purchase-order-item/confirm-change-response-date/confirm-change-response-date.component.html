@@ -1,0 +1,36 @@
+<!-- Dialog confirm từ chối phê duyệt -->
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [style]="{width: '40vw'}"
+          [modal]="true"
+          [baseZIndex]="99999"
+          appendTo="body"
+          (onHide)="onBtnCancelClick()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Confirm change response date'| translate }}
+    </p-header>
+
+    <h5>Are you sure want to change response date?</h5>
+    <div>{{ dialogRef.input?.itemName }}</div>
+    <div>
+        {{ dialogRef.input?.responseDateOriginal | date:"dd/MM/yyy" }} <i class="fal fa-arrow-right"></i>
+        {{ dialogRef.input?.responseDate | date:"dd/MM/yyy" }}
+    </div>
+    <br>
+
+    <div class="form-group">
+        <label>{{ 'PURCHASE_REQUEST.ITEM.NOTE' | translate }}</label>
+        <textarea type="text"
+                  class="form-control"
+                  name="confirmNote"
+                  placeholder="{{ 'PURCHASE_REQUEST.ITEM.NOTE' | translate }}"
+                  [(ngModel)]="confirmData.note"></textarea>
+    </div>
+    <br>
+
+    <button class="btn btn-label-success btn-sm mr-3"
+            title="Xác nhận"
+            (click)="onBtnSaveChangeClick()">Xác nhận</button>
+    <button class="btn btn-label-dark btn-sm"
+            title="{{ 'COMMON.CANCEL' | translate }}"
+            (click)="this.dialogRef.hide()">{{ 'COMMON.CANCEL' | translate }}</button>
+</p-dialog>

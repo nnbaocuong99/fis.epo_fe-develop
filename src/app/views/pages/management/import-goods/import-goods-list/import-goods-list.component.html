@@ -1,0 +1,738 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-calendar-alt"
+                       [title]="formTitle | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="importGoodsService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+                <div *ngIf="request.type === 1">
+                    <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+                    <div style="margin-bottom: 15px; text-align: center;">
+                        <mat-checkbox class="example-margin"
+                                      (change)="changeShowFilterShipment()"
+                                      [checked]="isShowFilterShipment"
+                                      [color]="'primary'"
+                                      style="margin-right: 80px; margin-left: 5px;">
+                            {{ 'MENU.SHIPMENT' | translate }}
+                        </mat-checkbox>
+                        <mat-checkbox class="example-margin"
+                                      (change)="changeShowFilterMerchandiseService()"
+                                      [checked]="isShowFilterMerchandiseService"
+                                      [color]="'primary'"
+                                      style="margin-right: 80px; margin-left: 5px;">
+                            {{ 'Hàng hóa dịch vụ' | translate }}
+                        </mat-checkbox>
+                    </div>
+                    <form autocomplete="off"
+                          #formFilter="ngForm">
+                        <div id="filter-shipment"
+                             [ngbCollapse]="!isShowFilterShipment">
+                            <h5 style="font-size: 15px !important;"> {{ 'MENU.SHIPMENT' | translate }} </h5>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Số vận đơn' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="waybillNumber"
+                                           placeholder="{{ 'Nhập số vận đơn' | translate }}"
+                                           [(ngModel)]="request.shipment.waybillNumber">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Số vận đơn chủ' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="masterBillNo"
+                                           placeholder="{{ 'Nhập số vận đơn chủ' | translate }}"
+                                           [(ngModel)]="request.shipment.masterBillNo">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Trạng thái hồ sơ' | translate }}</label>
+                                    <select class="form-control"
+                                            name="docStatus"
+                                            [(ngModel)]="request.shipment.docStatus">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of profileStatus"
+                                                [value]="item.value">{{item.label | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Trạng thái lô hàng' | translate }}</label>
+                                    <select class="form-control"
+                                            name="smStatus"
+                                            [(ngModel)]="request.shipment.smStatus">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of shipmentStatus"
+                                                [value]="item.value">{{item.label | translate }}</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Từ ngày' | translate }}</label>
+                                    <input-date name="fromDate"
+                                                [(ngModel)]="request.shipment.fromDate"></input-date>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Đến ngày' | translate }}</label>
+                                    <input-date name="toDate"
+                                                [(ngModel)]="request.shipment.toDate"></input-date>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Ngày nhận chứng từ' | translate }}</label>
+                                    <input-date name="fromReceiptDate"
+                                                [(ngModel)]="request.shipment.fromReceiptDate"></input-date>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Đến ngày nhận chứng từ' | translate }}</label>
+                                    <input-date name="toReceiptDate"
+                                                [(ngModel)]="request.shipment.toReceiptDate"></input-date>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{'PURCHASE_ORDER.ORG_APPLY'| translate}}</label>
+                                    <ng-select-async name="orgApply"
+                                                     bindLabel="name"
+                                                     suffixLabel=""
+                                                     placeholder="{{'PURCHASE_ORDER.ORG_APPLY'| translate}}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="departmentService"
+                                                     (change)="request.shipment.subDepartmentId = request.shipment.orgApplyDto?.subDepartmentId"
+                                                     [(ngModel)]="request.shipment.orgApplyDto">
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'FISx' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="fisx"
+                                           placeholder="{{ 'FISx' | translate }}"
+                                           [(ngModel)]="request.shipment.fisx">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'SHIPMENT.SUPPLIER' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="smSupplier"
+                                           placeholder="{{ 'SHIPMENT.SUPPLIER' | translate }}"
+                                           [(ngModel)]="request.shipment.smSupplier">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'SHIPMENT.EXP_RES_DATE_LEAVE' | translate }}</label>
+                                    <input-date name="expectedFromDate"
+                                                [(ngModel)]="request.shipment.expectedFromDate"></input-date>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'SHIPMENT.EXPECTED_RETURN_DATE' | translate }}</label>
+                                    <input-date name="expectedToDate"
+                                                [(ngModel)]="request.shipment.expectedToDate"></input-date>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'SHIPMENT.SHIPMENT_CREATOR' | translate }}</label>
+                                    <ng-select-async name="createdBy"
+                                                     bindLabel="userName"
+                                                     suffixLabel="fullName"
+                                                     placeholder="{{'SHIPMENT.SHIPMENT_CREATOR'| translate}}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="userService"
+                                                     (change)="request.shipment.createdBy = request.shipment.userDto?.userName"
+                                                     [(ngModel)]="request.shipment.userDto">
+                                    </ng-select-async>
+                                </div>
+                                <!-- <div class="col-md-3 mb-3">
+                                    <label>{{'Group tree'| translate}}</label>
+                                    <app-user-org name="listGroupId"
+                                                  [choose]="true"
+                                                  placeholder="{{'Group tree'| translate}}"
+                                                  [(ngModel)]="request.shipment.listGroupId">
+                                    </app-user-org>
+                                </div> -->
+                                <div class="col-md-3 mb-3">
+                                    <label>{{'AF group tree'| translate}}</label>
+                                    <app-user-af-group name="listSubDepartmentId"
+                                                       [choose]="true"
+                                                       placeholder="{{'AF group tree'| translate}}"
+                                                       [(ngModel)]="request.shipment.listSubDepartmentId">
+                                    </app-user-af-group>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'CO/CQ' | translate }}</label>
+                                    <select class="form-control"
+                                            name="certificate"
+                                            [(ngModel)]="request.shipment.certificate">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option [value]="1">Có CO</option>
+                                        <option [value]="2">Có CQ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Hình thức nhập khẩu' | translate }}</label>
+                                    <select class="form-control"
+                                            name="importForm"
+                                            [(ngModel)]="request.shipment.importForm">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of importForms"
+                                                [value]="item.value">{{item.label | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Hợp quy' | translate }}</label>
+                                    <select class="form-control"
+                                            name="conformity"
+                                            [(ngModel)]="request.shipment.isConformity">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option [value]="1">Có hợp quy</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'SHIPMENT.ITEM.TERM_ACCOUNT_STATUS' | translate }}</label>
+                                    <select class="form-control"
+                                            name="hasTermAccount"
+                                            [(ngModel)]="request.shipment.hasTermAccount">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option [value]="true">Có</option>
+                                        <option [value]="false">Không</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="filter-merchandiseService"
+                             [ngbCollapse]="!isShowFilterMerchandiseService"
+                             style="margin-top: 15px;">
+                            <h5 style="font-size: 15px !important;"> {{ 'Hàng hóa dịch vụ' | translate }}
+                            </h5>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Mã hàng' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="itemCode"
+                                           placeholder="{{ 'Nhập mã hàng' | translate }}"
+                                           [(ngModel)]="request.shipment.itemCode">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Part Number' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="partNo"
+                                           placeholder="Nhập part number"
+                                           [(ngModel)]="request.shipment.partNo">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Tên HH/DV' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="itemName"
+                                           placeholder="Nhập tên hàng"
+                                           [(ngModel)]="request.shipment.itemName">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PO/OC/HĐ đầu vào' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="poCode"
+                                           placeholder="Nhập số PO/OC/HĐ"
+                                           [(ngModel)]="request.shipment.poCode">
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Loại PO/HĐ' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="valueType"
+                                           placeholder="{{ 'Loại PO/HĐ' | translate }}"
+                                           [(ngModel)]="request.shipment.valueType">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'AM/PM' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="amPmAcount"
+                                           placeholder=""
+                                           [(ngModel)]="request.shipment.amPmAcount">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'Dự án' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="projectCode"
+                                           placeholder="{{ 'Nhập tên/mã dự án' | translate }}"
+                                           [(ngModel)]="request.shipment.projectCode">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mt-1">
+                            <button type="submit"
+                                    class="btn btn-sm btn-label-brand ml-2"
+                                    (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                            <button type="reset"
+                                    class="btn btn-sm btn-label-brand ml-2"
+                                    (click)="onReset()">{{ 'COMMON.RESET' | translate }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div *ngIf="request.type === 2">
+                    <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+                    <div style="margin-bottom: 15px; text-align: center;">
+                        <mat-checkbox class="example-margin"
+                                      (change)="changeShowFilterInvoice()"
+                                      [checked]="isShowFilterInvoice"
+                                      [color]="'primary'"
+                                      style="margin-right: 80px; margin-left: 5px;">
+                            {{ 'MENU.PURCHASE_INVOICE' | translate }}
+                        </mat-checkbox>
+                        <mat-checkbox class="example-margin"
+                                      (change)="changeShowFilterMerchandise()"
+                                      [checked]="isShowFilterMerchandise"
+                                      [color]="'primary'">{{ 'PURCHASE_INVOICE.MERCHANDISE' | translate }}
+                        </mat-checkbox>
+                    </div>
+                    <form autocomplete="off"
+                          #formFilter="ngForm">
+                        <div id="filter-invoice"
+                             *ngIf="isShowFilterInvoice">
+                            <h5 style="font-size: 15px !important;"> {{ 'MENU.PURCHASE_INVOICE' | translate }} </h5>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.INVOICE_TYPE' | translate }}</label>
+                                    <ng-select-async name="invoiceTypes"
+                                                     bindLabel="name"
+                                                     suffixLabel="description"
+                                                     placeholder="{{'PURCHASE_INVOICE.INVOICE_TYPE'| translate}}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="invoiceTypeService"
+                                                     (change)="request.invoiceType = request.invoice.invoiceTypeDto?.name"
+                                                     [(ngModel)]="request.invoice.invoiceTypeDto">
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="invoiveNo"
+                                           placeholder="{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}"
+                                           [(ngModel)]="request.invoice.code">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{'PURCHASE_ORDER.ORG_APPLY'| translate}}</label>
+                                    <ng-select-async name="orgApply"
+                                                     bindLabel="name"
+                                                     suffixLabel=""
+                                                     placeholder="{{'PURCHASE_ORDER.ORG_APPLY'| translate}}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="departmentService"
+                                                     (change)="request.invoice.subDepartmentId = request.invoice.orgApplyDto?.subDepartmentId"
+                                                     [(ngModel)]="request.invoice.orgApplyDto">
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'FISx' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="fisx"
+                                           placeholder="{{ 'FISx' | translate }}"
+                                           [(ngModel)]="request.invoice.fisx">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.CREATOR' | translate }}</label>
+                                    <ng-select-async name="createdBy"
+                                                     bindLabel="userName"
+                                                     suffixLabel="fullName"
+                                                     placeholder="{{ 'PURCHASE_INVOICE.CREATOR' | translate }}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="userService"
+                                                     (change)="request.invoice.createdBy = request.invoice.createdByDto?.id"
+                                                     [(ngModel)]="request.invoice.createdByDto">
+                                    </ng-select-async>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.SUPPLIER' | translate }}</label>
+                                    <ng-select-async name="vendorId"
+                                                     bindLabel="name"
+                                                     suffixLabel="code"
+                                                     searchField="generalFilter"
+                                                     placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER' | translate }}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="supplierService"
+                                                     (change)="request.supplierName = request.invoice.vendorIdDto?.name && request.vendorId = request.invoice.vendorIdDto?.code"
+                                                     [(ngModel)]="request.invoice.vendorIdDto">
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.SUPPLIER_SITE' | translate }}</label>
+                                    <select class="form-control"
+                                            name="supplierSite"
+                                            [(ngModel)]="request.invoice.supplierSite">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of arrSupplierSite"
+                                                [value]="item.code">{{item.code | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.SUPPLIER_TAX_CODE' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="supplierTax"
+                                           placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER_TAX_CODE' | translate }}"
+                                           [(ngModel)]="request.invoice.supplierTax">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.FROM_DATE' | translate }}</label>
+                                    <input-date name="fromDate"
+                                                [(ngModel)]="request.invoice.fromDate"></input-date>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.TO_DATE' | translate }}</label>
+                                    <input-date name="toDate"
+                                                [(ngModel)]="request.invoice.toDate"></input-date>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.COST_TYPE' | translate }}</label>
+                                    <select class="form-control"
+                                            name="costType"
+                                            [(ngModel)]="request.invoice.costType">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of arrCostTypes"
+                                                [value]="item.name">{{item.name | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.INVOICE_STATUS' | translate }}</label>
+                                    <select class="form-control"
+                                            name="status"
+                                            [(ngModel)]="request.invoice.status">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of statusInvoices"
+                                                [value]="item.value">{{item.label | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.ERP_SYNC_STATUS' | translate }}</label>
+                                    <select class="form-control"
+                                            name="syncStatus"
+                                            [(ngModel)]="request.invoice.syncStatus"
+                                            required>
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of syncErp"
+                                                [value]="item.value">{{item.label | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.TAX_CALCULATION_STATUS' | translate }}</label>
+                                    <select class="form-control"
+                                            name="taxStatus"
+                                            [(ngModel)]="request.invoice.taxStatus">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option *ngFor="let item of statusTaxs"
+                                                [value]="item.value">{{item.label | translate }}</option>
+                                    </select>
+                                </div>
+                                <!-- <div class="col-md-3 mb-3">
+                                    <label>{{'Group tree'| translate}}</label>
+                                    <app-user-org name="listGroupId"
+                                                  [choose]="true"
+                                                  placeholder="{{'Group tree'| translate}}"
+                                                  [(ngModel)]="request.invoice.listGroupId">
+                                    </app-user-org>
+                                </div> -->
+                                <div class="col-md-3 mb-3">
+                                    <label>{{'AF group tree'| translate}}</label>
+                                    <app-user-af-group name="listSubDepartmentId"
+                                                       [choose]="true"
+                                                       placeholder="{{'AF group tree'| translate}}"
+                                                       [(ngModel)]="request.invoice.listSubDepartmentId">
+                                    </app-user-af-group>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="filter-merchandise"
+                             *ngIf="isShowFilterMerchandise"
+                             style="margin-top: 15px;">
+                            <h5 style="font-size: 15px !important;"> {{ 'PURCHASE_INVOICE.MERCHANDISE' | translate }}
+                            </h5>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.ITEM.ITEM_CODE' | translate }}</label>
+                                    <ng-select-async name="itemCode"
+                                                     categoryType="item"
+                                                     bindLabel="code"
+                                                     suffixLabel="name"
+                                                     placeholder="{{ 'PURCHASE_INVOICE.ITEM.ITEM_CODE' | translate }}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="itemService"
+                                                     (change)="request.itemCode = request.invoice.itemCodeDto?.code"
+                                                     [(ngModel)]="request.invoice.itemCodeDto">
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.ITEM.PART_NO' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="partNumber"
+                                           placeholder="{{ 'PURCHASE_INVOICE.ITEM.PART_NO' | translate }}"
+                                           [(ngModel)]="request.invoice.partNo">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.ITEM.ITEM_NAME' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="itemName"
+                                           placeholder="{{ 'PURCHASE_INVOICE.ITEM.ITEM_NAME' | translate }}"
+                                           [(ngModel)]="request.invoice.itemName">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.ITEM.ITEM_TYPE' | translate }}</label>
+                                    <select class="form-control"
+                                            name="itemType"
+                                            [(ngModel)]="request.invoice.itemType">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option value="HW">HW</option>
+                                        <option value="SW">SW</option>
+                                        <option value="SRV">SRV</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.PO_CODE' | translate }}</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="poCode"
+                                           placeholder="{{ 'PURCHASE_INVOICE.PO_CODE' | translate }}"
+                                           [(ngModel)]="request.invoice.poCode">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.WAYBILL_NUMBER' | translate }}</label>
+                                    <ng-select-async name="waybillNumber"
+                                                     bindLabel="waybillNumber"
+                                                     placeholder="{{ 'PURCHASE_INVOICE.WAYBILL_NUMBER' | translate }}"
+                                                     [multiple]="false"
+                                                     [closeOnSelect]="true"
+                                                     [service]="shipmentService"
+                                                     (change)="request.waybillNumber = request.invoice.waybillNumberDto?.waybillNumber"
+                                                     [(ngModel)]="request.invoice.waybillNumberDto">
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'PURCHASE_INVOICE.ITEM.TERM_ACCOUNT_STATUS' | translate }}</label>
+                                    <select class="form-control"
+                                            name="hasTermAccount"
+                                            [(ngModel)]="request.invoice.hasTermAccount">
+                                        <option [ngValue]="undefined"
+                                                selected>{{ 'COMMON.ALL' | translate }}</option>
+                                        <option [value]="true">Có</option>
+                                        <option [value]="false">Không</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <br>
+                            <button type="submit"
+                                    class="btn btn-sm btn-label-brand ml-2"
+                                    (click)="onSearch()">{{ 'COMMON.GO' | translate }}</button>
+                            <button type="reset"
+                                    (click)="onReset()"
+                                    class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate }}</button>
+                        </div>
+                    </form>
+                </div>
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <ngb-tabset [justify]="'start'"
+                    (tabChange)="setQueryParamsToRoute($event)"
+                    [activeId]="activeIdTab">
+            <ngb-tab *ngFor="let tab of tabs"
+                     [id]="tab.value"
+                     [disabled]="tab.disabled">
+                <ng-template ngbTabTitle>
+                    <span>
+                        {{ tab.label | translate }} <b>
+                            <span [ngClass]="'badge badge-pill ' + tab.class"
+                                  *ngIf="tab.count">{{ tab.count }}</span></b>
+                    </span>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+        <div class="row kt-margin-b-15">
+
+            <div class="col-md-6 mb-3"
+                 *ngIf="request.type === 1">
+                <app-select-subdepartment-tree [(ngModel)]="request.shipment.listSubDepartmentId"
+                                               (selectionChange)="initData()">
+                </app-select-subdepartment-tree>
+            </div>
+
+            <div class="col-md-6 mb-3"
+                 *ngIf="request.type === 2">
+                <app-select-subdepartment-tree [(ngModel)]="request.invoice.listSubDepartmentId"
+                                               (selectionChange)="initData()">
+                </app-select-subdepartment-tree>
+            </div>
+
+            <div class="col-md-6 mb-3">
+
+            </div>
+
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input *ngIf="request.type === 1"
+                           matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.shipment.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <input *ngIf="request.type === 2"
+                           matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.invoice.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="importGoodsService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator #paginator
+                                   [pageSize]="5"
+                                   [pageSizeOptions]="[5,10,30,50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     tableStyleClass="table-no-wrap"
+                     [(selection)]="dataSource.items">
+                <ng-template pTemplate="header">
+                    <tr class="background-table-header">
+                        <th *ngIf="activeIdTab < 3"
+                            width="150px"
+                            class="action">
+                        </th>
+                        <th *ngFor="let col of headers"
+                            [style.minWidth]="col.minWidth"
+                            [style.width]="col.width"
+                            class="table-no-wrap">
+                            {{ col.title | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <!-- Shipment -->
+                    <tr *ngIf="this.request.type === 1">
+                        <td *ngIf="activeIdTab < 3"
+                            class="action"
+                            style="padding: 10px 0 10px 0 !important;">
+                            <button class="btn btn-label-brand btn-sm mr-2"
+                                    title="{{ 'IMPORT_GOODS.IMPORT' | translate }}"
+                                    (click)="onBtnImportClick(rowData)"
+                                    [disabled]="rowData.importStatus !== 1 && rowData.importStatus !== 2">
+                                {{ 'IMPORT_GOODS.IMPORT' | translate }}
+                            </button>
+                            <button class="btn btn-label-brand btn-sm"
+                                    title="{{ 'IMPORT_GOODS.ALLOCATION' | translate }}"
+                                    (click)="onBtnAllocationClick(rowData)"
+                                    [disabled]="rowData.importStatus < 3">
+                                {{ 'IMPORT_GOODS.ALLOCATION' | translate }}
+                            </button>
+                        </td>
+                        <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                            {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.waybillNumber"
+                            class="header-link">
+                            <a [routerLink]="['../../shipment/list/view/', rowData.id]"
+                               target="_blank">
+                                {{ rowData.waybillNumber }}</a>
+                        </td>
+                        <td [title]="rowData.masterBillNo">{{ rowData.masterBillNo }}</td>
+                        <td [title]="rowData.billOfLadingDate | date: mainConfig.formatDateList">
+                            {{ rowData.billOfLadingDate | date: mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.declarationNumber">{{ rowData.declarationNumber }}</td>
+                        <td [title]="rowData.declarationDate | date: mainConfig.formatDateList">
+                            {{ rowData.declarationDate | date: mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.smSupplierName">{{ rowData.smSupplierName }}</td>
+                        <td [title]="(rowData.importStatus | label: statusImportGoods) | translate">
+                            {{ (rowData.importStatus | label: statusImportGoods) | translate}}</td>
+                        <td [title]="(rowData.elimStatus | label: statusElim) | translate">
+                            {{ (rowData.elimStatus | label: statusElim) | translate}}</td>
+                        <td title="{{ rowData.creatorName }}: {{ rowData.creatorMail }}">{{ rowData.creatorName }}</td>
+                    </tr>
+                    <!-- Invoice -->
+                    <tr *ngIf="this.request.type === 2">
+                        <td *ngIf="activeIdTab < 3"
+                            class="action"
+                            style="padding: 10px 0 10px 0 !important;">
+                            <button class="btn btn-label-brand btn-sm mr-2"
+                                    title="{{ 'IMPORT_GOODS.IMPORT' | translate }}"
+                                    (click)="onBtnImportClick(rowData)"
+                                    [disabled]="rowData.importStatus !== 1 && rowData.importStatus !== 2">
+                                {{ 'IMPORT_GOODS.IMPORT' | translate }}
+                            </button>
+                            <button class="btn btn-label-brand btn-sm"
+                                    title="{{ 'IMPORT_GOODS.ALLOCATION' | translate }}"
+                                    (click)="onBtnAllocationClick(rowData)"
+                                    [disabled]="rowData.importStatus < 3">
+                                {{ 'IMPORT_GOODS.ALLOCATION' | translate }}
+                            </button>
+                        </td>
+                        <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                            {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.code"
+                            class="header-link">
+                            <a [routerLink]="['../../purchase-invoice/list/view/', rowData.id]"
+                               target="_blank">
+                                {{ rowData.code }}</a>
+                        </td>
+                        <td [title]="rowData.strPoCode">{{ rowData.strPoCode }}</td>
+                        <td [title]="rowData.strSubDepartment">{{ rowData.strSubDepartment }}</td>
+                        <td [title]="rowData.date">{{ rowData.date | date: mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.supplierName">{{ rowData.supplierName }}</td>
+                        <td [title]="(rowData.importStatus | label: statusImportGoods) | translate">
+                            {{ (rowData.importStatus | label: statusImportGoods) | translate }}</td>
+                        <td [title]="(rowData.elimStatus | label: statusElim) | translate">
+                            {{ (rowData.elimStatus | label: statusElim) | translate}}</td>
+                        <td title="{{ rowData.creatorName }}: {{ rowData.creatorMail }}">{{ rowData.creatorName }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

@@ -1,0 +1,553 @@
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '60%', minWidth: '95%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Thông tin báo giá NCC' + supplierData.supplierName | translate }}
+    </p-header>
+
+    <div class="kt-grid__item">
+        <form autocomplete="off"
+              #form="ngForm"
+              id="id-form-quotation">
+
+            <h5 class="kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'COMMON.GENERAL_INFO'| translate}}
+            </h5>
+            <!-- Form view -->
+            <div>
+                <table class="table table-no-wrap">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25%">{{ 'Công ty yêu cầu' | translate }}:
+                                <b>{{ quotationData.requestCompany }}</b>
+                            </td>
+                            <td style="width: 25%">{{ 'Mô tả yêu cầu báo giá' | translate }}:
+                                <b>{{ quotationData.description }}</b>
+                            </td>
+                            <td style="width: 25%">{{ 'Địa điểm nhận hàng' | translate }}:
+                                <b>{{ quotationData.deliveryLocation }}</b>
+                            </td>
+                            <td style="width: 25%">{{ 'Ghi chú' | translate }}:
+                                <b>{{ quotationData.note }}</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 25%">{{ 'Bên báo giá' | translate }}:
+                                <b>{{ supplierData.supplierName }}</b>
+                            </td>
+                            <td style="width: 25%">{{ 'Người gửi báo giá' | translate }}:
+                                <b>{{ supplierData.quotePeopleEmail }}</b>
+                            </td>
+                            <td style="width: 25%">{{ 'Số điện thoại' | translate }}:
+                                <b>{{ supplierData.phoneNumber }}</b>
+                            </td>
+                            <td style="width: 25%">{{ 'Báo giá có hiệu lực đến ngày' | translate }}:
+                                <b>{{ supplierData.quoteValidTillDate | date: mainConfig.formatJustDate}}</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 25%">{{ 'File báo giá' | translate }}:
+                                <single-attach-file *ngIf="quotationData.id"
+                                                    [edit]="false"
+                                                    module="Attachment\QuotationFile\{{quotationData.id}}">
+                                </single-attach-file>
+                            </td>
+                            <td style="width: 25%">{{ 'File báo giá NCC' | translate }}:
+                                <single-attach-file *ngIf="supplierData.supplierName && quotationData.id"
+                                                    [edit]="false"
+                                                    module="Attachment\QuotationFile\{{supplierData.supplierName}}\{{quotationData.id}}">
+                                </single-attach-file>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <!-- Table nhập báo giá báo giá -->
+            <div class="row">
+                <div class="col-md-12"
+                     style="position: relative; padding: 15px;">
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{'Danh sách sản phẩm'| translate}}
+                    </h5>
+                    <!-- <div style="position: absolute; right: 15px; top: 5px;"
+                         *ngIf="currentQuotationId">
+                        <button class="btn btn-sm btn-label-brand mr-2"
+                                title="{{ 'Xuất Excel'| translate }}"
+                                (click)="btnExportExcel()">
+                            <i class="fas fa-download"></i>{{ 'Xuất Excel' }}
+                        </button>
+                        <button class="btn btn-sm btn-label-brand mr-2"
+                                *ngIf="hasEdit"
+                                title="{{ 'Nhập Excel'| translate }}"
+                                (click)="btnImportExcel()">
+                            <i class="fas fa-upload"></i>{{ 'Nhập Excel' }}
+                        </button>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Danh sách sản phẩm -->
+            <div class="mat-table__wrapper">
+                <p-table [value]="quotationData.listQuotationItem"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+                    <ng-template pTemplate="header">
+                        <tr *ngFor="let row of headerQuotationItemEnterQuote"
+                            class="background-table-header">
+                            <th *ngFor="let col of row"
+                                [rowSpan]="col.rowSpan ? col.rowSpan : 1"
+                                [colSpan]="col.colSpan ? col.colSpan : 1"
+                                [width]="col.width"
+                                [ngClass]="col.class"
+                                class="align-center th-color">
+                                {{ col.title | translate }}
+                                <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex">
+                        <tr height="50px">
+                            <td class="align-center"
+                                rowspan="2"
+                                [title]="rowData.indexNo">
+                                {{ rowData.indexNo }}
+                            </td>
+
+                            <td rowspan="2"
+                                title="{{rowData.itemName}}">{{rowData.itemName}}</td>
+                            <td rowspan="2"
+                                title="{{rowData.description}}">
+                                <textarea pInputText
+                                          *ngIf="hasEdit"
+                                          type="text"
+                                          class="form-control"
+                                          name="{{ 'descriptionItems' + rowIndex }}"
+                                          maxlength="255"
+                                          (change)="onRowEditInit()"
+                                          placeholder="{{ 'Nhập...' | translate }}"
+                                          [(ngModel)]="rowData.description"></textarea>
+                                <span *ngIf="!hasEdit">{{rowData.description}}</span>
+                            </td>
+                            <td rowspan="2"
+                                title="{{rowData.unit}}">{{rowData.unit}}</td>
+                            <td rowspan="1"
+                                title="{{rowData.quantity}}">{{rowData.quantity}}</td>
+                            <td rowspan="2"
+                                title="{{rowData.currency}}">
+                                <select-sync-source name="{{ 'currency' + rowIndex}}"
+                                                    *ngIf="hasEdit"
+                                                    header="Loại tiền tệ"
+                                                    bindValue="code"
+                                                    [columns]="headerCurrency"
+                                                    [service]="currencyService"
+                                                    [requestPayload]="currencyRequestPayload"
+                                                    (change)="onChangeCurrency($event, rowData)"
+                                                    [width]="'40vw'"
+                                                    [(ngModel)]="rowData.currency"
+                                                    [isOnTable]="true"
+                                                    required>
+                                </select-sync-source>
+                                <validate-message [form]="form"
+                                                  controlName="{{ 'currency' + rowIndex }}">
+                                </validate-message>
+                                <span *ngIf="!hasEdit">{{rowData.currency}}</span>
+                            </td>
+                            <td rowspan="1"
+                                title="{{rowData.originalCurrency}}">
+                                <input pInputText
+                                       type="text"
+                                       *ngIf="hasEdit"
+                                       class="form-control align-right"
+                                       name="{{ 'originalCurrency' + rowIndex }}"
+                                       numberMask
+                                       validateTooltip
+                                       [validateForm]="form"
+                                       (change)="onChangeOriginalCurrency(rowData,$event)"
+                                       [(ngModel)]="rowData.originalCurrency"
+                                       required>
+                                <validate-message [form]="form"
+                                                  controlName="{{ 'originalCurrency' + rowIndex }}">
+                                </validate-message>
+                                <div *ngIf="!hasEdit"
+                                     class="align-right">{{convertCurrencyMask(rowData.originalCurrency)}}</div>
+                            </td>
+                            <td rowspan="1"
+                                title="{{rowData.taxType}}">
+                                <config-list-control name="{{ 'taxType' + rowIndex }}"
+                                                     *ngIf="hasEdit"
+                                                     type="TAX"
+                                                     header="Danh sách Thuế"
+                                                     placeholder="Loại thuế"
+                                                     [items]="configListDataTax"
+                                                     (getChange)="onChangeRowEditTaxRate(rowData, $event)"
+                                                     [(ngModel)]="rowData.taxType"
+                                                     required>
+                                </config-list-control>
+                                <validate-message [form]="form"
+                                                  controlName="{{ 'taxType' + rowIndex }}">
+                                </validate-message>
+
+                                <span *ngIf="!hasEdit">{{rowData.taxType + '%'}}</span>
+                            </td>
+                            <td rowspan="1"
+                                title="{{rowData.originalCurrencyTotal}}">
+                                <input pInputText
+                                       type="text"
+                                       *ngIf="hasEdit"
+                                       class="form-control align-right"
+                                       name="{{ 'originalCurrencyTotal' + rowIndex }}"
+                                       numberMask
+                                       validateTooltip
+                                       [validateForm]="form"
+                                       (change)="onChangeOriginalCurrencyTotal(rowData,$event)"
+                                       [(ngModel)]="rowData.originalCurrencyTotal">
+                                <validate-message [form]="form"
+                                                  controlName="{{ 'originalCurrencyTotal' + rowIndex }}">
+                                </validate-message>
+                                <div *ngIf="!hasEdit"
+                                     class="align-right">{{convertCurrencyMask(rowData.originalCurrencyTotal)}}
+                                </div>
+                            </td>
+                            <td rowspan="2"
+                                title="{{ rowData.otherRequest }}">{{ rowData.otherRequest }}</td>
+                            <td rowspan="2"
+                                title="{{rowData.deliveryTime | date:mainConfig.formatDateList}}">
+                                <input-date name="{{ 'deliveryTime' + rowIndex }}"
+                                            validateTooltip
+                                            *ngIf="hasEdit"
+                                            [validateForm]="form"
+                                            [(ngModel)]="rowData.deliveryTime">
+                                </input-date>
+                                <span *ngIf="!hasEdit">
+                                    {{rowData.deliveryTime |date:mainConfig.formatDateList}}</span>
+                            </td>
+                            <td rowspan="2"
+                                title="{{rowData.originGoods}}">
+                                <input pInputText
+                                       type="text"
+                                       *ngIf="hasEdit"
+                                       class="form-control"
+                                       name="{{ 'originGoods' + rowIndex }}"
+                                       maxlength="255"
+                                       (change)="onRowEditInit()"
+                                       placeholder="{{ 'Xuất xứ hàng hóa' | translate }}"
+                                       [(ngModel)]="rowData.originGoods">
+                                <span *ngIf="!hasEdit">{{rowData.originGoods}}</span>
+                            </td>
+                            <td rowspan="2"
+                                title="{{rowData.status | label: goodsStatus}}">
+                                <ng-select [items]="goodsStatus"
+                                           name="{{ 'goodsStatus' + rowIndex }}"
+                                           *ngIf="hasEdit"
+                                           bindLabel="label"
+                                           bindValue="value"
+                                           appendTo="body"
+                                           (change)="onRowEditInit()"
+                                           placeholder="{{ 'Hàng mới/Hàng qua sử dụng' | translate }}"
+                                           [(ngModel)]="rowData.status">
+                                </ng-select>
+
+                                <span *ngIf="!hasEdit">{{rowData.status | label: goodsStatus}}</span>
+                            </td>
+                            <td rowspan="2"
+                                title="{{rowData.warrantyTime}}">
+                                <input pInputText
+                                       type="number"
+                                       *ngIf="hasEdit"
+                                       class="form-control"
+                                       name="{{ 'warrantyTime' + rowIndex }}"
+                                       (change)="onRowEditInit()"
+                                       placeholder="{{ 'Thời gian bảo hành' | translate }}"
+                                       [(ngModel)]="rowData.warrantyTime">
+                                <span *ngIf="!hasEdit">{{rowData.warrantyTime}}</span>
+                            </td>
+                            <td rowspan="2"
+                                title="{{rowData.warrantyConditions}}">
+                                <textarea pInputText
+                                          type="text"
+                                          *ngIf="hasEdit"
+                                          class="form-control"
+                                          name="{{ 'warrantyConditions' + rowIndex }}"
+                                          maxlength="255"
+                                          (change)="onRowEditInit()"
+                                          placeholder="{{ 'Điều kiện bảo hành' | translate }}"
+                                          [(ngModel)]="rowData.warrantyConditions"></textarea>
+                                <span *ngIf="!hasEdit">{{rowData.warrantyConditions}}</span>
+                            </td>
+                            <td rowspan="2"
+                                title="{{rowData.note}}">
+                                <textarea pInputText
+                                          type="text"
+                                          *ngIf="hasEdit"
+                                          class="form-control"
+                                          name="{{ 'note' + rowIndex }}"
+                                          maxlength="255"
+                                          (change)="onRowEditInit()"
+                                          placeholder="{{ 'Nhập ghi chú sản phẩm' | translate }}"
+                                          [(ngModel)]="rowData.note"></textarea>
+                                <span *ngIf="!hasEdit">{{rowData.note}}</span>
+                            </td>
+                            <td rowspan="2"
+                                class="align-center"
+                                title="{{ rowData.expirationDate | date:mainConfig.formatDateList}}">
+                                {{rowData.expirationDate | date:mainConfig.formatDateList}}
+                            </td>
+                            <td rowspan="2"
+                                class="align-center"
+                                title="{{ rowData.quotationExtend | date:mainConfig.formatDateList}}">
+                                {{rowData.quotationExtend | date:mainConfig.formatDateList}}
+                            </td>
+                            <td rowspan="2"
+                                class="align-center">
+                                <mat-checkbox name="{{ 'outOfStock' + rowIndex }}"
+                                              class="example-margin"
+                                              [ngModel]="rowData.outOfStock"
+                                              (ngModelChange)="rowData.outOfStock = $event ? 1 : 0"
+                                              [checked]="rowData.outOfStock == 1"
+                                              [disabled]="!hasEdit"
+                                              [color]="'primary'">
+                                </mat-checkbox>
+                            </td>
+                        </tr>
+                        <tr height="50px">
+                            <td title="{{rowData.price}}">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control align-right"
+                                       name="{{ 'price' + rowIndex }}"
+                                       numberMask
+                                       *ngIf="hasEdit"
+                                       validateTooltip
+                                       [validateForm]="form"
+                                       (change)="onChangePrice(rowData,$event)"
+                                       [(ngModel)]="rowData.price"
+                                       required>
+                                <validate-message [form]="form"
+                                                  controlName="{{ 'price' + rowIndex }}">
+                                </validate-message>
+
+                                <div *ngIf="!hasEdit"
+                                     class="align-right">{{convertCurrencyMask(rowData.price)}}</div>
+                            </td>
+
+                            <td title="{{convertCurrencyMask(rowData.amount)}}"
+                                class="align-right">
+                                {{convertCurrencyMask(rowData.amount)}}</td>
+
+                            <td title="{{rowData.taxAmount}}">
+                                <input pInputText
+                                       type="text"
+                                       *ngIf="hasEdit"
+                                       class="form-control align-right"
+                                       name="{{ 'taxAmount' + rowIndex }}"
+                                       numberMask
+                                       validateTooltip
+                                       [validateForm]="form"
+                                       (change)="onChangeTaxAmount(rowData,$event)"
+                                       [(ngModel)]="rowData.taxAmount">
+                                <validate-message [form]="form"
+                                                  controlName="{{ 'taxAmount' + rowIndex }}">
+                                </validate-message>
+                                <div *ngIf="!hasEdit"
+                                     class="align-right">{{convertCurrencyMask(rowData.taxAmount)}}</div>
+                            </td>
+
+                            <td title="{{convertCurrencyMask(rowData.amountTotal)}}"
+                                class="align-right">
+                                {{convertCurrencyMask(rowData.amountTotal)}}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <tr style="background: #f8f9fa;">
+                            <td class="align-right"
+                                style="border: 1px solid #e9ecef;"
+                                colspan="8">{{ 'Tổng trước chiết khấu' | translate}}</td>
+                            <td colspan="2"
+                                style="border: 1px solid #e9ecef;"
+                                class="align-right"
+                                title="{{convertCurrencyMask(totalBeforeDiscount)}}">
+                                {{convertCurrencyMask(totalBeforeDiscount)}}
+                            <td colspan="9"
+                                style="border: 1px solid #e9ecef;"></td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td class="align-right"
+                                style="border: 1px solid #e9ecef;"
+                                colspan="8">{{ 'Chiết khấu' | translate}}</td>
+                            <td colspan="2"
+                                style="border: 1px solid #e9ecef;"
+                                title="{{discount ? convertCurrencyMask(discount) : 0}}">
+                                <input pInputText
+                                       type="text"
+                                       *ngIf="hasEdit"
+                                       class="form-control align-right"
+                                       name="discount"
+                                       numberMask
+                                       validateTooltip
+                                       [validateForm]="form"
+                                       placeholder="{{ 'Chiết khấu' | translate }}"
+                                       (change)="onChangeDiscount($event)"
+                                       [(ngModel)]="discount">
+
+                                <div *ngIf="!hasEdit"
+                                     class="align-right">{{discount ? convertCurrencyMask(discount) : 0}}</div>
+                            </td>
+                            <td colspan="9"
+                                style="border: 1px solid #e9ecef;"></td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td class="align-right"
+                                style="border: 1px solid #e9ecef;"
+                                colspan="8">{{ 'Tổng tiền' | translate}}</td>
+                            <td colspan="2"
+                                style="border: 1px solid #e9ecef;"
+                                class="align-right"
+                                title="{{convertCurrencyMask(totalAmountAterDiscount)}}">
+                                {{convertCurrencyMask(totalAmountAterDiscount)}}
+                            </td>
+                            <td colspan="9"
+                                style="border: 1px solid #e9ecef;"></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div
+                     *ngIf="quotationData.listQuotationItem && quotationData.listQuotationItem.length === 0 && !hasEdit">
+                    <view-empty></view-empty>
+                </div>
+            </div>
+
+            <br><br>
+            <!-- Table Add điều khoản thương mại -->
+            <h5 class="kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{'Điều khoản thương mại'| translate}}
+            </h5>
+            <div class="mat-table__wrapper">
+                <p-table [value]="quotationData.listQuotationTradeConditions"
+                         [columns]="headerTradeConditions"
+                         dataKey="id"
+                         editMode="row"
+                         class="table-no-wrap"
+                         tableStyleClass="table-no-wrap">
+
+                    <ng-template pTemplate="header"
+                                 let-columns>
+                        <tr class="background-table-header">
+                            <th *ngFor="let col of columns"
+                                [width]="col.width"
+                                class="align-center"
+                                [ngClass]="col.class">
+                                {{col.title | translate}} <span class="lbl-required"
+                                      *ngIf="col.isRequired">
+                                </span>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body"
+                                 let-rowData
+                                 let-rowIndex="rowIndex"
+                                 let-editing="editing">
+                        <tr>
+                            <td [title]="rowData.name">
+                                <input pInputText
+                                       *ngIf="hasEdit"
+                                       name="{{ 'name' + rowIndex }}"
+                                       class="form-control"
+                                       type="text"
+                                       placeholder="{{ 'Nhập...' | translate }}"
+                                       [(ngModel)]="rowData.name">
+                                <span *ngIf="!hasEdit">{{rowData.name}}</span>
+                            </td>
+
+                            <td [title]="rowData.description">
+                                <input pInputText
+                                       *ngIf="hasEdit"
+                                       name="{{ 'description' + rowIndex }}"
+                                       class="form-control"
+                                       type="text"
+                                       placeholder="{{ 'Nhập...' | translate }}"
+                                       [(ngModel)]="rowData.description">
+                                <span *ngIf="!hasEdit">{{rowData.description}}</span>
+                            </td>
+
+                            <td style="text-align: center;">
+                                <button pButton
+                                        pRipple
+                                        type="button"
+                                        icon="fas fa-trash-alt"
+                                        (click)="deleteRowTradeConditions(rowIndex)"
+                                        [disabled]="!hasEdit"
+                                        class="p-button-rounded p-button-text"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer"
+                                 *ngIf="hasEdit">
+                        <tr style="background: #f8f9fa;">
+                            <td [title]="addTradeConditions.name"
+                                style="border: 1px solid #e9ecef;">
+                                <input pInputText
+                                       name="name"
+                                       class="form-control"
+                                       type="text"
+                                       placeholder="{{ 'Nhập...' | translate }}"
+                                       [(ngModel)]="addTradeConditions.name">
+                            </td>
+
+                            <td [title]="addTradeConditions.description"
+                                style="border: 1px solid #e9ecef;">
+                                <input pInputText
+                                       name="descriptionTradeConditions"
+                                       class="form-control"
+                                       type="text"
+                                       placeholder="{{ 'Nhập...' | translate }}"
+                                       [(ngModel)]="addTradeConditions.description">
+                            </td>
+
+                            <td style="text-align: center;border: 1px solid #e9ecef;">
+                                <button (click)="addNewRowTradeConditions()"
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        icon="flaticon2-add-1"
+                                        class="p-button-rounded p-button-text"
+                                        [disabled]="!hasEdit">
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div
+                     *ngIf="quotationData.listQuotationTradeConditions && quotationData.listQuotationTradeConditions.length === 0 && !hasEdit">
+                    <view-empty></view-empty>
+                </div>
+                <br>
+            </div>
+        </form>
+    </div>
+    <app-discuss-with-fpt #discussWithFptComponent></app-discuss-with-fpt>
+
+    <div class="mat-table__bottom"
+         style="text-align:left; margin-top: 15px;">
+        <button class="btn btn-secondary"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="close()">{{
+            'COMMON.CLOSE' | translate }}
+        </button>
+    </div>
+    <p-footer> </p-footer>
+</p-dialog>

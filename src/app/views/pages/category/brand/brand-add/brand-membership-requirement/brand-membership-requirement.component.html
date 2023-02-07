@@ -1,0 +1,177 @@
+<form #formContact="ngForm"
+      id="membership-requirement">
+    <h5 class="kt-margin-b-15">
+        <i class="fab fa-envira"></i> {{'Membership Requirement'| translate}}
+    </h5>
+    <div class="table-responsive">
+        <p-table [value]="dataSource.items"
+                 tableStyleClass="table-no-wrap"
+                 dataKey="id"
+                 [columns]="header">
+            <ng-template pTemplate="header">
+                <tr style="background: #f8f9fa;">
+                    <th *ngFor="let col of header"
+                        [width]="col.width"
+                        [ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-rowIndex="rowIndex"
+                         let-editing="editing">
+                <tr [pEditableRow]="rowData">
+                    <td class="align-center">
+                        {{ rowData.indexNo }}
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.requirement }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'requirement'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.requirement"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.requirement}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.information}}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'information'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.information"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.information}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td class="align-center">
+                        <mat-checkbox name="{{rowIndex + 1 + 'isRequired'}}"
+                                      class="example-margin"
+                                      (change)="onChangeIsRequired(rowData, $event)"
+                                      [(ngModel)]="rowData.isRequired"
+                                      [disabled]="!editTable"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.note }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'note'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.note"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.note}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td class="action align-center"
+                        *ngIf="editTable">
+                        <button class="button-icon"
+                                *ngIf="+rowData.indexNo > 4"
+                                (click)="onBtnDeleteClick(rowData)">
+                            <i class="fas fa-trash-alt"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.DELETE' | translate"></i>
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr *ngIf="editTable"
+                    [pEditableRow]="addItem"
+                    class="td-editable"
+                    style="background: #f8f9fa;">
+
+                    <td *ngFor="let col of columns"
+                        style="border: 1px solid #e9ecef;">
+
+                        <div *ngIf="col.field === 'requirement'"
+                             class="p-text-right th-border"
+                             [title]="addItem.requirement">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="requirement"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItem.requirement">
+                        </div>
+                        <div *ngIf="col.field === 'information'"
+                             class="p-text-right th-border"
+                             [title]="addItem.information">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="information"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItem.information">
+                        </div>
+
+                        <div *ngIf="col.field === 'isRequired'"
+                             class="p-text-right align-center">
+                            <mat-checkbox name="isRequired"
+                                          class="example-margin"
+                                          (change)="onChangeIsRequired(addItem, $event)"
+                                          [(ngModel)]="addItem.isRequired"
+                                          [color]="'primary'">
+                            </mat-checkbox>
+                        </div>
+
+                        <div *ngIf="col.field === 'note'"
+                             class="p-text-right th-border"
+                             [title]="addItem.note">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="note"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItem.note">
+                        </div>
+
+                        <div *ngIf="col.field === 'action'"
+                             class="align-center">
+                            <button (click)="addNewRow()"
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    pSaveEditableRow
+                                    icon="flaticon2-add-1"
+                                    class="p-button-rounded p-button-text">
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</form>

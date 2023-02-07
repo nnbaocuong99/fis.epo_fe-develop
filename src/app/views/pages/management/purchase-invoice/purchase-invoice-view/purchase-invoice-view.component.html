@@ -1,0 +1,269 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'PURCHASE_INVOICE.INVOICE_INFORMATION' | translate"
+                       [viewLoading$]="purchaseInvoiceService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goPaymentOrder()">
+                <i class="far fa-money-check-alt"></i>
+                <span class="kt-hidden-mobile">{{ 'Đề nghị thanh toán' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goPaymentTracking()">
+                <i class="far fa-money-check-alt"></i>
+                <span class="kt-hidden-mobile">{{ 'Theo dõi thanh toán' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <ngb-tabset>
+            <!-- tab thông tin chung -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{'PURCHASE_INVOICE.GENERAL_INFO'| translate}}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <h5 class="kt-margin-t-15 kt-margin-b-15"
+                        style="position: relative; padding: 15px;">
+                        <i class="fab fa-envira"></i> {{'PURCHASE_INVOICE.GENERAL_INFO'| translate}}
+                    </h5>
+
+                    <!-- Thông tin chung -->
+                    <table class="table table-no-wrap">
+                        <tbody>
+                            <tr *ngFor="let key of listKey; let a = index">
+                                <td *ngFor="let item of key; let b = index"
+                                    style="width: 25%">
+                                    <span
+                                          *ngIf="!item?.hasFormatDate && !item?.dictionary && item?.name !== 'conversionRate'">
+                                        <span *ngIf="item?.name === 'waybillNumber' && purchaseinvoice.waybillNumber">
+                                            <span>{{item?.title | translate}} {{item ? ': ' : ''}}</span>
+                                            <b>
+                                                <a [routerLink]="['../../../../shipment/list/view/', purchaseinvoice.shipmentId]"
+                                                   target="_blank">
+                                                    {{listValue[a * 4 + b]}}
+                                                </a>
+                                            </b>
+                                        </span>
+                                        <span *ngIf="item?.name !== 'waybillNumber'">
+                                            <span>{{item?.title | translate}} {{item ? ': ' : ''}}</span>
+                                            <b>{{listValue[a * 4 + b]}}</b>
+                                        </span>
+                                    </span>
+                                    <span *ngIf="item?.hasFormatDate && item?.name !== 'conversionRate'">
+                                        <span>{{item?.title | translate}} {{item ? ': ' : ''}}</span>
+                                        <b [ngClass]="{'background-word': (item?.name === 'accountingDate')}">
+                                            {{listValue[a * 4 + b] | date:mainConfig.formatDateList}}</b>
+                                    </span>
+                                    <span *ngIf="item?.dictionary && item?.name !== 'conversionRate'">
+                                        <span>{{item?.title | translate}} {{item ? ': ' : ''}}</span>
+                                        <b>{{(listValue[a * 4 + b] | label: item.dictionary) | translate}}</b>
+                                    </span>
+                                    <span *ngIf="item?.name === 'conversionRate'">
+                                        <span>{{item?.title | translate}} {{item ? ': ' : ''}}</span>
+                                        <b>{{ listValue[a * 4 + b] }}</b>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <ngb-tabset>
+                        <!-- Danh sách HH/DV  -->
+                        <ngb-tab>
+                            <ng-template ngbTabTitle>
+                                <h5>{{'PURCHASE_INVOICE.DETAILS_OF_THE_GOODS'| translate}}</h5>
+                            </ng-template>
+                            <ng-template ngbTabContent>
+
+                                <div class="col-md-12">
+                                    <div class="btn-group">
+                                        <h5 class="kt-margin-t-15 kt-margin-b-15">
+                                            <i class="fab fa-envira"></i> {{'PURCHASE_INVOICE.DETAILS_OF_THE_GOODS'|
+                                            translate}}
+                                        </h5>
+                                    </div>
+                                    <div class="float-right">
+                                        <button *ngIf="currentPiId && allowRequestImportGoods"
+                                                user-role="BP_MANAGER,BP_STAFF"
+                                                class="btn btn-sm btn-simple mr-2"
+                                                title="Đề nghị nhập hàng"
+                                                (click)="requestImportGoods()"
+                                                [disabled]="!currentPiId || (purchaseinvoice.importStatus && purchaseinvoice.importStatus >= 1) || !allowRequestImportGoods">
+                                            Đề nghị nhập hàng
+                                        </button>
+                                        <button *ngIf="currentPiId && allowRequestImportGoods && purchaseinvoice.importStatus && purchaseinvoice.importStatus >= 1"
+                                                user-role="BP_MANAGER,BP_STAFF,AF_INV"
+                                                class="btn btn-sm btn-simple mr-2"
+                                                title="In đề nghị nhập hàng"
+                                                (click)="printPaperImportGoods()">
+                                            In giấy đề nghị nhập kho
+                                        </button>
+
+                                    </div>
+                                </div>
+                                <!-- Danh sách HH/DV  -->
+                                <app-purchase-invoice-item #lPurchaseInvoiceItem
+                                                           [editTable]="false"
+                                                           [headerItemsTreeTable]="headerItemsTreeTable"
+                                                           [headerItemsTable]="headerItemsTable"
+                                                           [isShowTreeTable]="isShowTreeTable"
+                                                           [isCostTypeCreditNote]="isCostTypeCreditNote"
+                                                           [isCostTypeForShipment]="isCostTypeForShipment"
+                                                           [purchaseInvoiceData]="purchaseinvoice"
+                                                           [purchaseInvoiceItemsData]="purchaseInvoiceItem">
+                                </app-purchase-invoice-item>
+                            </ng-template>
+                        </ngb-tab>
+                        <!-- Bảng tính thuế nhà thầu -->
+                        <ngb-tab *ngIf="purchaseinvoice.id && isShowContractorTax">
+                            <ng-template ngbTabTitle>
+                                <h5>{{ 'PURCHASE_INVOICE.CONTRACTOR_TAX_INFORMATION'| translate }}</h5>
+                            </ng-template>
+                            <ng-template ngbTabContent>
+                                <app-contractor-tax-calculation [editTable]="false"
+                                                                [dataSource]="purchaseInvoiceItem"
+                                                                [purchaseInvoiceData]="purchaseinvoice">
+                                </app-contractor-tax-calculation>
+                            </ng-template>
+                        </ngb-tab>
+                    </ngb-tabset>
+                </ng-template>
+            </ngb-tab>
+            <!-- tab thông tin thanh toán -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_INVOICE.PAYMENT_INFO'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <app-purchase-invoice-payment [purchaseInvoiceData]="purchaseinvoice"
+                                                  [viewMode]="true"></app-purchase-invoice-payment>
+                </ng-template>
+            </ngb-tab>
+            <!-- tab thông tin hồ sơ  -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_INVOICE.PROFILE'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <attach-document mainModule="INVOICE_ATTACHMENT"
+                                     fileModule="Attachment\PurchaseInvoice\{{currentPiId}}"
+                                     recordId="{{currentPiId}}"
+                                     [formTitle]="'PURCHASE_INVOICE.INVOICE_PROFILE_CATEGORY'"
+                                     [hideOptional]="true"
+                                     [isDelete]="false"
+                                     [multiple]="true">
+                    </attach-document>
+                    <br>
+                    <div *ngIf="listPoHasFile && listPoHasFile.length > 0">
+                        <h5>- {{ 'Đơn hàng' | translate }}</h5>
+                        <div *ngFor="let item of listPoHasFile; let i = index">
+                            <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                                {{ item.objectName }}
+                            </p>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                                    <single-attach-file *ngIf="item.objectId"
+                                                        [edit]="false"
+                                                        module="Attachment\PurchaseOrder\{{item.objectId}}">
+                                    </single-attach-file>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-3">
+                                    <label>{{ 'Hồ sơ'| translate }}</label>
+                                </div>
+                            </div>
+                            <attach-document mainModule="PO_ATTACHMENT"
+                                             fileModule="Attachment\PurchaseOrder\{{item.objectId}}"
+                                             recordId="{{item.objectId}}"
+                                             [viewMode]="true"
+                                             [hideOptional]="true"
+                                             [formTitle]="null"
+                                             [multiple]="true">
+                            </attach-document>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="listPrHasFile && listPrHasFile.length > 0">
+                        <h5>- {{ 'Yêu cầu mua hàng' | translate }}</h5>
+                        <div *ngFor="let item of listPrHasFile; let i = index">
+                            <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                                {{ item.objectName }}
+                            </p>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                                    <single-attach-file *ngIf="item.objectId"
+                                                        [edit]="false"
+                                                        module="Attachment\PurchaseRequest\{{item.objectId}}">
+                                    </single-attach-file>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-3">
+                                    <label>{{ 'Hồ sơ'| translate }}</label>
+                                </div>
+                            </div>
+                            <attach-document mainModule="PR_ATTACHMENT"
+                                             fileModule="Attachment\PurchaseRequest\{{item.objectId}}"
+                                             recordId="{{item.objectId}}"
+                                             [viewMode]="true"
+                                             [hideOptional]="true"
+                                             [formTitle]="null"
+                                             [multiple]="true">
+                            </attach-document>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="listPpHasFile && listPpHasFile.length > 0">
+                        <h5>- {{ 'Kế hoạch mua hàng' | translate }}</h5>
+                        <div *ngFor="let item of listPpHasFile; let i = index">
+                            <p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+                                {{ item.objectName }}
+                            </p>
+                            <div class="form-row">
+                                <div class="col-md-3 mb-3">
+                                    <label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+                                    <single-attach-file *ngIf="item.objectId"
+                                                        [edit]="false"
+                                                        module="Attachment\PurchasePlan\{{item.objectId}}">
+                                    </single-attach-file>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-dialog-request-import #dialogRequestImport
+                           *ngIf="purchaseinvoice.codeCostType === '1'"
+                           [purchaseInvoiceData]="purchaseinvoice"
+                           [purchaseInvoiceItemsData]="purchaseInvoiceItem.items"
+                           [orgChart]="orgChart"
+                           (success)="updateStatusImportGoods($event)"></app-dialog-request-import>

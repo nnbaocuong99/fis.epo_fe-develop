@@ -1,0 +1,383 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'PURCHASE_REQUEST.PURCHASE_REQUEST_INFO' | translate"
+                       [viewLoading$]="purchaseRequestService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <a *ngIf="purchaseRequest?.id && (allowViewPrice || purchaseRequest.overSixWeeks !== 1) && (purchaseRequest?.prStatus === 4 || (!purchaseRequest?.sproTicketId && purchaseRequest?.status !== prStatus[6].value))"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               title="{{ 'COMMON.SUBMIT_APPROVAL' | translate }}"
+               (click)="onBtnCreateTicket()">
+                <i class="fal fa-paper-plane"></i> {{ 'COMMON.SUBMIT_APPROVAL' | translate }}</a>
+
+            <a *ngIf="purchaseRequest?.prStatus !== prStatus[5].value"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="viewHistory()">
+                <i class="fas fa-history"></i>
+                <span class="kt-hidden-mobile">{{ 'PURCHASE_ORDER.VIEW_HISTORY' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <business-process-management *ngIf="purchaseRequest.id"
+                                     #bpm
+                                     titleOptionProcess="{{ 'Xem xét và phê duyệt Yêu cầu mua hàng' | translate }}"
+                                     module="PURCHASE_REQUEST"
+                                     [objectData]="purchaseRequest"
+                                     [items]="purchaseRequestItem"
+                                     [isTreeItems]="false"
+                                     (createTicketSuccess)="createTicketSuccess($event)"
+                                     (cancelTicketSuccess)="updateStatus(prStatus[3].value)"
+                                     (changeCombobox)="changeComboboxSpro($event)"
+                                     (changeProcess)="changeProcessSpro($event)"
+                                     [file]="file">
+        </business-process-management>
+
+        <h5 class="kt-margin-b-15">
+            <i class="fal fa-money-check-edit"></i> {{ 'PURCHASE_REQUEST.GENERAL_INFO'| translate }}
+        </h5>
+        <table class="table table-no-wrap">
+            <tbody>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.PR_CODE'| translate }}:
+                        <b>{{ purchaseRequest?.prNo }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.PR_TYPE' | translate }}:
+                        <b>{{ purchaseRequest?.prTypeName }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_STATUS' | translate }}:
+                        <b>{{ (purchaseRequest?.prType | label:prContractInfo) | translate }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.PROJECT_CODE' | translate }}:
+                        <b>{{ purchaseRequest?.projectCode }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.ORG_APPLY'| translate }}:
+                        <b>{{ purchaseRequest?.orgApplyName }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.ORG_CODE' | translate }}:
+                        <b>{{ purchaseRequest?.orgCode }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.LEGAL' | translate }}:
+                        <b>{{ purchaseRequest?.legalName }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'COMMON.NOTE' | translate }}:
+                        <b>{{ purchaseRequest?.note }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%"
+                        title="{{purchaseRequest?.hasCo ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}">
+                        {{ 'CO' | translate }}: <b>{{ purchaseRequest?.hasCo ?
+                            ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                        </b>
+                    </td>
+                    <td style="width: 25%"
+                        title="{{purchaseRequest?.hasCq ? ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}">
+                        {{ 'CQ' | translate }}: <b>{{ purchaseRequest?.hasCq ?
+                            ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                        </b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CODE' | translate }}:
+                        <a class="header-link"
+                           [routerLink]="['../../../../purchase-plan/list/view/', purchaseRequest?.ppId]"
+                           target="_blank">
+                            <b>{{ purchaseRequest?.code }}</b>
+                        </a>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CREATOR' | translate }}:
+                        <b>{{ purchaseRequest?.createdByName }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.PEOPLE_INVOLVEL' | translate }}:
+                        <b>{{ purchaseRequest?.peopleInvolved }}</b>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+
+        <h5 class="kt-margin-b-15">
+            <i class="fal fa-list-ul"></i> {{ 'PURCHASE_REQUEST.PR_CONTRACT_INFO'| translate }}
+        </h5>
+        <table class="table table-no-wrap">
+            <tbody>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_NO'| translate }}:
+                        <b>{{ purchaseRequest?.contractNo }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_TYPE' | translate }}:
+                        <b>{{ purchaseRequest?.contractType }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_DESCRIPTION' | translate }}:
+                        <b>{{ purchaseRequest?.contractDescription }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CUSTOMER' | translate }}:
+                        <b>{{ purchaseRequest?.customer }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.AM'| translate }}:
+                        <b>{{ purchaseRequest?.amAccount }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.PM' | translate }}:
+                        <b>{{ purchaseRequest?.pmAccount }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'CEO/COO' | translate }}:
+                        <b>{{ purchaseRequest?.ceoCoo }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.SIGN_DATE' | translate }}:
+                        <b>{{ purchaseRequest?.signDate | date: mainConfig.formatDateList }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.END_DATE'| translate }}:
+                        <b>{{ purchaseRequest?.endDate | date: mainConfig.formatDateList }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CURRENCY' | translate }}:
+                        <b>{{ purchaseRequest?.currency }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.CONTRACT_TOTAL_AMOUNT' | translate }}:
+                        <b>{{ purchaseRequest?.contractTotalAmount }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_REQUEST.OVER_SIX_WEEKS' | translate }}:
+                        <b>{{ purchaseRequest?.overSixWeeks ?
+                            ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                        </b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">
+                        <single-attach-file module="Attachment\PurchasePlan\{{purchaseRequest?.ppId}}"
+                                            (success)="onSuccessInitFile($event)"
+                                            [edit]="false">
+                        </single-attach-file>
+                    </td>
+                    <td style="width: 25%"></td>
+                    <td style="width: 25%"></td>
+                    <td style="width: 25%"></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+
+        <ngb-tabset>
+            <!-- Thông tin mặt hàng -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'PURCHASE_REQUEST.ITEM.ITEM_INFO'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+
+                    <div class="col-md-12">
+                        <div class="kt-margin-b-15 float-right">
+                            <button class="btn btn-sm btn-label-brand mr-2"
+                                    title="{{ 'Export Excel Thông tin line hàng' | translate }}"
+                                    (click)="checkLicensedExport()">
+                                {{ 'Export Excel' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mat-table__wrapper">
+                        <p-table [value]="purchaseRequestItem"
+                                 tableStyleClass="table-no-wrap">
+                            <ng-template pTemplate="header">
+                                <tr class="background-table-header">
+                                    <th *ngFor="let col of headeritems"
+                                        [width]="col.width"
+                                        [ngClass]="col.class"
+                                        class="table-no-wrap align-center header-height">
+                                        {{ col.title | translate }}<span class="lbl-required"
+                                              *ngIf="col.isRequired"></span>
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body"
+                                         let-rowData
+                                         let-rowIndex="rowIndex">
+                                <tr>
+                                    <td>
+                                        <div class="wrap-text-grid-item align-center"
+                                             [title]="rowData.indexNo">{{rowData.indexNo}}</div>
+                                    </td>
+
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.itemCode">{{rowData.itemCode}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.partNo">{{rowData.partNo}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.itemName">{{rowData.itemName}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.itemType">{{rowData.itemType}}
+                                            <!-- Loại hàng hoá SRV thêm checkbox -->
+                                            <mat-checkbox name="{{ rowData.indexNo + 'srv' }}"
+                                                          *ngIf="rowData.itemType === 'SRV'"
+                                                          class="example-margin"
+                                                          [(ngModel)]="rowData.isUpdateSrv"
+                                                          [color]="'primary'"
+                                                          disabled>
+                                            </mat-checkbox>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.unit">{{rowData.unit}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.currency">{{rowData.currency}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.quantity">{{rowData.quantity}}</div>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="allowViewPrice"
+                                             class="wrap-text-grid-item"
+                                             [title]="rowData.expectedPrice | currencyMask"
+                                             class="align-right">{{rowData.expectedPrice | currencyMask}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="allowViewPrice"
+                                             class="wrap-text-grid-item"
+                                             [title]="(rowData.expectedPrice * rowData.quantity) | currencyMask"
+                                             class="align-right">
+                                            {{(rowData.expectedPrice * rowData.quantity) | currencyMask}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]=" rowData.expectedDate | date: mainConfig.formatDateList ">
+                                            {{ rowData.expectedDate | date: mainConfig.formatDateList }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.supplierName">{{rowData.supplierName}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.producerName">{{rowData.producerName}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.guarantee">{{rowData.guarantee}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.deliveryLocation">{{rowData.deliveryLocation}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.note">{{rowData.note}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]="rowData.conversionRate"
+                                             class="align-right">{{rowData.conversionRate}}</div>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="allowViewPrice"
+                                             class="wrap-text-grid-item"
+                                             [title]="rowData.priceBp"
+                                             class="align-right">
+                                            {{rowData.priceBp | currencyMask}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="allowViewPrice"
+                                             class="wrap-text-grid-item align-right"
+                                             [title]="rowData.priceBp ? ((rowData.priceBp* rowData.quantity) | currencyMask) : null">
+                                            {{rowData.priceBp ?
+                                            ((rowData.priceBp*rowData.quantity) | currencyMask) : null}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="wrap-text-grid-item"
+                                             [title]=" rowData.responseDate | date: mainConfig.formatDateList ">
+                                            {{ rowData.responseDate | date: mainConfig.formatDateList }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <div *ngIf="purchaseRequestItem && purchaseRequestItem.length === 0">
+                            <view-empty></view-empty>
+                        </div>
+                    </div>
+                    <label *ngIf="allowViewPrice">{{ 'Tổng tiền' | translate }}</label>
+                    <div *ngIf="allowViewPrice"
+                         class="table-responsive">
+                        <table class="table table-auto-width">
+                            <tr *ngFor="let item of totalBom; let i = index">
+                                <td class="transparent align-right">{{ item.key }}:</td>
+                                <td class="align-right"
+                                    [title]="item.count | currencyMask">
+                                    <b>{{ item.count | currencyMask }}</b>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+            <!-- Thông tin hồ sơ và phụ lục -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'Hồ sơ'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <attach-document mainModule="PR_ATTACHMENT"
+                                     fileModule="Attachment\PurchaseRequest\{{prIdCurrent}}"
+                                     recordId="{{prIdCurrent}}"
+                                     [isDelete]="false"
+                                     [multiple]="true">
+                    </attach-document>
+                </ng-template>
+            </ngb-tab>
+            <!-- Thông tin theo dõi số lượng items -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'Theo dõi số lượng items'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <app-purchase-request-item-follow [purchaseRequestData]="purchaseRequest"
+                                                      [allowViewPrice]="allowViewPrice">
+                    </app-purchase-request-item-follow>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-purchase-request-history #purchaseRequestHistoryComponent></app-purchase-request-history>

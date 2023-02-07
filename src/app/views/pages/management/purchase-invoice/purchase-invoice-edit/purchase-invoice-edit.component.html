@@ -1,0 +1,846 @@
+<form-dynamic [formData]="formData"
+			  [form]="form"
+			  (cancel)="onBtnCancelClick()">
+	<ngb-tabset [justify]="'start'"
+				(tabChange)="setFragmentToRoute($event)"
+				[activeId]="0">
+		<ngb-tab *ngFor="let tab of tabs"
+				 [id]="tab.value">
+			<ng-template ngbTabTitle>
+				<h5>{{ tab.label | translate }}</h5>
+			</ng-template>
+		</ngb-tab>
+	</ngb-tabset>
+
+	<!-- Thông tin hóa đơn -->
+	<div class="kt-grid__item"
+		 [ngClass]="{'hide': currentTab !== 1}">
+		<div class="row">
+			<div class="col-md-12"
+				 style="position: relative; padding: 15px;">
+				<h5 class="kt-margin-b-15">
+					<i class="fal fa-list-ul"></i> {{ 'PURCHASE_INVOICE.GENERAL_INFO'| translate }}
+				</h5>
+
+				<!-- // BA confirm mở để copy tiếp line hàng PO ở form edit -->
+				<div style="position: absolute; right: 15px; top: 5px;">
+					<button *ngIf="isCostTypeCreditNote"
+							class="btn btn-sm btn-label-brand mr-2"
+							title="{{ 'PURCHASE_INVOICE.COPY_FROM_FOR_CREDIT_NOTE'| translate }}"
+							(click)="onBtnCopyForCreditNoteClick()">
+						{{ 'PURCHASE_INVOICE.COPY_FROM_FOR_CREDIT_NOTE'| translate }}
+					</button>
+					<button *ngIf="purchaseInvoiceData.costType === getCostTypeName(listCostType, '1')"
+							class="btn btn-sm btn-label-brand mr-2"
+							title="{{ 'PURCHASE_INVOICE.COPY_FROM_PO'| translate }}"
+							(click)="onBtnCopyPoClick()">
+						{{ 'PURCHASE_INVOICE.COPY_FROM_PO'| translate }}
+					</button>
+					<button *ngIf="!currentPiId"
+							class="btn btn-sm btn-label-brand mr-2"
+							title="{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}"
+							(click)="onBtnCopyPiClick()">
+						{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}
+					</button>
+				</div>
+			</div>
+		</div>
+		<form autocomplete="off"
+			  #form="ngForm"
+			  id="purchase-invoice-edit">
+			<div class="form-row">
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="code"
+						   placeholder="{{ 'PURCHASE_INVOICE.INVOICE_NUMBER' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.code"
+						   (focusout)="focusOutCheckExists()"
+						   [readonly]="purchaseInvoiceData.syncStatus === 2"
+						   required>
+					<validate-message [form]="form"
+									  controlName="code"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_INVOICE.INVOICE_NUMBER_TOTAL' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="codeTotal"
+						   placeholder="{{ 'PURCHASE_INVOICE.INVOICE_NUMBER_TOTAL' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.codeTotal"
+						   [readonly]="purchaseInvoiceData.syncStatus === 2">
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.INVOICE_TYPE' | translate }}</label>
+					<select-sync-source name="invoiceType"
+										placeholder="{{ 'PURCHASE_INVOICE.INVOICE_TYPE' | translate }}"
+										header="{{ 'PURCHASE_INVOICE.INVOICE_TYPE' | translate }}"
+										bindValue="name"
+										[width]="'60vw'"
+										[columns]="headerInvoiceType"
+										[service]="invoiceTypeService"
+										[requestPayload]="invoiceTypeRequestPayload"
+										(ngModelChange)="onChangeInvoiceType($event)"
+										[(ngModel)]="purchaseInvoiceData.invoiceTypeDto"
+										[disabled]="purchaseInvoiceData.isDisableInvoiceType"
+										required>
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="invoiceType"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.COST_TYPE' | translate }}</label>
+					<config-list-control name="costType"
+										 type="COST_TYPE"
+										 header="{{ 'PURCHASE_INVOICE.COST_TYPE' | translate }}"
+										 bindValue="code"
+										 [hasEdit]="false"
+										 (ngModelChange)="onChangeCostType($event)"
+										 [(ngModel)]="purchaseInvoiceData.costType"
+										 required>
+					</config-list-control>
+					<validate-message [form]="form"
+									  controlName="costType"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="purchaseInvoiceData.invoiceType === invoiceTypes.PurchaseInvoice">
+					<label>{{ 'PURCHASE_INVOICE.INVOICE_TYPE_ON_THE_LIST' | translate }}</label>
+					<select-sync-source name="invoiceTypeOnList"
+										placeholder="{{ 'PURCHASE_INVOICE.INVOICE_TYPE_ON_THE_LIST' | translate }}"
+										header="{{ 'PURCHASE_INVOICE.INVOICE_TYPE_ON_THE_LIST' | translate }}"
+										bindValue="description"
+										[width]="'50vw'"
+										[columns]="headerinputInvoiceInformation"
+										[service]="inputInvoiceInformationService"
+										(change)="changeInvoiceTypeOnList($event)"
+										[requestPayload]="inputInvoiceInformationRequestPayload"
+										[(ngModel)]="purchaseInvoiceData.invoiceTypeOnListDto">
+					</select-sync-source>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="purchaseInvoiceData.invoiceType === invoiceTypes.PurchaseInvoice && purchaseInvoiceData.invoiceTypeOnList === getInvoiceTypeOnListName(listInvoiceTypeOnList, '08')">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.TAX_TYPE_NO_DEDUCTION' | translate }}</label>
+					<select-sync-source name="taxType"
+										placeholder="{{ 'PURCHASE_INVOICE.TAX_TYPE_NO_DEDUCTION' | translate }}"
+										header="{{ 'PURCHASE_INVOICE.TAX_TYPE_NO_DEDUCTION' | translate }}"
+										bindValue="description"
+										[width]="'50vw'"
+										[columns]="headerTaxTypeNotDeduction"
+										[service]="taxTypeNotDeductionService"
+										[requestPayload]="taxTypeNotDeductionRequestPayload"
+										(change)="purchaseInvoiceData.taxType = purchaseInvoiceData.taxTypeDto?.description"
+										[(ngModel)]="purchaseInvoiceData.taxTypeDto"
+										[required]="true">
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="taxType"></validate-message>
+				</div>
+				<!-- control show khi loại hóa đơn là PurchaseInvoice, và loại chi phí khác thuế VAT, thuế VAT nhập khẩu -->
+				<div class="col-md-2 mb-3"
+					 *ngIf="purchaseInvoiceData.invoiceType === invoiceTypes.PurchaseInvoice 
+					 && purchaseInvoiceData.costType !== getCostTypeName(listCostType, '8') 
+					 && purchaseInvoiceData.costType !== getCostTypeName(listCostType, '9')">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.INVOICE_SERIAL_NUMBER' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="seriNo"
+						   maxlength="8"
+						   placeholder="{{ 'PURCHASE_INVOICE.INVOICE_SERIAL_NUMBER' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.seriNo"
+						   (focusout)="focusOutCheckExists()"
+						   required>
+					<validate-message [form]="form"
+									  controlName="seriNo"></validate-message>
+				</div>
+				<!-- control show khi loại hóa đơn là PurchaseInvoice, và loại chi phí khác thuế VAT, thuế VAT nhập khẩu -->
+				<div class="col-md-2 mb-3"
+					 *ngIf="purchaseInvoiceData.invoiceType === invoiceTypes.PurchaseInvoice 
+					 && purchaseInvoiceData.costType !== getCostTypeName(listCostType, '8') 
+					 && purchaseInvoiceData.costType !== getCostTypeName(listCostType, '9')">
+					<label>{{ 'PURCHASE_INVOICE.INVOICE_SAMPLE_SYMBOL' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="symbol"
+						   maxlength="11"
+						   placeholder="{{ 'PURCHASE_INVOICE.INVOICE_SAMPLE_SYMBOL' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.symbol"
+						   (focusout)="focusOutCheckExists()">
+					<validate-message [form]="form"
+									  controlName="symbol"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3"
+					 class="hide">
+					<label>{{ 'PURCHASE_INVOICE.ACCOUNTING_DATE' | translate }}</label>
+					<input-date name="accountingDate"
+								[(ngModel)]="purchaseInvoiceData.accountingDate"></input-date>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.INVOICE_DATE' | translate }}</label>
+					<input-date name="date"
+								[(ngModel)]="purchaseInvoiceData.date"
+								required></input-date>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.INVOICE_STATUS' | translate }}</label>
+					<select class="form-control"
+							name="status"
+							[(ngModel)]="purchaseInvoiceData.status"
+							disabled
+							required>
+						<option [ngValue]="undefined"
+								selected>{{ 'COMMON.ALL' | translate }}</option>
+						<option *ngFor="let item of statusInvoices"
+								[value]="item.value">{{item.label | translate }}
+						</option>
+					</select>
+					<validate-message [form]="form"
+									  controlName="status"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.ERP_SYNC_STATUS' | translate }}</label>
+					<select class="form-control"
+							name="syncStatus"
+							[(ngModel)]="purchaseInvoiceData.syncStatus"
+							required
+							disabled>
+						<!-- <option [ngValue]="undefined"
+										selected>{{ 'COMMON.ALL' | translate }}</option> -->
+						<option *ngFor="let item of statusErps"
+								[value]="item.value">{{item.label | translate }}
+						</option>
+					</select>
+					<validate-message [form]="form"
+									  controlName="syncStatus"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isShowPoNumber">
+					<label class="lbl-required">{{ 'PURCHASE_ORDER.LEGAL' | translate }}</label>
+					<select-sync-source name="ouCode"
+										placeholder="{{ 'PURCHASE_ORDER.LEGAL' | translate }}"
+										header="MENU.CATEGORY.COMPANY"
+										bindValue="code"
+										[width]="'60vw'"
+										[columns]="headerOperatingUnit"
+										[service]="operatingUnitService"
+										(change)="onChangeLegal($event)"
+										[(ngModel)]="purchaseInvoiceData.ouNameDto"
+										[required]="isShowPoNumber">
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="ouCode"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.SUPPLIER' | translate }}</label>
+					<select-sync-source name="vendorId"
+										placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER' | translate }}"
+										header="MENU.CATEGORY.SUPPLIER"
+										bindValue="name"
+										suffixLabel="code"
+										searchField="generalFilter"
+										[width]="'60vw'"
+										[columns]="headerSuppliers"
+										[service]="supplierService"
+										[(ngModel)]="purchaseInvoiceData.supplierNameDto"
+										(change)="onChangeSupplier()"
+										required>
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="vendorId"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.TERMS_PAYMENT' | translate }}</label>
+					<select-sync-source name="paymentTerm"
+										placeholder="{{ 'PURCHASE_INVOICE.TERMS_PAYMENT' | translate }}"
+										header="Điều khoản thanh toán"
+										bindValue="name"
+										[columns]="headerPaymentTerm"
+										[service]="paymentTermService"
+										(change)="onChangePaymentTerm($event)"
+										[(ngModel)]="purchaseInvoiceData.paymentTermDto"
+										required>
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="paymentTerm"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_INVOICE.SUPPLIER_TAX_CODE' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="supplierTax"
+						   placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER_TAX_CODE' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.supplierTax">
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.SUPPLIER_SITE' | translate }}</label>
+					<select-sync-source name="siteId"
+										placeholder="{{ 'PURCHASE_INVOICE.SUPPLIER_SITE' | translate }}"
+										header="{{ 'PURCHASE_INVOICE.SUPPLIER_SITE' | translate }}"
+										bindValue="code"
+										[columns]="headerSupplierSites"
+										[service]="supplierSiteService"
+										[requestPayload]="{ouId: purchaseInvoiceData.ouCode, vendorId: purchaseInvoiceData.vendorId}"
+										(change)="onChangeSupplierSite($event)"
+										[(ngModel)]="purchaseInvoiceData.supplierSiteNameDto"
+										required>
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="siteId"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">
+						{{ 'PURCHASE_INVOICE.CURRENCY' | translate }}</label>
+					<ng-select-async name="currency"
+									 bindLabel="code"
+									 placeholder="{{ 'PURCHASE_INVOICE.CURRENCY' | translate }}"
+									 [multiple]="false"
+									 [closeOnSelect]="true"
+									 [service]="currencyService"
+									 (change)="onChangeCurrency()"
+									 [(ngModel)]="purchaseInvoiceData.currencyDto"
+									 [disabled]="costTypeInsurrance"
+									 required>
+					</ng-select-async>
+					<validate-message [form]="form"
+									  controlName="currency"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_INVOICE.EXCHANGE_RATE' | translate }}</label>
+					<exchange-rate name="exchangeRateType"
+								   bindValue="conversionRate"
+								   [(ngModel)]="purchaseInvoiceData.conversionRate"
+								   [exchangeRateData]="exchangeRateData"
+								   (change)="onChangeExchangeRate($event)"
+								   [disabled]="costTypeInsurrance">
+					</exchange-rate>
+				</div>
+				<div class="col-md-2 mb-3"
+					 class="hide">
+					<label>{{ 'PURCHASE_INVOICE.TOTAL_AMOUNT' | translate}}</label>
+					<input type="text"
+						   class="form-control"
+						   name="totalAmount"
+						   placeholder="{{ 'PURCHASE_INVOICE.TOTAL_AMOUNT' | translate}}"
+						   [(ngModel)]="purchaseInvoiceData.totalAmount"
+						   [disabled]="isDisabledAmount">
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="purchaseInvoiceData.isStoring">
+					<label>{{ 'PURCHASE_INVOICE.DERPARTMENT_RECEIVING_GOODS' | translate }}</label>
+					<select-sync-source name="receivingDept"
+										placeholder="{{ 'PURCHASE_INVOICE.DERPARTMENT_RECEIVING_GOODS' | translate }}"
+										header="{{ 'PURCHASE_INVOICE.DERPARTMENT_RECEIVING_GOODS' | translate }}"
+										bindValue="fullName"
+										[width]="'50vw'"
+										[columns]="headerUser"
+										[service]="userService"
+										(change)="onChangeAccount()"
+										[(ngModel)]="purchaseInvoiceData.receivingDeptNameDto">
+					</select-sync-source>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isShowCostTypeGoodsService">
+					<label [ngClass]="{'lbl-required': isCostTypeCreditNote}">
+						{{ 'PURCHASE_INVOICE.PO_CODE' | translate}}
+					</label>
+					<select-sync-source placeholder="{{ 'PURCHASE_INVOICE.PO_CODE' | translate}}"
+										header="{{ 'PURCHASE_INVOICE.PO_CODE' | translate}}"
+										bindValue="code"
+										name="poCode"
+										[columns]="headerPo"
+										[service]="purchaseOrderService"
+										(change)="onChangePoCode($event)"
+										[(ngModel)]="purchaseInvoiceData.poCodeDto"
+										[required]="isCostTypeCreditNote">
+					</select-sync-source>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isShowCostTypeGoodsService">
+					<label>{{ 'PURCHASE_INVOICE.WAYBILL_NUMBER' | translate }}</label>
+					<select-sync-source name="waybillNumber"
+										placeholder="{{ 'PURCHASE_INVOICE.WAYBILL_NUMBER' | translate}}"
+										header="PURCHASE_INVOICE.WAYBILL_NUMBER"
+										bindValue="waybillNumber"
+										[columns]="headerShipment"
+										[service]="shipmentService"
+										(change)="onChangeWaybillNumber($event)"
+										[(ngModel)]="purchaseInvoiceData.waybillNumberDto"
+										[disabled]="purchaseInvoiceData.syncStatus === 2">
+					</select-sync-source>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_INVOICE.CREATOR' | translate }}</label>
+					<select-sync-source name="createdBy"
+										header="{{ 'PURCHASE_INVOICE.CREATOR' | translate }}"
+										[width]="'50vw'"
+										placeholder="{{ 'PURCHASE_INVOICE.CREATOR' | translate }}"
+										[columns]="headerUser"
+										bindValue="fullName"
+										[service]="userService"
+										(change)="purchaseInvoiceData.createdByInvoice = purchaseInvoiceData.createdByInvoiceDto?.userName"
+										[(ngModel)]="purchaseInvoiceData.createdByInvoiceDto">
+					</select-sync-source>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isCostTypeCredit">
+					<label>{{ 'PURCHASE_INVOICE.INVOICE_NUMBER_EXPORTED' | translate }}</label>
+					<select-sync-source name="billsExportedNo"
+										placeholder="{{'PURCHASE_INVOICE.INVOICE_NUMBER_EXPORTED' | translate}}"
+										header="PURCHASE_INVOICE.INVOICE_NUMBER_EXPORTED"
+										bindValue="code"
+										[columns]="headerPurchaseInvoice"
+										[service]="purchaseInvoiceService"
+										[requestPayload]="purchaseInvoiceRequestPayload"
+										[(ngModel)]="purchaseInvoiceData.invoiceExportedNoDto">
+					</select-sync-source>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isCostTypeCredit">
+					<label>{{ 'PURCHASE_INVOICE.CONTRAST_WEEK' | translate }}</label>
+					<input type="number"
+						   min="0"
+						   class="form-control"
+						   name="contrastWeek"
+						   placeholder="{{ 'PURCHASE_INVOICE.CONTRAST_WEEK' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.contrastWeek">
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isCostTypeCredit">
+					<label>{{ 'PURCHASE_INVOICE.NEGATIVE_VALUE' | translate }}</label>
+					<input type="number"
+						   min="0"
+						   class="form-control"
+						   name="negativeValue"
+						   placeholder="{{ 'PURCHASE_INVOICE.NEGATIVE_VALUE' | translate }}"
+						   [(ngModel)]="purchaseInvoiceData.contrastValue">
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isShowPoNumber">
+					<label class="lbl-required">{{ 'PURCHASE_PLAN.PROJECT_CODE' | translate }}</label>
+					<select-sync-source name="projectCode"
+										placeholder="{{ 'PURCHASE_PLAN.PROJECT_CODE' | translate }}"
+										header="MENU.CATEGORY.PROJECT"
+										bindValue="code"
+										[columns]="headerProject"
+										[service]="projectService"
+										[width]="'70vw'"
+										[requestPayload]="{ouId: purchaseInvoiceData.ouCode}"
+										(change)="onChangeProjectCode($event)"
+										[(ngModel)]="purchaseInvoiceData.projectCodeDto"
+										[required]="isShowPoNumber"
+										readonly>
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="projectCode"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3"
+					 *ngIf="isShowPoNumber">
+					<label class="lbl-required">{{ 'PURCHASE_INVOICE.ORG_APPLY' | translate }}</label>
+					<select-sync-source name="subDepartmentId"
+										placeholder="{{ 'PURCHASE_INVOICE.ORG_APPLY' | translate }}"
+										header="{{ 'PURCHASE_INVOICE.ORG_APPLY' | translate }}"
+										bindValue="name"
+										[columns]="headerDepartment"
+										[service]="departmentService"
+										(change)="onChangeOrgApply($event)"
+										[width]="'50vw'"
+										[requestPayload]="{ouId: purchaseInvoiceData.ouCode}"
+										[(ngModel)]="purchaseInvoiceData.orgApplyNameDto"
+										[required]="isShowPoNumber">
+					</select-sync-source>
+					<validate-message [form]="form"
+									  controlName="subDepartmentId"></validate-message>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label class="lbl-required">
+						{{ 'PURCHASE_INVOICE.INVOICE_INTERPRETATION' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="invoiceDesc"
+							  maxlength="240"
+							  placeholder="{{ 'PURCHASE_INVOICE.INVOICE_INTERPRETATION' | translate }}"
+							  [(ngModel)]="purchaseInvoiceData.invoiceDesc"
+							  required></textarea>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_INVOICE.NOTE' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="noteAf"
+							  maxlength="240"
+							  placeholder="{{ 'PURCHASE_INVOICE.NOTE' | translate }}"
+							  [(ngModel)]="purchaseInvoiceData.noteAf"></textarea>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>{{ 'PURCHASE_INVOICE.NOTE_OF_AF' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="noteOfAf"
+							  maxlength="240"
+							  placeholder="{{ 'PURCHASE_INVOICE.NOTE_OF_AF' | translate }}"
+							  [(ngModel)]="purchaseInvoiceData.noteOfAf"></textarea>
+				</div>
+				<div class="col-md-2 mb-3">
+					<label>
+						{{'PURCHASE_INVOICE.PEOPLE_INVOLVEL' | translate}}
+					</label>
+					<ng-select-async name="userInform"
+									 bindLabel="userName"
+									 validateTooltip
+									 placeholder="{{'PURCHASE_INVOICE.PEOPLE_INVOLVEL' | translate}}"
+									 [multiple]="true"
+									 [service]="userService"
+									 [(ngModel)]="purchaseInvoiceData.peopleInvolvedDto"
+									 (ngModelChange)="onChangePeopleInvolved($event)">
+					</ng-select-async>
+				</div>
+
+				<div class="col-md-2 mb-3"
+					 *ngIf="purchaseInvoiceData.costType !== getCostTypeName(this.listCostType, '2')
+				&& purchaseInvoiceData.costType !== getCostTypeName(this.listCostType, '3')
+				&& purchaseInvoiceData.costType !== getCostTypeName(this.listCostType, '8')
+				&& purchaseInvoiceData.costType !== getCostTypeName(this.listCostType, '9')
+				&& purchaseInvoiceData.costType !== getCostTypeName(this.listCostType, '10')">
+					<mat-radio-group (change)="valueStoreChange($event)">
+						<div>
+							<mat-radio-button class="example-margin"
+											  [value]="storeItems[0].value"
+											  [checked]="purchaseInvoiceData.isStoring == storeItems[0].value">
+								{{ storeItems[0].label | translate}}
+							</mat-radio-button>
+						</div>
+						<div>
+							<mat-radio-button class="example-margin"
+											  [value]="storeItems[1].value"
+											  [checked]="purchaseInvoiceData.isStoring == storeItems[1].value">
+								{{ storeItems[1].label | translate}}
+							</mat-radio-button>
+						</div>
+					</mat-radio-group>
+				</div>
+
+				<div class="col-md-2 mb-3"
+					 *ngIf="isShowIsDeduct">
+					<mat-radio-group (change)="valueTaxVatChange($event)">
+						<div>
+							<mat-radio-button class="example-margin"
+											  [value]="taxVats[0].value"
+											  [checked]="purchaseInvoiceData.isDeduct == taxVats[0].value">
+								{{ taxVats[0].label | translate }}
+							</mat-radio-button>
+						</div>
+						<div>
+							<mat-radio-button class="example-margin"
+											  [value]="taxVats[1].value"
+											  [checked]="purchaseInvoiceData.isDeduct == taxVats[1].value">
+								{{ taxVats[1].label | translate}}
+							</mat-radio-button>
+						</div>
+					</mat-radio-group>
+				</div>
+			</div>
+		</form>
+		<br>
+		<ngb-tabset *ngIf="currentPiId && isShowContractorTax && !isBuyInternalUse"
+					[justify]="'start'"
+					(tabChange)="changTabDetail($event)"
+					[activeId]="0">
+			<ngb-tab *ngFor="let tab of tabDetails"
+					 [id]="tab.value">
+				<ng-template ngbTabTitle>
+					<h5>{{ tab.label | translate }}</h5>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+		<div class="kt-grid__item"
+			 [ngClass]="{'hide': currentchangTab !== 1}">
+			<!-- Begin Thông tin chi tiết hàng -->
+			<div class="row">
+				<div class="col-md-6 kt-margin-b-15">
+					<h5 class="kt-margin-b-15">
+						<i class="fal fa-list-ul"></i> {{ 'PURCHASE_ORDER.LIST_GOODS_SERVICES'| translate }}
+					</h5>
+					<!-- class="mb-3" -->
+					<!-- <div class="float-right" *ngIf="!isShowInvoiceItemOrther">
+						<button class="btn btn-sm btn-label-brand"
+								title="{{ 'Thêm hàng hóa'| translate }}"
+								(click)="onBtnAddItemClick()"><i class="fal fa-plus"></i>
+							{{ 'COMMON.CRUD.ADD'| translate }}</button>
+					</div> -->
+				</div>
+				<div class="col-md-6 kt-margin-b-15"
+					 *ngIf="purchaseInvoiceData.costType === getCostTypeName(listCostType, '1')">
+					<button user-role="AF_ADMIN,AF_AP,AF_INV,AF_MANAGER_WAREHOUSE,AF_TAX"
+							class="btn btn-brand float-right"
+							(click)="onBtnRequestUpdateClick()">Request update ORG code</button>
+				</div>
+			</div>
+			<!-- Danh sách HH/DV  -->
+			<app-purchase-invoice-item #purchaseInvoiceItems
+									   [editTable]="true"
+									   [purchaseInvoiceItemsData]="dataSource"
+									   [totalWithTax]="purchaseInvoiceData.totalWithTax"
+									   [purchaseInvoiceData]="purchaseInvoiceData"
+									   [headerItemsTreeTable]="headerItemsTreeTable"
+									   [headerItemsTable]="headerItemsTable"
+									   [piId]="currentPiId"
+									   [isShowTreeTable]="isShowTreeTable"
+									   [isCostTypeCredit]="isCostTypeCredit"
+									   [isCostTypeCreditNote]="isCostTypeCreditNote"
+									   [isCostTypeForShipment]="isCostTypeForShipment"
+									   [form]="form"
+									   (editRow)="editRow($event)"
+									   (success)="loadFromPurchaseInvoiceItem($event)">
+			</app-purchase-invoice-item>
+			<br>
+			<!-- end Thông tin chi tiết hàng -->
+		</div>
+		<div class="kt-grid__item"
+			 *ngIf="currentchangTab === 2">
+			<!-- <div class="kt-grid__item"
+			 [ngClass]="{'hide': currentchangTab !== 2}"> -->
+			<!-- Bảng tính thuế nhà thầu -->
+			<app-contractor-tax-calculation #contractorTaxCalculation
+											[dataSource]="dataSource"
+											(success)="loadFromPurchaseInvoiceItem($event)"
+											[purchaseInvoiceData]="purchaseInvoiceData">
+			</app-contractor-tax-calculation>
+			<!-- Bảng tính thuế nhà thầu -->
+		</div>
+		<div *ngIf="currentchangTab !== 2">
+			<!-- Ẩn button saveform tại tab thuế nhà thầu -->
+			<button class="btn btn-sm btn-success mr-2"
+					title="{{ 'COMMON.SAVE' | translate }}"
+					(click)="onBtnSavePurchaseInvoiceClick()"
+					[disabled]="purchaseInvoiceData.syncStatus === 2">
+				<i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}</button>
+			<!-- Tạm thời ẩn button lưu nháp -->
+			<!-- <button class="btn btn-sm btn-success mr-2"
+					*ngIf="currentchangTab !== 2 && isShowBtnSaveDraft"
+					title="{{ 'COMMON.SAVE_AS_DRAFT' | translate }}"
+					(click)="onBtnSaveAsDraftClick()"
+					[disabled]="purchaseInvoiceData.syncStatus === 2">
+				<i class="fal fa-save"></i> {{ 'COMMON.SAVE_AS_DRAFT' | translate }}</button> -->
+			<button class="btn btn-sm btn-secondary mr-2"
+					title="{{ 'COMMON.CANCEL' | translate }}"
+					(click)="onBtnCancelClick()">
+				<i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}</button>
+		</div>
+		<br>
+		<!-- class="mat-table__bottom"
+		style="text-align:left; margin-top: 15px;"> -->
+		<div class="row"
+			 [ngClass]="{'hide': currentchangTab !== 1}">
+			<div class="col-md-12"
+				 style="position: relative; padding: 15px;">
+				<div style="position: absolute; right: 15px; top: 5px;">
+
+					<button *ngIf="purchaseInvoiceData.id && (showBtnSyncErp || isBuyInternalUse || isRoleSuperAdmin)"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							[title]="'SYNC_ERP.CONFIRM_RETURN_MESSAGE' | translate"
+							user-role="SUPER_ADMIN"
+							(click)="returnPi()">
+						<i class="far fa-exclamation-triangle"
+						   style="color: red;"></i> {{ 'Return AP' | translate }}
+					</button>
+
+					<button *ngIf="purchaseInvoiceData.id && (showBtnSyncErp || isBuyInternalUse || isRoleSuperAdmin)"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							user-role="SUPER_ADMIN"
+							(click)="viewLogPi()">{{ 'View log AP' | translate }}
+					</button>
+
+					<button *ngIf="purchaseInvoiceData.id && (showBtnSyncErp || isBuyInternalUse || isRoleSuperAdmin)"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							[ngClass]="{'border-red': purchaseInvoiceData.errorSyncAp}"
+							[title]="purchaseInvoiceData.errorSyncAp ? 'Lỗi đồng bộ ERP vui lòng đồng bộ lại:\n'+ purchaseInvoiceData.errorSyncAp : 'Đồng bộ thông tin ERP'"
+							(click)="onBtnSyncErpClick()"
+							[disabled]="purchaseInvoiceData.syncErp && purchaseInvoiceData.syncErp >= 2">
+						Đồng bộ thông tin ERP
+					</button>
+					<!-- Giá hàng hóa dịch vụ mới show button -->
+					<button *ngIf="purchaseInvoiceData.id && allowRequestImportGoods && purchaseInvoiceData.importStatus && purchaseInvoiceData.importStatus >= 1"
+							user-role="BP_MANAGER,BP_STAFF"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							title="Đề nghị nhập hàng"
+							(click)="goToImportGoods()">
+						<i class="fal fa-external-link-alt"></i> Nhập hàng
+					</button>
+					<button *ngIf="purchaseInvoiceData.id && allowRequestImportGoods"
+							user-role="BP_MANAGER,BP_STAFF"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							title="Đề nghị nhập hàng"
+							(click)="requestImportGoods()"
+							[disabled]="purchaseInvoiceData.importStatus && purchaseInvoiceData.importStatus >= 1">
+						Đề nghị nhập hàng
+					</button>
+
+					<button *ngIf="purchaseInvoiceData.id && allowRequestImportGoods && purchaseInvoiceData.importStatus && purchaseInvoiceData.importStatus >= 1"
+							user-role="BP_MANAGER,BP_STAFF,AF_INV"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							title="In đề nghị nhập hàng"
+							(click)="printPaperImportGoods()">
+						In giấy đề nghị nhập kho
+					</button>
+					<!-- Giá hàng hóa dịch vụ mới show button -->
+					<button *ngIf="purchaseInvoiceData.id && purchaseInvoiceData.isShowContractorTax && !isShowCostTypeGoodsService && !isBuyInternalUse"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							title="AF tính thuế"
+							(click)="btnAfCalculateTax()"
+							[disabled]="isHideBtnAfCaculationTax">
+						AF tính thuế
+					</button>
+					<!-- Giá hàng hóa dịch vụ mới show button -->
+					<button *ngIf="purchaseInvoiceData.id && showBtnSuggestionImport"
+							class="btn btn-sm btn-label-brand float-right mr-3"
+							title="Đề nghị nhập"
+							(click)="suggestionImport()"
+							[disabled]="purchaseInvoiceData.isSuggestionImport">
+						Đề nghị nhập
+					</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Thông tin thanh toán -->
+	<div class="kt-grid__item"
+		 *ngIf="currentTab === 2">
+		<app-purchase-invoice-payment [purchaseInvoiceData]="purchaseInvoiceData"></app-purchase-invoice-payment>
+	</div>
+
+	<!-- Thông tin hồ sơ -->
+	<div class="kt-grid__item"
+		 *ngIf="currentTab === 3">
+		<!-- Thông tin hồ sơ -->
+		<attach-document mainModule="INVOICE_ATTACHMENT"
+						 fileModule="Attachment\PurchaseInvoice\{{currentPiId}}"
+						 recordId="{{currentPiId}}"
+						 [formTitle]="'PURCHASE_INVOICE.INVOICE_PROFILE_CATEGORY'"
+						 [hideOptional]="true"
+						 [multiple]="true">
+		</attach-document>
+		<br>
+		<div *ngIf="listPoHasFile && listPoHasFile.length > 0">
+			<h5>- {{ 'Đơn hàng' | translate }}</h5>
+			<div *ngFor="let item of listPoHasFile; let i = index">
+				<p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+					{{ item.objectName }}
+				</p>
+				<div class="form-row">
+					<div class="col-md-3 mb-3">
+						<label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+						<single-attach-file *ngIf="item.objectId"
+											[edit]="false"
+											module="Attachment\PurchaseOrder\{{item.objectId}}">
+						</single-attach-file>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-3">
+						<label>{{ 'Hồ sơ'| translate }}</label>
+					</div>
+				</div>
+				<attach-document mainModule="PO_ATTACHMENT"
+								 fileModule="Attachment\PurchaseOrder\{{item.objectId}}"
+								 recordId="{{item.objectId}}"
+								 [viewMode]="true"
+								 [hideOptional]="true"
+								 [formTitle]="null"
+								 [multiple]="true">
+				</attach-document>
+			</div>
+		</div>
+		<br>
+		<div *ngIf="listPrHasFile && listPrHasFile.length > 0">
+			<h5>- {{ 'Yêu cầu mua hàng' | translate }}</h5>
+			<div *ngFor="let item of listPrHasFile; let i = index">
+				<p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+					{{ item.objectName }}
+				</p>
+				<div class="form-row">
+					<div class="col-md-3 mb-3">
+						<label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+						<single-attach-file *ngIf="item.objectId"
+											[edit]="false"
+											module="Attachment\PurchaseRequest\{{item.objectId}}">
+						</single-attach-file>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-3">
+						<label>{{ 'Hồ sơ'| translate }}</label>
+					</div>
+				</div>
+				<attach-document mainModule="PR_ATTACHMENT"
+								 fileModule="Attachment\PurchaseRequest\{{item.objectId}}"
+								 recordId="{{item.objectId}}"
+								 [viewMode]="true"
+								 [hideOptional]="true"
+								 [formTitle]="null"
+								 [multiple]="true">
+				</attach-document>
+			</div>
+		</div>
+		<br>
+		<div *ngIf="listPpHasFile && listPpHasFile.length > 0">
+			<h5>- {{ 'Kế hoạch mua hàng' | translate }}</h5>
+			<div *ngFor="let item of listPpHasFile; let i = index">
+				<p style="font-size: 1rem; margin: 0 0 0.5rem 10px; font-weight: bold; color: #646c9a;">
+					{{ item.objectName }}
+				</p>
+				<div class="form-row">
+					<div class="col-md-3 mb-3">
+						<label>{{ 'COMMON.ATTACH_FILE'| translate }}</label>
+						<single-attach-file *ngIf="item.objectId"
+											[edit]="false"
+											module="Attachment\PurchasePlan\{{item.objectId}}">
+						</single-attach-file>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+	</div>
+
+</form-dynamic>
+
+<!-- Form copy từ PI cho Credit note -->
+<app-purchase-invoice-edit-copy-for-credit-note #dialogCopyForCreditNote
+												(success)="loadItemForCreditNote($event)">
+</app-purchase-invoice-edit-copy-for-credit-note>
+
+<!-- Form copy từ PO -->
+<app-purchase-invoice-edit-copy-po [dialogRef]="dialogRefPo"
+								   [piId]="currentPiId"
+								   [purchaseInvoiceData]="purchaseInvoiceData"
+								   *ngIf="isShowCopyPo"
+								   (save)="loadItemFromPo($event)">
+</app-purchase-invoice-edit-copy-po>
+
+<!-- Form copy từ Pi -->
+<app-purchase-invoice-edit-copy-inv [dialogRef]="dialogRefPi"
+									*ngIf="isShowCopyInv"
+									(save)="loadItemFromPi($event)">
+</app-purchase-invoice-edit-copy-inv>
+
+<!-- Thêm item vào purchase-invoice -->
+<app-purchase-invoice-item-add-dialog *ngIf="isShowAddItemPI"
+									  [dialogRef]="dialogRefAddPiItem"
+									  (save)="onLoadItemAddData($event)"></app-purchase-invoice-item-add-dialog>
+
+<!-- Đồng bộ ERP  -->
+<app-dialog-sync-erp-ap #dialogSyncErpAp
+						[dialogRef]="dialogRefSyncAp"
+						[purchaseInvoiceData]="purchaseInvoiceData"
+						(success)="syncSuccess($event)"></app-dialog-sync-erp-ap>
+
+<app-dialog-request-import #dialogRequestImport
+						   *ngIf="purchaseInvoiceData.costType === getCostTypeName(listCostType, '1')"
+						   [purchaseInvoiceData]="purchaseInvoiceData"
+						   [purchaseInvoiceItemsData]="dataSource.items"
+						   [orgChart]="orgChart"
+						   (success)="updateStatusImportGoods($event)"></app-dialog-request-import>
+
+<app-dialog-request-update-org [dialogRef]="dialogRefRequestUpdOrg"></app-dialog-request-update-org>

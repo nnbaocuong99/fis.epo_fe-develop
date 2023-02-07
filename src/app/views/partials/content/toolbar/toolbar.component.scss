@@ -1,0 +1,19 @@
+.toolbar-row {
+	flex-direction: row !important;
+	position: initial !important;
+	padding: 0 !important;
+	width: 100% !important;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+span.disabled, a.disabled {
+    color: gray;
+    pointer-events: none;
+    filter: saturate(0.1);
+    cursor: not-allowed;
+    text-decoration: none;
+    opacity: 0.6;
+}

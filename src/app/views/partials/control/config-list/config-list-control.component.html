@@ -1,0 +1,39 @@
+<div class="input-group">
+    <select #t
+            class="form-control"
+            [(ngModel)]="value"
+            (change)="onChangeSelect(t.value)"
+            [disabled]="isDisabled"
+            ngDefaultControl>
+        <option [ngValue]="undefined"
+                *ngIf="hasDefaultValue"
+                selected>{{ 'COMMON.SELECT_DEFAULT' | translate }}</option>
+        <option *ngFor="let item of items"
+                [value]="item.name"
+                [selected]="item.name === value"
+                [title]="item.note">{{item.name | translate }}</option>
+    </select>
+    <div class="input-group-append">
+        <button *ngIf="hasEdit"
+                class="input-group-text input-group-right attach-button"
+                title="Add"
+                tabindex="-1"
+                [disabled]="isDisabled"
+                (click)="onBtnAddCostTypeClick()">
+            <i class="fal fa-ellipsis-v"></i>
+        </button>
+    </div>
+</div>
+
+<config-list [dialogRef]="dialogRef"
+             [type]="type"
+             [header]="header"
+             [bindLabel]="bindLabel"
+             [bindValue]="bindValue"
+             [attr1Name]="attr1Name"
+             [attr2Name]="attr2Name"
+             [attr3Name]="attr3Name"
+             [attr4Name]="attr4Name"
+             [orderBy]="orderBy"
+             (onSave)="getDataConfigList($event)"
+             *ngIf="isShowConfigList"></config-list>

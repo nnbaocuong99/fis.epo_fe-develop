@@ -1,0 +1,316 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'COMMON.DETAILS' | translate"
+                       [viewLoading$]="supplierService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goToEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'COMMON.GENERAL_INFO'| translate}}
+        </h5>
+        <table class="table table-no-wrap">
+            <tbody>
+                <tr>
+                    <td style="width: 25%">{{ 'Tên gói thầu' | translate }}:
+                        <b>{{ bidsData.name }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Đơn vị mời thầu' | translate }}:
+                        <b>{{ bidsData.bidSolicitationUnit }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Ngày mời thầu' | translate }}:
+                        <b>{{ bidsData.bidInvitationDate | date: mainConfig.formatJustDate }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Hạn nộp hồ sơ thầu' | translate }}:
+                        <b>{{ bidsData.deadlineForSubmission | date: mainConfig.formatFullDate }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'Gia hạn thời gian nộp hồ sơ thầu' | translate }}:
+                        <b>{{ bidsData.deadlineForSubmissionExtend | date: mainConfig.formatFullDate }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Ngày bắt đầu chào giá' | translate }}:
+                        <b>{{ bidsData.bidStartDate | date: mainConfig.formatFullDate }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Ngày kết thúc chào giá' | translate }}:
+                        <b>{{ bidsData.bidEndDate | date: mainConfig.formatFullDate }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'Thông tin liên hệ' | translate }}:
+                        <b>{{ bidsData.contact }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%"></td>
+                    <td style="width: 25%"></td>
+                    <td style="width: 25%"></td>
+                    <td style="width: 25%"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h5 class="kt-margin-t-30 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Hồ sơ năng lực yêu cầu'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="bidsData.listBidsCapacityProfileRequest"
+                     [columns]="arrHeaderBidsCapacityProfileRequest"
+                     dataKey="id"
+                     editMode="row"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.name">
+                            {{ rowData.name }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div
+                 *ngIf="bidsData.listBidsCapacityProfileRequest && bidsData.listBidsCapacityProfileRequest.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <h5 class="kt-margin-t-30 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Tiêu chí đánh giá'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="bidsData.listBidsEvaluationCriteria"
+                     [columns]="arrHeaderBidsEvaluationCriteria"
+                     dataKey="id"
+                     editMode="row"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td pInitEditableRow
+                            [title]="rowData.name">
+                            {{ rowData.name }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="bidsData.listBidsEvaluationCriteria && bidsData.listBidsEvaluationCriteria.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <h5 class="kt-margin-t-30 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Danh sách hồ sơ nhà cung cấp'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="bidsData.listBidsSupplierProfile"
+                     [columns]="arrHeaderSupplierProfile"
+                     dataKey="id"
+                     editMode="row"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.supplierName">
+                            <span *ngIf="!(rowData.status && rowData.status >= 3)">
+                                {{ rowData.supplierName }}
+                            </span>
+                            <a *ngIf="rowData.status && rowData.status >= 3"
+                               href="javascript:;"
+                               (click)="viewSupplierProfile(rowData)">
+                                {{ rowData.supplierName }}
+                            </a>
+                        </td>
+                        <td [title]="rowData.supplierTaxCode">
+                            {{ rowData.supplierTaxCode }}
+                        </td>
+                        <td [title]="rowData.email">
+                            {{ rowData.email }}
+                        </td>
+                        <td [title]="rowData.description">
+                            {{ rowData.description }}
+                        </td>
+                        <td [title]="rowData.scores">
+                            {{ rowData.scores }}
+                        </td>
+                        <td class="text-center">
+                            <mat-checkbox class="example-margin"
+                                          (click)="$event.preventDefault()"
+                                          [checked]="rowData.requestForQuotation == 1"
+                                          [color]="'primary'">
+                            </mat-checkbox>
+                        </td>
+                        <td class="text-center">
+                            <mat-checkbox class="example-margin"
+                                          (click)="$event.preventDefault()"
+                                          [checked]="rowData.auction == 1"
+                                          [color]="'primary'">
+                            </mat-checkbox>
+                        </td>
+                        <td class="text-center">
+                            <mat-checkbox class="example-margin"
+                                          (click)="$event.preventDefault()"
+                                          [checked]="rowData.wonTheBid == 1"
+                                          [color]="'primary'">
+                            </mat-checkbox>
+                        </td>
+                        <td [title]="rowData.status === 1 ? rowData.reasonReject : ''">
+                            <span [ngClass]="{'text-danger': rowData.status === 1}">
+                                {{(rowData.status | label:arrSupplierProfileStatus) | translate}}
+                            </span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="bidsData.listBidsSupplierProfile && bidsData.listBidsSupplierProfile.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+        <h5 class="kt-margin-t-30 kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{'Báo giá'| translate}}
+        </h5>
+        <div class="mat-table__wrapper">
+            <p-table [value]="bidsData.listBidsItem"
+                     [columns]="arrHeaderBidsItem"
+                     dataKey="id"
+                     editMode="row"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+
+                <ng-template pTemplate="header"
+                             let-columns>
+                    <tr class="background-table-header">
+                        <th *ngFor="let col of columns"
+                            [width]="col.width"
+                            class="align-center"
+                            [ngClass]="col.class">
+                            {{col.title | translate}}
+                            <span class="lbl-required"
+                                  *ngIf="col.isRequired">
+                            </span>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex"
+                             let-editing="editing">
+                    <tr [pEditableRow]="rowData">
+                        <td class="text-center"
+                            [title]="rowIndex + 1">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.itemName">
+                            {{ rowData.itemName }}
+                        </td>
+                        <td [title]="rowData.description">
+                            {{ rowData.description }}
+                        </td>
+                        <td [title]="rowData.quantity">
+                            {{ rowData.quantity }}
+                        </td>
+                        <td [title]="rowData.unit">
+                            {{ rowData.unit }}
+                        </td>
+                        <td [title]="rowData.otherRequest">
+                            {{ rowData.otherRequest }}
+                        </td>
+                        <td>
+                            {{ rowData.expirationDate | date: mainConfig.formatJustDate }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="bidsData.listBidsSupplierProfile && bidsData.listBidsSupplierProfile.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+
+<app-bids-management-view-supplier-profile #bidsManagementViewSupplierProfile>
+</app-bids-management-view-supplier-profile>

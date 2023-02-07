@@ -1,0 +1,212 @@
+<crud-dialog [dialogRef]="dialogRef"
+			 [form]="form"
+			 (save)="onBtnSaveClick()"
+			 (cancel)="onBtnCancelClick()">
+	<form autocomplete="off"
+		  #form="ngForm"
+		  id="role-edit">
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.ITEM_CODE' | translate }}</label>
+				<select-sync-source name="itemCode"
+									categoryType="item"
+									placeholder="PURCHASE_PLAN.ITEM.ITEM_CODE"
+									header="MENU.CATEGORY.ITEM"
+									bindValue="code"
+									[columns]="headerItems"
+									[service]="itemService"
+									[requestPayload]="itemRequestPayload"
+									(change)="onChangeItemCode($event)"
+									[width]="'65vw'"
+									[(ngModel)]="dialogRef.input.rowEditing.itemCodeDto">
+				</select-sync-source>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.PART_NO' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="partNo"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.PART_NO' | translate }}"
+					   [(ngModel)]="dialogRef.input.rowEditing.partNo">
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.ITEM_NAME' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="itemName"
+					   maxlength="500"
+					   validateTooltip
+					   [validateForm]="form"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.ITEM_NAME' | translate }}"
+					   [(ngModel)]="dialogRef.input.rowEditing.itemName"
+					   required>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.ITEM_TYPE' | translate }}</label>
+				<select class="form-control"
+						name="itemType"
+						[(ngModel)]="dialogRef.input.rowEditing.itemType">
+					<option [ngValue]="undefined"
+							selected>{{ 'COMMON.ALL' | translate }}</option>
+					<option *ngFor="let item of itemTypes"
+							[value]="item.label">{{item.label | translate }}</option>
+				</select>
+
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">
+					{{ 'PURCHASE_PLAN.ITEM.QUANTITY' | translate }}
+				</label>
+				<input type="number"
+					   min="0"
+					   class="form-control"
+					   name="quantity"
+					   validateTooltip
+					   [validateForm]="form"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.QUANTITY' | translate }}"
+					   [(ngModel)]="dialogRef.input.rowEditing.quantity"
+					   required>
+
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.UNIT' | translate }}</label>
+				<input type="text"
+					   class="form-control"
+					   name="unit"
+					   validateTooltip
+					   [validateForm]="form"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.UNIT' | translate }}"
+					   [disabled]="dialogRef.input.rowEditing.itemId"
+					   [(ngModel)]="dialogRef.input.rowEditing.unit"
+					   required>
+
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.CURRENCY' | translate }}</label>
+				<ng-select-async name="currency"
+								 bindLabel="code"
+								 placeholder="{{ 'PURCHASE_PLAN.ITEM.CURRENCY' | translate }}"
+								 [multiple]="false"
+								 validateTooltip
+								 [validateForm]="form"
+								 [closeOnSelect]="true"
+								 [service]="currencyService"
+								 (change)="dialogRef.input.rowEditing.currency = dialogRef.input.rowEditing.currencyDto?.code"
+								 [(ngModel)]="dialogRef.input.rowEditing.currencyDto"
+								 required>
+				</ng-select-async>
+			</div>
+			<div *ngIf="allowViewPrice"
+				 class="col-md-3 mb-3">
+				<label class="lbl-required">
+					{{ 'PURCHASE_PLAN.ITEM.EXPECTED_PRICE' | translate}}
+				</label>
+				<input type="text"
+					   class="form-control"
+					   name="expectedPrice"
+					   numberMask
+					   validateTooltip
+					   [validateForm]="form"
+					   (change)="onChangeExpectedPrice(dialogRef.input.rowEditing.expectedPrice)"
+					   [(ngModel)]="dialogRef.input.rowEditing.expectedPrice"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.EXPECTED_PRICE' | translate }}"
+					   required>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">
+					{{ 'PURCHASE_PLAN.ITEM.EXPECTED_DATE' | translate }}
+				</label>
+				<input-date name="expectedDate"
+							required
+							validateTooltip
+							[validateForm]="form"
+							[(ngModel)]="dialogRef.input.rowEditing.expectedDate">
+				</input-date>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.SUPPLIER_NAME' | translate }}</label>
+				<select-sync-source name="supplier"
+									placeholder="Nhà cung cấp"
+									header="MENU.CATEGORY.SUPPLIER"
+									bindValue="name"
+									suffixLabel="code"
+									searchField="generalFilter"
+									[columns]="headerSuppliers"
+									[width]="'70vw'"
+									[service]="supplierService"
+									[requestPayload]="supplierRequestPayload"
+									(change)="onChangeSupplier($event)"
+									[width]="'65vw'"
+									[(ngModel)]="dialogRef.input.rowEditing.supplierNameDto">
+				</select-sync-source>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.PRODUCER_NAME' | translate }}</label>
+				<ng-select-async name="producerName"
+								 bindLabel="name"
+								 suffixLabel="acronymName"
+								 placeholder="{{ 'PURCHASE_PLAN.ITEM.PRODUCER_NAME' | translate }}"
+								 [multiple]="false"
+								 [closeOnSelect]="true"
+								 [service]="brandService"
+								 (change)="onChangeProductName($event)"
+								 [(ngModel)]="dialogRef.input.rowEditing.producerNameDto">
+				</ng-select-async>
+				<validate-message [form]="form"
+								  controlName="producerName"></validate-message>
+
+			</div>
+			<div class="col-md-3 mb-3">
+				<label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.GUARANTEE' | translate }}</label>
+				<validate-message [form]="form"
+								  controlName="guarantee"></validate-message>
+				<input type="number"
+					   class="form-control"
+					   name="guarantee"
+					   min="0"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.GUARANTEE' | translate }}"
+					   [(ngModel)]="dialogRef.input.rowEditing.guarantee"
+					   required>
+			</div>
+		</div>
+
+		<div class="form-row">
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' | translate }}</label>
+				<validate-message [form]="form"
+								  controlName="deliveryLocation"></validate-message>
+				<config-list-control name="deliveryLocation"
+									 type="DELIVERY_LOCATION"
+									 header="{{ 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' | translate }}"
+									 bindValue="code"
+									 [(ngModel)]="dialogRef.input.rowEditing.deliveryLocation">
+				</config-list-control>
+			</div>
+			<div class="col-md-3 mb-3">
+				<label>{{ 'PURCHASE_PLAN.ITEM.NOTE' | translate }}</label>
+				<validate-message [form]="form"
+								  controlName="note"></validate-message>
+				<input type="text"
+					   class="form-control"
+					   name="note"
+					   placeholder="{{ 'PURCHASE_PLAN.ITEM.NOTE' | translate }}"
+					   [(ngModel)]="dialogRef.input.rowEditing.note">
+			</div>
+			<div class="col-md-3 mb-3"
+				 *ngIf="dialogRef.input.rowEditing.itemType === 'SRV'"
+				 style="text-align: center;">
+				<label></label>
+				<label>
+					<mat-checkbox name="isUpdateSrv"
+								  class="example-margin"
+								  [ngModel]="dialogRef.input.rowEditing.isUpdateSrv"
+								  (change)="ongChangeIsUpdateSrv($event)"
+								  (ngModelChange)="dialogRef.input.rowEditing.isUpdateSrv = $event ? 1 : 0"
+								  [checked]="dialogRef.input.rowEditing.isUpdateSrv == 1"
+								  [color]="'primary'"> {{ 'Update SRV' | translate }}
+					</mat-checkbox>
+				</label>
+			</div>
+		</div>
+	</form>
+</crud-dialog>

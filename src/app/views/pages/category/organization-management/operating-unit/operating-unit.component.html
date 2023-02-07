@@ -1,0 +1,64 @@
+<div class="row kt-margin-b-15">
+    <div class="col-md-6">
+        <mat-form-field class="input-general-filter">
+            <input matInput
+                   #searchInput
+                   (keydown.enter)="initData()"
+                   [(ngModel)]="request.generalFilter"
+                   placeholder="Search ..."
+                   class="mat-form-field mat-form-field-fluid">
+            <mat-hint align="start">
+            </mat-hint>
+        </mat-form-field>
+    </div>
+    <div class="col-md-6">
+        <div class="mat-table__bottom">
+            <mat-spinner [diameter]="20"
+                         *ngIf="operatingUnitService.isLoading$ | async"></mat-spinner>
+            <mat-paginator [pageSize]="10"
+                           [pageSizeOptions]="[10,30,50]"
+                           [length]="dataSource.paginatorTotal"
+                           [showFirstLastButtons]="true"></mat-paginator>
+        </div>
+    </div>
+</div>
+<div class="mat-table__wrapper">
+    <p-table [value]="dataSource.items"
+             [columns]="headers"
+             class="table-no-wrap"
+             tableStyleClass="table-no-wrap">
+
+        <ng-template pTemplate="header"
+                     let-columns>
+            <tr class="background-table-header">
+                <th *ngFor="let col of columns"
+                    [width]="col.width"
+                    class="align-center"
+                    [ngClass]="col.class">
+                    {{col.title | translate}}
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex"
+                     let-editing="editing">
+            <tr [pEditableRow]="rowData">
+                <td class="text-center"
+                    [title]="request.pageSize * request.pageIndex + rowIndex + 1">
+                    {{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+                </td>
+                <td>{{ rowData.ouId }}</td>
+                <td>{{ rowData.code }}</td>
+                <td style="text-align: left !important;">{{ rowData.name }}</td>
+                <td style="text-align: left !important;">{{ rowData.address }}</td>
+                <td>{{ rowData.syncSource }}</td>
+                <td>{{ rowData.syncAt | date: mainConfig.formatFullDate }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <div *ngIf="dataSource.items && dataSource.items.length === 0">
+        <view-empty></view-empty>
+    </div>
+</div>

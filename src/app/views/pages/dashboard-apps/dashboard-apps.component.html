@@ -1,0 +1,110 @@
+<div class="row">
+    <div class="col-md-2">
+        <a [routerLink]="['../../management/purchase-plan/list']">
+            <p-card header="Kế hoạch mua hàng"
+                    subheader="FIS e-Purchase Plan"
+                    [style]="{width: '100%'}"
+                    styleClass="p-card-shadow mb-4">
+                <ng-template pTemplate="header">
+                    <img alt="Card"
+                         src="{{srcImage}}">
+                </ng-template>
+                <p></p>
+            </p-card>
+        </a>
+    </div>
+
+    <div class="col-md-2 col-sm-3">
+        <a [routerLink]="['../../management/purchase-request/list']">
+            <p-card header="Yêu cầu mua hàng"
+                    subheader="FIS e-Purchase Request"
+                    [style]="{width: '100%'}"
+                    styleClass="p-card-shadow mb-4">
+                <ng-template pTemplate="header">
+                    <img alt="Card"
+                         src="{{srcImage}}">
+                </ng-template>
+                <p></p>
+            </p-card>
+        </a>
+    </div>
+
+    <div class="col-md-2 col-sm-3">
+        <a [routerLink]="['../../management/purchase-order/list']">
+            <p-card header="Quản lý đơn hàng"
+                    subheader="FIS e-Purchase Order"
+                    [style]="{width: '100%'}"
+                    styleClass="p-card-shadow mb-4">
+                <ng-template pTemplate="header">
+                    <img alt="Card"
+                         src="{{srcImage}}">
+                </ng-template>
+                <p></p>
+            </p-card>
+        </a>
+    </div>
+
+    <div class="col-md-2 col-sm-3">
+        <a [routerLink]="['../../management/purchase-invoice/list']">
+            <p-card header="Hóa đơn mua hàng"
+                    subheader="FIS e-Purchase Invoice"
+                    [style]="{width: '100%'}"
+                    styleClass="p-card-shadow mb-4">
+                <ng-template pTemplate="header">
+                    <img alt="Card"
+                         src="{{srcImage}}">
+                </ng-template>
+                <p></p>
+            </p-card>
+        </a>
+    </div>
+
+    <div class="col-md-2 col-sm-3">
+        <a [routerLink]="['../../management/shipment/list']">
+            <p-card header="Lô hàng"
+                    subheader="FIS e-Shipment"
+                    [style]="{width: '100%'}"
+                    styleClass="p-card-shadow mb-4">
+                <ng-template pTemplate="header">
+                    <img alt="Card"
+                         src="{{srcImage}}">
+                </ng-template>
+                <p></p>
+            </p-card>
+        </a>
+    </div>
+
+    <div class="col-md-2 col-sm-3">
+        <a href="javascript:;">
+            <p-card header="Báo giá - Đấu thầu"
+                    subheader="FIS e-Quotation-Bidding"
+                    [style]="{width: '100%'}"
+                    styleClass="p-card-shadow mb-4">
+                <ng-template pTemplate="header">
+                    <img alt="Card"
+                         src="{{srcImage}}">
+                </ng-template>
+                <p></p>
+            </p-card>
+        </a>
+    </div>
+</div>
+
+
+<kt-portlet>
+    <kt-portlet-body [class]="'kt-portlet__body--fit'">
+        <div class="row row-no-padding row-col-separator-xl">
+            <div class="col-xl-4">
+                <kt-widget1></kt-widget1>
+            </div>
+            <div class="col-xl-4">
+                <kt-widget14 [title]="'Daily Sales'"
+                             [desc]="'Check out each collumn for more details'"></kt-widget14>
+            </div>
+            <div class="col-xl-4">
+                <kt-widget14 [title]="'Revenue Change'"
+                             [desc]="'Revenue change breakdown by cities'"></kt-widget14>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

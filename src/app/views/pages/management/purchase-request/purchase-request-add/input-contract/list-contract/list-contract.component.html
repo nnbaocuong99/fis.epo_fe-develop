@@ -1,0 +1,35 @@
+<div class="mat-table__wrapper">
+    <p-table [value]="dataSource.items"
+             selectionMode="single"
+             [(selection)]="selectedContract"
+             dataKey="id"
+             tableStyleClass="table-no-wrap">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of cols"
+                    [width]="col.width">{{ col.title | translate }}</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-rowData
+                     let-rowIndex="rowIndex">
+            <tr [pSelectableRow]="rowData">
+                <td>{{ paginator.pageIndex * 10 + rowIndex + 1 }}</td>
+                <td [title]="rowData.numberOfContract">{{ rowData.numberOfContract }}</td>
+                <td [title]="rowData.description">{{ rowData.description }}</td>
+                <td [title]="rowData.signDate">{{ rowData.signDate | date:'dd/MM/yyyy' }}</td>
+                <td [title]="rowData.endDate">{{ rowData.endDate | date:'dd/MM/yyyy' }}</td>
+                <td [title]="rowData.am">{{ rowData.am }}</td>
+                <td [title]="rowData.pm">{{ rowData.pm }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<div class="mat-table__bottom">
+    <mat-spinner [diameter]="20"
+                 *ngIf="contractService.isLoading$ | async"></mat-spinner>
+    <mat-paginator [pageSize]="10"
+                   [length]="dataSource.paginatorTotal"
+                   [hidePageSize]="true"
+                   [showFirstLastButtons]="true"></mat-paginator>
+</div>

@@ -1,0 +1,146 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'PURCHASE_PLAN.HEADER_VIEW' | translate"
+                       [viewLoading$]="purchasePlanService.isLoading$">
+        <ng-container ktPortletTools>
+
+            <a *ngIf="purchasePlan.id && purchasePlan.overSixWeeks === 1 && (purchasePlan.status === 6 || (!purchasePlan.sproTicketId && purchasePlan.status !== ppStatus[3].value))"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               title="{{ 'COMMON.SUBMIT_APPROVAL' | translate }}"
+               (click)="onBtnCreateTicket()">
+                <i class="fal fa-paper-plane"></i> {{ 'COMMON.SUBMIT_APPROVAL' | translate }}</a>
+
+            <a *ngIf="purchasePlan?.status !== 2 && purchasePlan?.status !== 3"
+               class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="viewHistory()">
+                <i class="fas fa-history"></i>
+                <span class="kt-hidden-mobile">{{ 'PURCHASE_ORDER.VIEW_HISTORY' | translate }}</span>
+            </a>
+
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <business-process-management *ngIf="purchasePlan.id"
+                                     #bpm
+                                     titleOptionProcess="{{ 'Xem xét và phê duyệt Kế hoạch đặt hàng' | translate }}"
+                                     module="PURCHASE_PLAN"
+                                     [objectData]="purchasePlan"
+                                     [items]="purchasePlanItem.dataSource.treeNodes"
+                                     (createTicketSuccess)="createTicketSuccess($event)"
+                                     (cancelTicketSuccess)="updateStatus(ppStatus[6].value)"
+                                     [file]="file">
+        </business-process-management>
+
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{ 'PURCHASE_PLAN.GENERAL_INFO'| translate }}
+        </h5>
+
+        <table class="table table-no-wrap">
+            <tbody>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CODE'| translate }}:
+                        <b>{{ purchasePlan?.code }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.PROJECT_CODE' | translate }}:
+                        <b>{{ purchasePlan?.projectCode }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_NO' | translate }}:
+                        <b>{{ purchasePlan?.contractNo }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_TYPE' | translate }}:
+                        <b>{{ purchasePlan?.contractType }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_DESCRIPTION' | translate }}:
+                        <b>{{ purchasePlan?.contractDescription }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}:
+                        <b>{{ purchasePlan?.customer }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.AM_ACCOUNT' | translate }}:
+                        <b>{{ purchasePlan?.amAccount }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.PM_ACCOUNT' | translate }}:
+                        <b>{{ purchasePlan?.pmAccount }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CEO_COO' | translate }}:
+                        <b>{{ purchasePlan?.ceoCoo }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.SIGN_DATE' | translate }}:
+                        <b>{{ purchasePlan?.signDate | date: mainConfig.formatDateList }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.END_DATE' | translate }}:
+                        <b>{{ purchasePlan?.endDate | date: mainConfig.formatDateList }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.NOTE' | translate }}:
+                        <b>{{ purchasePlan?.note }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'CO'| translate }}:
+                        <b>{{(purchasePlan?.hasCo ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO')| translate }}</b>
+                    </td>
+                    <td style="width: 25%"> {{ 'CQ'| translate }}:
+                        <b>{{ (purchasePlan?.hasCq ? 'COMMON.ANSWER.YES' : 'COMMON.ANSWER.NO')| translate}}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CREATOR'| translate }}:
+                        <b>{{ purchasePlan?.createdByName }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CURRENCY' | translate }}:
+                        <b>{{ purchasePlan?.currency }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.CONTRACT_TOTAL_AMOUNT' | translate }}:
+                        <b>{{ purchasePlan?.contractTotalAmount }}</b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.OVER_SIX_WEEKS' | translate }}:
+                        <b>{{ purchasePlan?.overSixWeeks ?
+                            ('COMMON.ANSWER.YES'| translate) : ('COMMON.ANSWER.NO'| translate)}}
+                        </b>
+                    </td>
+                    <td style="width: 25%">{{ 'PURCHASE_PLAN.PEOPLE_INVOLVEL' | translate }}:
+                        <b>{{ purchasePlan?.peopleInvolved }}</b>
+                    </td>
+                    <td style="width: 25%"
+                        [title]="file?.name">{{ 'COMMON.ATTACH_FILE'| translate }}:
+                        <div class="btn-link"
+                             style="cursor: pointer;"
+                             (click)="onBtnDownloadClick()">
+                            <b>{{ file?.name }}</b>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i> {{ 'PURCHASE_PLAN.ITEM_INFO'| translate }}
+        </h5>
+        <app-purchase-plan-item #purchasePlanItem
+                                [editTable]="false"
+                                [allowViewPrice]="allowViewPrice"></app-purchase-plan-item>
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-purchase-plan-history #purchasePlanHistory></app-purchase-plan-history>

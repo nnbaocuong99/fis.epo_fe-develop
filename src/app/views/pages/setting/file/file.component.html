@@ -1,0 +1,170 @@
+<!-- <p>file works!</p> -->
+<!-- <button (click)="dlgUpload.open()">A</button> -->
+
+<!-- [message]="uploadMessage | translate" -->
+<!-- (onupload)="performUpload($event, searchEntity)" -->
+<upload-file #dlgUpload
+             accept=".xlsx"></upload-file>
+
+<div class="row">
+    <div class="col-lg-4">
+        <kt-portlet>
+            <kt-portlet-header [title]="'Explorer'"
+                               [class]="'kt-portlet__head--lg'"
+                               [viewLoading$]="fileService.isLoading$">
+            </kt-portlet-header>
+
+            <kt-portlet-body>
+                <p-tree [value]="treeData"
+                        selectionMode="single"
+                        [(selection)]="selectedFolder"
+                        (onNodeSelect)="onNodeSelect($event)"
+                        [contextMenu]="cm"></p-tree>
+                <p-contextMenu #cm
+                               appendTo="body"
+                               [model]="menuItems"></p-contextMenu>
+            </kt-portlet-body>
+        </kt-portlet>
+    </div>
+    <div class="col-lg-8">
+        <kt-portlet>
+            <kt-portlet-header [title]="'Files'"
+                               [class]="'kt-portlet__head--lg'"
+                               [viewLoading$]="fileService.isLoading$">
+                <ng-container ktPortletTools>
+                    <button class="btn btn-primary"
+                            matTooltip="Create new Organization"
+                            (click)="onBtnAddFileClick()">Add</button>
+                </ng-container>
+            </kt-portlet-header>
+            <kt-portlet-body>
+                <div class="row">
+                    <div class="col-md-4">
+                        <mat-form-field class="input-general-filter">
+                            <input matInput
+                                   #searchInput
+                                   (keydown.enter)="initData()"
+                                   [(ngModel)]="request.name"
+                                   placeholder="Search ..."
+                                   class="mat-form-field mat-form-field-fluid">
+                            <mat-hint align="start">
+                                <strong>Search in all fields</strong>
+                            </mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-8">
+                        <mat-paginator [pageSize]="10"
+                                       [hidePageSize]="true"
+                                       [length]="dataSource.paginatorTotal"
+                                       [showFirstLastButtons]="true"></mat-paginator>
+                    </div>
+                </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th *ngFor="let header of headers"
+                                [width]="header.width">{{ header.title | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let rowData of dataSource.items; index as i;">
+                            <td>{{ i + 1 }}</td>
+                            <td class="header-link"
+                                (click)="onBtnDownloadClick(rowData)">{{ rowData.name }}</td>
+                            <td>{{ rowData.extension }}</td>
+                            <td>{{ rowData.note }}</td>
+                            <td class="action">
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        matTooltip="More actions">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item
+                                            (click)="onBtnDeleteClick(rowData.id)">
+                                        <span>Delete</span>
+                                    </button>
+                                </mat-menu>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </kt-portlet-body>
+        </kt-portlet>
+    </div>
+</div>
+
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '782px', minWidth: '200px'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [focusOnShow]="false"
+          appendTo="body">
+    <p-header>
+        <i class="fab fa-dropbox"></i> {{ 'Upload file to server' }}
+    </p-header>
+    <form autocomplete="off"
+          #form="ngForm">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>Module</label>
+                    <ng-select name="module"
+                               [items]="modules"
+                               [addTag]="true"
+                               [(ngModel)]="newFile.module">
+                    </ng-select>
+                    <small>Ex: Template\PurchasePlan</small>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>File</label>
+                    <div class="input-group">
+                        <input name="file"
+                               type="text"
+                               [(ngModel)]="newFile.name"
+                               (click)="onInputNameFileClick()"
+                               readonly
+                               class="form-control">
+                        <div class="input-group-append">
+                            <label class="input-group-text input-group-right attach-button"
+                                   id="control-upload"
+                                   for="input-file">
+                                <i class="fal fa-ellipsis-v"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>Note</label>
+                    <textarea name="note"
+                              type="text"
+                              class="form-control"
+                              [(ngModel)]="newFile.note"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+    <p-footer>
+        <button class="btn btn-sm btn-secondary mr-2"
+                (click)="onBtnCancelClick()">Cancel</button>
+        <button class="btn btn-sm btn-success"
+                (click)="onBtnPerformClick()">Add file</button>
+    </p-footer>
+</p-dialog>
+
+<input #file
+       id="input-file"
+       name="input-file"
+       style="display:none"
+       class="form-control"
+       (change)="onFilesInputChanged(file.files)"
+       type="file">

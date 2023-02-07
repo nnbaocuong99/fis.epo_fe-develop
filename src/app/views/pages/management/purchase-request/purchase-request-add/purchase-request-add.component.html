@@ -1,0 +1,598 @@
+<kt-portlet>
+	<kt-portlet-header icon="fal fa-shopping-cart"
+					   [title]="formTitle | translate"
+					   [class]="'kt-portlet__head--lg'"
+					   [viewLoading$]="purchaseRequestService.isLoading$">
+		<ng-container ktPortletTools>
+			<a (click)="onBtnCancelClick()"
+			   class="btn btn-secondary kt-margin-r-10"
+			   mat-raised-button
+			   *ngIf="formData.isCancel">
+				<i class="la la-arrow-left"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+			</a>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<!--begin: Wizard -->
+		<div #wizard
+			 class="kt-wizard-v4"
+			 id="kt_wizard_v4"
+			 data-ktwizard-state="step-first">
+			<!--begin: Form Wizard Nav -->
+			<div class="kt-wizard-v4__nav">
+				<div class="kt-wizard-v4__nav-items">
+					<a class="kt-wizard-v4__nav-item"
+					   *ngFor="let s of steps; index as i;"
+					   href="javascript:;"
+					   data-ktwizard-type="step"
+					   [attr.data-ktwizard-state]="step == s.value?'current':''"
+					   (click)="onChangeStepClick(s.value)">
+						<div class="kt-wizard-v4__nav-body">
+							<div class="kt-wizard-v4__nav-number">
+								{{s.value}}
+							</div>
+							<div class="kt-wizard-v4__nav-label">
+								<div class="kt-wizard-v4__nav-label-title"
+									 [title]="s.label | translate">
+									{{s.label | translate}}
+								</div>
+								<div class="kt-wizard-v4__nav-label-desc"
+									 [title]="s.description | translate">
+									{{s.description| translate}}
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+			</div>
+			<!--end: Form Wizard Nav -->
+
+			<div class="kt-portlet__body kt-portlet__body--fit">
+				<div class="kt-grid">
+					<div>
+						<!-- STEP 1 -->
+						<div class="kt-wizard-v4__content"
+							 data-ktwizard-type="step-content"
+							 [attr.data-ktwizard-state]="step == 1?'current':''">
+							<p-fieldset legend="{{ 'COMMON.FILTER' | translate }}"
+										[toggleable]="true"
+										[collapsed]="true">
+								<form>
+									<div class="form-row">
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.PROJECT_CODE'| translate}}</label>
+											<ng-select-async name="projectCode"
+															 bindLabel="code"
+															 suffixLabel="name"
+															 placeholder="{{'PURCHASE_PLAN.PROJECT_CODE'| translate}}"
+															 [multiple]="false"
+															 [closeOnSelect]="true"
+															 [service]="projectService"
+															 (change)="request.projectCode = request.projectCodeDto?.code"
+															 [(ngModel)]="request.projectCodeDto">
+											</ng-select-async>
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.CODE'| translate}}</label>
+											<ng-select-async name="code"
+															 bindLabel="code"
+															 placeholder="{{'PURCHASE_PLAN.CODE'| translate}}"
+															 [multiple]="false"
+															 [closeOnSelect]="true"
+															 [service]="purchasePlanService"
+															 (change)="request.code = request.codeDto?.code"
+															 [(ngModel)]="request.codeDto">
+											</ng-select-async>
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.AM_ACCOUNT'| translate}}</label>
+											<input type="text"
+												   class="form-control"
+												   name="amAccount"
+												   placeholder="{{'PURCHASE_PLAN.AM_ACCOUNT'| translate}}"
+												   [(ngModel)]="request.amAccount">
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.PM_ACCOUNT'| translate}}</label>
+											<input type="text"
+												   class="form-control"
+												   name="pmAccount"
+												   placeholder="{{'PURCHASE_PLAN.PM_ACCOUNT'| translate}}"
+												   [(ngModel)]="request.pmAccount">
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.CONTRACT_NO'| translate}}</label>
+											<input type="text"
+												   class="form-control"
+												   name="contractNo"
+												   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_NO' | translate }}"
+												   [(ngModel)]="request.contractNo"
+												   placement="bottom-right"
+												   ngbTooltip="{{ request.contractNo }}">
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.CONTRACT_TYPE'| translate}}</label>
+											<input type="text"
+												   class="form-control"
+												   name="contractType"
+												   placeholder="{{ 'PURCHASE_PLAN.CONTRACT_TYPE' | translate }}"
+												   [(ngModel)]="request.contractType">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.CUSTOMER'| translate}}</label>
+											<input type="text"
+												   class="form-control"
+												   name="customer"
+												   placeholder="{{ 'PURCHASE_PLAN.CUSTOMER' | translate }}"
+												   [(ngModel)]="request.customer">
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.FROM_DATE'| translate}}</label>
+											<input-date name="fromDate"
+														[(ngModel)]="request.fromDate">
+											</input-date>
+										</div>
+										<div class="col-md-2 mb-3">
+											<label>{{'PURCHASE_PLAN.TO_DATE'| translate}}</label>
+											<input-date name="toDate"
+														[(ngModel)]="request.toDate">
+											</input-date>
+										</div>
+									</div>
+									<div class="form-row">
+										<button type="submit"
+												class="btn btn-sm btn-label-brand ml-2"
+												(click)="onBtnSearchClick()">{{ 'COMMON.GO' | translate
+											}}</button>
+										<button type="reset"
+												(click)="onBtnResetSearchClick()"
+												class="btn btn-sm btn-label-brand ml-2">Reset</button>
+									</div>
+								</form>
+							</p-fieldset>
+							<br>
+							<ngb-tabset [justify]="'start'"
+										(tabChange)="onTabSelectPpChange($event)"
+										[activeId]="1">
+								<ngb-tab *ngFor="let tab of ppTabs"
+										 [id]="tab.value">
+									<ng-template ngbTabTitle>
+										<span>
+											{{ tab.label | translate }} <b>
+												<span [ngClass]="'badge badge-pill ' + tab.class"
+													  *ngIf="tab.count">{{ tab.count }}</span></b>
+										</span>
+									</ng-template>
+								</ngb-tab>
+							</ngb-tabset>
+							<div class="row">
+								<div class="col-md-6">
+									<!-- <mat-form-field class="input-general-filter">
+										<input matInput
+											   #searchInput
+											   (keyup)="initData()"
+											   [(ngModel)]="request.generalFilter"
+											   placeholder="Search ..."
+											   class="mat-form-field mat-form-field-fluid">
+										<mat-hint align="start">
+											<strong>Search in all fields</strong>
+										</mat-hint>
+									</mat-form-field> -->
+								</div>
+								<div class="col-md-6">
+									<mat-paginator [pageSize]="10"
+												   [pageSizeOptions]="[10, 30, 50]"
+												   [length]="dataSource.paginatorTotal"
+												   [showFirstLastButtons]="true"></mat-paginator>
+								</div>
+							</div>
+							<div class="mat-table__wrapper">
+								<p-table [value]="dataSource.items"
+										 selectionMode="single"
+										 [(selection)]="selectedPurchasePlan"
+										 dataKey="id"
+										 tableStyleClass="table-no-wrap">
+									<ng-template pTemplate="header">
+										<tr>
+											<th *ngFor="let col of headerPurchasePlans"
+												[width]="col.width">{{ col.title | translate }}</th>
+										</tr>
+									</ng-template>
+									<ng-template pTemplate="body"
+												 let-rowData
+												 let-rowIndex="rowIndex">
+										<tr [pSelectableRow]="rowData"
+											[ngClass]="(rowData.status === 0 || rowData.status === 5) || (rowData.status === 1 && rowData.quantityRemainTotal > 0) ? '': 'font-disabled' ">
+											<td>{{ paginator.pageIndex * 10 + rowIndex + 1 }}</td>
+											<td [title]="rowData.code"
+												class="header-link"><a
+												   [routerLink]="['../../../purchase-plan/list/view/', rowData.id]"
+												   target="_blank">
+													{{ rowData.code }}</a></td>
+											<td [title]="rowData.projectCode">{{ rowData.projectCode }}</td>
+											<td [title]="rowData.contractNo">{{ rowData.contractNo }}</td>
+											<td [title]="rowData.contractType">{{ rowData.contractType }}</td>
+											<td [title]="rowData.customer">{{ rowData.customer }}</td>
+											<td [title]="rowData.amAccount">{{ rowData.amAccount}}</td>
+											<td [title]="rowData.pmAccount">{{ rowData.pmAccount }}</td>
+											<td [title]="rowData.createdAt | date: mainConfig.formatDateList">
+												{{ rowData.createdAt | date: mainConfig.formatDateList}}</td>
+											<td style="max-width: 100px !important;"
+												title="{{ rowData.note }}">{{ rowData.note }}</td>
+											<td [title]="(rowData.status | label:ppStatus) | translate">
+												{{(rowData.status | label:ppStatus) | translate}}</td>
+										</tr>
+									</ng-template>
+								</p-table>
+							</div>
+							<div class="kt-margin-t-30">
+								<button class="btn btn-primary kt-margin-r-15"
+										title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+										(click)="onChangeStepClick(steps[1].value)"
+										mat-raised-button
+										color="primary">
+									<i class="la la-arrow-right"></i>
+									<span class="kt-hidden-mobile">{{ 'COMMON.NEXT' | translate }}</span>
+								</button>
+							</div>
+						</div>
+						<app-purchase-plan-view [dialogRef]="dialogRef"></app-purchase-plan-view>
+
+						<!-- STEP 2 -->
+						<div class="kt-wizard-v4__content"
+							 data-ktwizard-type="step-content"
+							 [attr.data-ktwizard-state]="step == 2?'current':''">
+							<form autocomplete="off"
+								  #form="ngForm"
+								  id="{{ formData.formId }}">
+
+								<h5 class="kt-margin-t-30 kt-margin-b-15">
+									<i class="fab fa-envira"></i> {{ 'PURCHASE_REQUEST.HEADER'| translate }}
+								</h5>
+								<div class="form-row">
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">Mã yêu cầu mua hàng</label>
+										<input type="text"
+											   class="form-control"
+											   name="prNo"
+											   placeholder="Mã yêu cầu mua hàng"
+											   [(ngModel)]="purchaseRequestData.prNo"
+											   disabled
+											   required>
+										<validate-message [form]="form"
+														  controlName="prNo"></validate-message>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">{{ 'PURCHASE_REQUEST.PR_TYPE' | translate }}</label>
+										<select name="prTypeTemp"
+												class="form-control"
+												placeholder="Loại yêu cầu mua hàng"
+												[(ngModel)]="purchaseRequestData.prTypeTemp"
+												(change)="onChangeSelectPrType($event.target.value)"
+												required>
+											<option *ngFor="let item of prTypeTemp"
+													[value]="item.value">{{ item.label | translate }}</option>
+										</select>
+										<validate-message [form]="form"
+														  controlName="prTypeTemp"></validate-message>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">Tình trạng hợp đồng</label>
+										<select name="prType"
+												class="form-control"
+												placeholder="Tình trạng hợp đồng"
+												[(ngModel)]="purchaseRequestData.prType"
+												required>
+											<option *ngFor="let item of prContractInfo"
+													[value]="item.value">{{item.label | translate }}</option>
+										</select>
+										<validate-message [form]="form"
+														  controlName="prType"></validate-message>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">Mã dự án</label>
+										<input type="text"
+											   class="form-control"
+											   name="projectCode"
+											   placeholder="Mã dự án"
+											   [(ngModel)]="purchaseRequestData.projectCode"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">{{ 'PURCHASE_REQUEST.LEGAL' | translate }}</label>
+										<select-sync-source name="legal"
+															placeholder="{{ 'PURCHASE_REQUEST.LEGAL' | translate }}"
+															header="Pháp nhân"
+															bindValue="code"
+															[columns]="headerOperatingUnit"
+															[width]="'70vw'"
+															[service]="operatingUnitService"
+															(change)="onChangeLegal($event)"
+															[(ngModel)]="purchaseRequestData.legalDto"
+															required>
+										</select-sync-source>
+										<validate-message [form]="form"
+														  controlName="legal"></validate-message>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">Đơn vị sử dụng</label>
+										<select-sync-source name="subDepartmentId"
+															placeholder="Đơn vị sử dụng"
+															header="Đơn vị sử dụng"
+															bindValue="name"
+															[columns]="headerDepartment"
+															[width]="'60vw'"
+															[service]="departmentService"
+															(change)="onChangeOrgApply($event)"
+															[requestPayload]="{ouId: purchaseRequestData.legal}"
+															[(ngModel)]="purchaseRequestData.orgApplyDto"
+															required>
+										</select-sync-source>
+										<validate-message [form]="form"
+														  controlName="subDepartmentId"></validate-message>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label> {{ 'PURCHASE_REQUEST.ORG_CODE' | translate }}</label>
+										<select-sync-source name="orgCode"
+															placeholder="PURCHASE_REQUEST.ORG_CODE"
+															header="MENU.CATEGORY.ORGANIZATION"
+															bindValue="code"
+															[columns]="headerOrg"
+															[width]="'60vw'"
+															[service]="organizationService"
+															[requestPayload]="{ouId: purchaseRequestData.legal}"
+															(change)="purchaseRequestData.orgCode = purchaseRequestData.orgCodeDto?.code"
+															[(ngModel)]="purchaseRequestData.orgCodeDto">
+										</select-sync-source>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>{{ 'COMMON.NOTE' | translate }}</label>
+										<textarea type="text"
+												  class="form-control"
+												  name="note"
+												  placeholder="{{ 'COMMON.NOTE' | translate }}"
+												  [(ngModel)]="purchaseRequestData.note"></textarea>
+									</div>
+								</div>
+								<div class="form-row">
+									<div class="col-md-2 mb-3">
+										<label style="display: block;">{{'PURCHASE_ORDER.CERT_ORIGIN_QUALITY'
+											|translate}}</label>
+										<span style="display: block;">
+											<mat-checkbox name="co"
+														  class="example-margin"
+														  [ngModel]="purchaseRequestData.hasCo"
+														  (ngModelChange)="purchaseRequestData.hasCo = $event ? 1 : 0"
+														  [checked]="purchaseRequestData.hasCo == 1"
+														  [color]="'primary'"> {{ 'PURCHASE_ORDER.CO' | translate }}
+											</mat-checkbox>
+										</span>
+										<span style="display: block;">
+											<mat-checkbox name="cq"
+														  class="example-margin"
+														  [ngModel]="purchaseRequestData.hasCq"
+														  (ngModelChange)="purchaseRequestData.hasCq = $event ? 1 : 0"
+														  [checked]="purchaseRequestData.hasCq == 1"
+														  [color]="'primary'"> {{ 'PURCHASE_ORDER.CQ' | translate }}
+											</mat-checkbox>
+										</span>
+									</div>
+								</div>
+
+								<h5 class="kt-margin-t-15 kt-margin-b-15">
+									<i class="fab fa-envira"></i> {{ 'PURCHASE_REQUEST.PR_CONTRACT_INFO'| translate }}
+								</h5>
+								<div class="form-row">
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate
+											}}</label>
+										<div class="input-group">
+											<input type="text"
+												   class="form-control"
+												   name="contractNo"
+												   placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}"
+												   [(ngModel)]="purchaseRequestData.contractNo"
+												   placement="bottom-right"
+												   ngbTooltip="{{ purchaseRequestData.contractNo }}"
+												   required>
+										</div>
+										<small class="text-validate">
+											Chú ý: Vui lòng nhập lại số hợp đồng đầu ra rút gọn
+										</small>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>Loại HĐ đầu ra</label>
+										<input type="text"
+											   class="form-control"
+											   name="contractType"
+											   placeholder="Loại HĐ đầu ra"
+											   [(ngModel)]="purchaseRequestData.contractType"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label class="lbl-required">Mô tả hợp đồng</label>
+										<input type="text"
+											   class="form-control"
+											   name="contractDescription"
+											   placeholder="Mô tả hợp đồng"
+											   [(ngModel)]="purchaseRequestData.contractDescription"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>Tên khách hàng</label>
+										<input type="text"
+											   class="form-control"
+											   name="customer"
+											   placeholder="Tên khách hàng"
+											   [(ngModel)]="purchaseRequestData.customer"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>{{ 'PURCHASE_REQUEST.AM' | translate }}</label>
+										<ng-select-async name="amAccount"
+														 bindLabel="userName"
+														 placeholder="{{ 'PURCHASE_REQUEST.AM' | translate }}"
+														 [multiple]="true"
+														 [closeOnSelect]="true"
+														 [service]="userService"
+														 [(ngModel)]="purchaseRequestData.amAccountDto"
+														 (change)="onChangeAmAccount($event)">
+										</ng-select-async>
+
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>{{ 'PURCHASE_REQUEST.PM' | translate }}</label>
+										<ng-select-async name="pmAccount"
+														 bindLabel="userName"
+														 placeholder="{{ 'PURCHASE_REQUEST.PM' | translate }}"
+														 [multiple]="true"
+														 [closeOnSelect]="true"
+														 [service]="userService"
+														 [(ngModel)]="purchaseRequestData.pmAccountDto"
+														 (ngModelChange)="onChangePmAccount($event)">
+										</ng-select-async>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>CEO/COO</label>
+										<input type="text"
+											   class="form-control"
+											   name="ceo"
+											   placeholder="CEO/COO"
+											   [(ngModel)]="purchaseRequestData.ceoCoo"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>Ngày ký hợp đồng</label>
+										<input type="text"
+											   class="form-control"
+											   name="contractStartDate"
+											   disabled
+											   placeholder="Ngày ký hợp đồng"
+											   [ngModel]="purchaseRequestData.signDate| date:'dd/MM/yyyy'">
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>Ngày kết thúc HĐ</label>
+										<input type="text"
+											   class="form-control"
+											   name="contractEndDate"
+											   disabled
+											   placeholder="Ngày kết thúc HĐ"
+											   [ngModel]="purchaseRequestData.endDate | date:'dd/MM/yyyy'">
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>{{ 'PURCHASE_REQUEST.CURRENCY' | translate }}</label>
+										<input type="text"
+											   name="currency"
+											   class="form-control"
+											   placeholder="{{ 'PURCHASE_REQUEST.CURRENCY' | translate }}"
+											   [(ngModel)]="purchaseRequestData.currency"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>{{ 'PURCHASE_REQUEST.CONTRACT_TOTAL_AMOUNT' | translate }}</label>
+										<input type="text"
+											   name="contractTotalAmount"
+											   class="form-control"
+											   numberMask
+											   placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_TOTAL_AMOUNT' | translate }}"
+											   [(ngModel)]="purchaseRequestData.contractTotalAmount"
+											   disabled>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label style="display: block;">
+											{{ 'PURCHASE_REQUEST.OVER_SIX_WEEKS' | translate }}</label>
+										<span class="ml-3">
+											<mat-checkbox name="overSixWeeks"
+														  class="example-margin"
+														  (click)="$event.preventDefault()"
+														  [checked]="purchaseRequestData.overSixWeeks == 1"
+														  [color]="'primary'">
+											</mat-checkbox>
+										</span>
+									</div>
+									<div class="col-md-2 mb-3">
+										<label>
+											{{'PURCHASE_REQUEST.PEOPLE_INVOLVEL' | translate}}
+										</label>
+										<ng-select-async name="peopleInvolved"
+														 bindLabel="userName"
+														 validateTooltip
+														 placeholder="{{'PURCHASE_REQUEST.PEOPLE_INVOLVEL' | translate}}"
+														 [multiple]="true"
+														 [service]="userService"
+														 [(ngModel)]="purchaseRequestData.peopleInvolvedDto"
+														 (ngModelChange)="onChangePeopleInvolved($event)">
+										</ng-select-async>
+									</div>
+								</div>
+
+								<div class="kt-margin-t-30">
+									<button class="btn btn-secondary kt-margin-r-15"
+											title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+											(click)="onChangeStepClick(steps[0].value)"
+											mat-raised-button>
+										<i class="la la-arrow-left"></i>
+										<span class="kt-hidden-mobile">{{ 'COMMON.PREVIOUS' | translate }}</span>
+									</button>
+									<button class="btn btn-primary kt-margin-r-15"
+											title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+											(click)="onChangeStepClick(steps[2].value)"
+											mat-raised-button
+											color="primary">
+										<i class="la la-arrow-right"></i>
+										<span class="kt-hidden-mobile">{{ 'COMMON.NEXT' | translate }}</span>
+									</button>
+								</div>
+							</form>
+						</div>
+
+						<!-- STEP 3 -->
+						<div class="kt-wizard-v4__content"
+							 data-ktwizard-type="step-content"
+							 [attr.data-ktwizard-state]="step == 3?'current':''">
+							<br>
+							<!-- <div class="row table-view"></div> -->
+							<app-purchase-request-item [selectedPurchasePlan]="selectedPurchasePlan"
+													   [purchaseRequestData]="purchaseRequestData"
+													   [isShowTableItem]="step === 3"
+													   [allowViewPrice]="allowViewPrice"
+													   (sendData)="getDataFromChildrenAndSave($event)"
+													   #purchaseRequestItem></app-purchase-request-item>
+							<div class="kt-margin-t-30">
+								<button class="btn btn-secondary kt-margin-r-15"
+										title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+										(click)="onChangeStepClick(steps[1].value)"
+										mat-raised-button>
+									<i class="la la-arrow-left"></i>
+									<span class="kt-hidden-mobile">{{ 'COMMON.PREVIOUS' | translate }}</span>
+								</button>
+								<button class="btn btn-primary kt-margin-r-15"
+										title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+										(click)="onChangeStepClick(steps[3].value)"
+										mat-raised-button
+										color="primary">
+									<i class="la la-arrow-right"></i>
+									<span class="kt-hidden-mobile">{{ 'COMMON.NEXT' | translate }}</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<!--end: Wizard -->
+	</kt-portlet-body>
+</kt-portlet>
+
+
+<p-confirmDialog #dlgConfirm
+				 header="Confirmation"
+				 appendTo="body"
+				 [baseZIndex]="10001"
+				 [key]="key"
+				 position="top"
+				 icon="pi pi-exclamation-triangle"></p-confirmDialog>

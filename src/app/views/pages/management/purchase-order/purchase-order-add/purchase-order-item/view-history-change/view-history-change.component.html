@@ -1,0 +1,43 @@
+<!-- Dialog confirm từ chối phê duyệt -->
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [style]="{width: '60vw'}"
+          [modal]="true"
+          [baseZIndex]="10000"
+          appendTo="body"
+          (onHide)="onHide()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'View response date change history'| translate }}
+    </p-header>
+    <table class="table table-hover"
+           *ngIf="dataSource && dataSource.length > 0">
+        <thead>
+            <tr>
+                <th title="No."
+                    [width]="'80px'">{{ 'No.' | translate }}</th>
+                <th title="Response date changed value"
+                    [width]="'150px'">{{ 'Response date changed value' | translate }}</th>
+                <th title="Note"
+                    [width]="'200px'">{{ 'Note' | translate }}</th>
+                <th title="Change at"
+                    [width]="'150px'">{{ 'Change at' | translate }}</th>
+                <th title="Change by"
+                    [width]="'200px'">{{ 'Change by' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let rowData of dataSource; index as i;">
+                <td title="{{ i + 1 }}">{{ i + 1 }}</td>
+                <td title="{{ rowData.content | date:'dd/MM/yyy' }}">{{ rowData.content | date:'dd/MM/yyy' }}</td>
+                <td title="{{ rowData.note }}">{{ rowData.note }}</td>
+                <td title="{{ rowData.createdAt | date:'dd/MM/yyy h:mm:ss a' }}">{{ rowData.createdAt | date:'dd/MM/yyyy h:mm:ss a' }}</td>
+                <td title="{{ rowData.createdByMail }}">{{ rowData.createdByMail }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <view-empty *ngIf="!dataSource || dataSource.length === 0"></view-empty>
+    <p-footer>
+        <button class="btn btn-label-dark btn-sm"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="dialogRef.hide()">{{ 'COMMON.CANCEL' | translate }}</button>
+    </p-footer>
+</p-dialog>

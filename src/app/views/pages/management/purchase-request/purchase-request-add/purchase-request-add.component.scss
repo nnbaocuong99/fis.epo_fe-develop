@@ -1,0 +1,98 @@
+@import "sass/pages/wizard/wizard-4";
+::ng-deep {
+	.process {
+		color: orange !important;
+	}
+	.cancel {
+		color: red;
+		font-weight: bold;
+		font-family: oppins, Helvetica, sans-serif;
+	}
+	.kt-wizard-v1__nav {
+		border-bottom: none !important;
+		overflow: auto !important;
+		.kt-wizard-v1__nav-items {
+			width: 100% !important;
+			min-width: 200px !important;
+			.ng-star-inserted {
+				padding: 1px 0 !important;
+			}
+			.kt-wizard-v1__nav-body {
+				padding: 10px 1rem !important;
+				background-color: #f8f8fb !important;
+				border-radius: 5px !important;
+				.kt-wizard-v1__nav-icon {
+					font-size: 20px !important;
+				}
+				.kt-wizard-v1__nav-label {
+					white-space: nowrap !important;
+					overflow: hidden !important;
+					text-overflow: ellipsis !important;
+					max-width: 140px !important;
+					font-size: 13px !important;
+				}
+			}
+		}
+	}
+	.content-action {
+		min-height: 180px !important;
+	}
+	.input-switch {
+		margin-top: 8px;
+	}
+	.p-paginator-bottom {
+		border-width: inherit !important;
+	}
+	.btn-add {
+		height: 153px;
+	}
+}
+
+::ng-deep {
+	.p-fieldset {
+		border: none;
+		margin-top: 15px;
+	}
+
+	.p-fieldset .p-fieldset-legend {
+		margin-bottom: 0;
+		border: none;
+		background: none;
+		width: 175px;
+	}
+
+	.p-fieldset.p-fieldset-toggleable .p-fieldset-legend:hover {
+		background: #e9ecef;
+		border-color: #dee2e6;
+		color: #495057;
+	}
+
+	.p-fieldset.p-fieldset-toggleable .p-fieldset-legend a .p-fieldset-toggler {
+		color: #0c4da2;
+	}
+
+	.p-fieldset-legend-text {
+		color: #0c4da2;
+		font-size: 1.25rem;
+		font-weight: 500;
+		font-family: "Quicksand", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+			sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	}
+}
+
+:host ::ng-deep .kt-portlet {
+	margin-bottom: none !important;
+}
+
+.input-group-right {
+	border-top-right-radius: 4px !important;
+	border-bottom-right-radius: 4px !important;
+}
+
+.table-view {
+	margin-top: 30px;
+}
+
+.table-view td b {
+	font-weight: 500;
+}

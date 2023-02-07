@@ -1,0 +1,86 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'REPORT.PO_MAN.TITLE' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="reportService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+                <form autocomplete="off"
+                      #formFilter="ngForm">
+
+
+                </form>
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-12 mb-3">
+                <h5>{{ 'REPORT.EXPORT' | translate }} </h5>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'FISx' | translate }}</label>
+                <select class="form-control"
+                        name="fISx"
+                        [(ngModel)]="request.fISx">
+                    <option [ngValue]="undefined"
+                            selected>{{ 'Chọn' | translate }}</option>
+                    <option *ngFor="let item of listFisX"
+                            [value]="item.label">{{item.label | translate }}</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Poman' | translate }}</label>
+                <ng-select-async name="poman"
+                                 bindLabel="userName"
+                                 suffixLabel="fullName"
+                                 placeholder="{{ 'poman' | translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="userService"
+                                 (change)="request.poman = request.pomanDto?.userName"
+                                 [(ngModel)]="request.pomanDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'Bộ phận phòng ban' | translate }}</label>
+                <ng-select-async name="subDepartment"
+                                 bindLabel="orgCode"
+                                 suffixLabel="orgName"
+                                 placeholder="{{ 'USER.GROUP'| translate }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="orgService"
+                                 (change)="request.subDepartment = request.subDepartmentDto?.orgName"
+                                 [(ngModel)]="request.subDepartmentDto">
+                </ng-select-async>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.FROM_DATE' | translate }}</label>
+                <input-date name="fromDate"
+                            [(ngModel)]="request.fromDate">
+                </input-date>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label>{{ 'REPORT.TO_DATE' | translate }}</label>
+                <input-date name="toDate"
+                            [(ngModel)]="request.toDate">
+                </input-date>
+            </div>
+        </div>
+        <div class="row kt-margin-b-30">
+            <div class="col-md-6">
+                <button type="button"
+                        class="btn btn-sm btn-label-brand mr-2"
+                        (click)="btnExportPoMan()">
+                    {{ 'REPORT.PO_MAN.EXPORT_PO_MAN' | translate }}
+                </button>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>

@@ -1,0 +1,631 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]=" titleForm | translate"
+                       [viewLoading$]="quotationService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               *ngIf="!hasEdit"
+               mat-raised-button
+               (click)="goToEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="kt-grid__item">
+            <form autocomplete="off"
+                  #form="ngForm"
+                  id="id-form-quotation">
+
+                <div>
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{'Thông tin báo giá'| translate}}
+                    </h5>
+
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label class="lbl-required">{{ 'Số báo giá' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="requestNumber"
+                                   maxlength="255"
+                                   placeholder="{{ 'Số báo giá' | translate }}"
+                                   [(ngModel)]="quotationData.requestNumber"
+                                   [disabled]="!hasEdit"
+                                   required>
+                            <validate-message [form]="form"
+                                              controlName="requestNumber"></validate-message>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Mô tả yêu cầu báo giá' | translate }}</label>
+                            <textarea type="text"
+                                      class="form-control"
+                                      name="description"
+                                      placeholder="{{ 'Mô tả yêu cầu báo giá' | translate }}"
+                                      [(ngModel)]="quotationData.description"
+                                      [disabled]="!hasEdit"></textarea>
+                            <validate-message [form]="form"
+                                              controlName="description"></validate-message>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Địa điểm nhận hàng' | translate }}</label>
+                            <textarea type="text"
+                                      class="form-control"
+                                      name="deliveryLocation"
+                                      placeholder="{{ 'Địa điểm nhận hàng' | translate }}"
+                                      [(ngModel)]="quotationData.deliveryLocation"
+                                      [disabled]="!hasEdit"></textarea>
+                            <validate-message [form]="form"
+                                              controlName="deliveryLocation"></validate-message>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Ghi chú' | translate }}</label>
+                            <textarea type="text"
+                                      class="form-control"
+                                      name="note"
+                                      placeholder="{{ 'Ghi chú' | translate }}"
+                                      [(ngModel)]="quotationData.note"
+                                      [disabled]="!hasEdit"></textarea>
+                            <validate-message [form]="form"
+                                              controlName="note"></validate-message>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="lbl-required">{{ 'Công ty yêu cầu' | translate }}</label>
+                            <select-sync-source name="requestCompany"
+                                                placeholder="{{ 'Công ty yêu cầu' | translate }}"
+                                                header="MENU.CATEGORY.COMPANY"
+                                                bindValue="code"
+                                                [columns]="headerOperatingUnit"
+                                                [width]="'70vw'"
+                                                [service]="operatingUnitService"
+                                                (change)="onChangeRequestCompany($event)"
+                                                [requestPayload]="operatingUnitRequestPayload"
+                                                [(ngModel)]="quotationData.requestCompanyDto"
+                                                validateTooltip
+                                                [validateForm]="form"
+                                                required
+                                                [disabled]="!hasEdit">
+                            </select-sync-source>
+                            <!-- <input type="text"
+                                   class="form-control"
+                                   name="requestCompany"
+                                   placeholder="{{ 'Công ty yêu cầu' | translate }}"
+                                   [(ngModel)]="quotationData.requestCompany"
+                                   [disabled]="!hasEdit"
+                                   required> -->
+                            <validate-message [form]="form"
+                                              controlName="requestCompany"></validate-message>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="lbl-required">{{ 'Phòng ban' | translate }}</label>
+                            <select-sync-source name="subDepartmentId"
+                                                placeholder="Phòng ban"
+                                                header="Phòng ban"
+                                                bindValue="name"
+                                                [columns]="headerDepartment"
+                                                [width]="'60vw'"
+                                                [service]="departmentService"
+                                                (change)="onChangeSubDepartmentId($event)"
+                                                [requestPayload]="departmentRequestPayload"
+                                                [(ngModel)]="quotationData.subDepartmentDto"
+                                                validateTooltip
+                                                [validateForm]="form"
+                                                required
+                                                [disabled]="!hasEdit">
+                            </select-sync-source>
+                            <!-- <input type="text"
+                                   class="form-control"
+                                   name="subDepartmentId"
+                                   placeholder="{{ 'Phòng ban' | translate }}"
+                                   [(ngModel)]="quotationData.subDepartmentId"
+                                   [disabled]="!hasEdit"
+                                   required> -->
+                            <validate-message [form]="form"
+                                              controlName="subDepartmentId"></validate-message>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'Mã số thuế' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="requestTaxCode"
+                                   maxlength="255"
+                                   placeholder="{{ 'Mã số thuế' | translate }}"
+                                   [(ngModel)]="quotationData.requestTaxCode"
+                                   [disabled]="!hasEdit">
+                            <validate-message [form]="form"
+                                              controlName="requestTaxCode"></validate-message>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="lbl-required">{{ 'Người YC báo giá' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="requestPeople"
+                                   placeholder="{{ 'email@abc' | translate }}"
+                                   [(ngModel)]="quotationData.requestPeople"
+                                   [disabled]="!hasEdit"
+                                   required>
+                            <validate-message [form]="form"
+                                              controlName="requestPeople"></validate-message>
+
+                        </div>
+
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-4 mb-3">
+                            <label>{{ 'Đính kèm báo giá:' | translate }}</label>
+
+                            <single-attach-file module="Attachment\QuotationFile\{{quotationData.id}}"
+                                                [disabled]="!hasEdit"
+                                                [hasDirectSave]="hasDirectSave"
+                                                (noSave)="bindingDataToSave($event)">
+                            </single-attach-file>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- Table bên báo giá  - Add danh sách nhà cung cấp-->
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{'Thông tin NCC (Bên báo giá)'| translate}}
+                    </h5>
+                    <div class="mat-table__wrapper">
+                        <p-table [value]="quotationData.listQuotationSupplier"
+                                 [columns]="headerQuotationSupplier"
+                                 dataKey="id"
+                                 editMode="row"
+                                 class="table-no-wrap"
+                                 tableStyleClass="table-no-wrap">
+
+                            <ng-template pTemplate="header"
+                                         let-columns>
+                                <tr class="background-table-header">
+                                    <th *ngFor="let col of columns"
+                                        [width]="col.width"
+                                        class="align-center"
+                                        [ngClass]="col.class">
+                                        {{col.title | translate}} <span class="lbl-required"
+                                              *ngIf="col.isRequired">
+                                        </span>
+                                    </th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body"
+                                         let-rowData
+                                         let-rowIndex="rowIndex"
+                                         let-editing="editing">
+                                <tr [pEditableRow]="rowData">
+                                    <td class="text-center"
+                                        [title]="rowIndex + 1">
+                                        {{ rowIndex + 1 }}
+                                    </td>
+
+                                    <td [title]="rowData.supplierName"
+                                        *ngIf="rowData.status !== 4">
+                                        <!-- <select-sync-source name="{{ 'supplierId' + rowIndex }}"
+                                                            *ngIf="hasEdit"
+                                                            placeholder="{{ 'Nhà cung cấp' | translate }}"
+                                                            header="MENU.CATEGORY.SUPPLIER"
+                                                            bindValue="name"
+                                                            [columns]="headerSuppliers"
+                                                            [width]="'50vw'"
+                                                            searchField="generalFilterControl"
+                                                            [service]="supplierService"
+                                                            (change)="onChangeSupplierRowData($event, rowData)"
+                                                            [requestPayload]="supplierRequestPayload"
+                                                            [(ngModel)]="rowData.supplierIdDto"
+                                                            [isOnTable]="true">
+                                        </select-sync-source> -->
+
+                                        <span>{{rowData.supplierName}}</span>
+
+                                    </td>
+                                    <td *ngIf="rowData.status === 4"
+                                        title="Xem thông tin báo giá NCC"
+                                        class="header-link"
+                                        (click)="onViewEnterQuoteClick(rowData)">
+                                        {{rowData.supplierName}}
+                                    </td>
+
+                                    <td [title]="rowData.code">
+                                        {{rowData.code}}
+                                    </td>
+
+                                    <td [title]="rowData.quotePeople">
+                                        <input pInputText
+                                               *ngIf="hasEdit"
+                                               class="form-control"
+                                               name="{{ 'quotePeople' + rowData.id }}"
+                                               type="text"
+                                               (change)="editForm()"
+                                               placeholder="{{ 'Người báo giá' | translate }}"
+                                               [(ngModel)]="rowData.quotePeople">
+
+                                        <span *ngIf="!hasEdit">{{rowData.quotePeople}}</span>
+
+                                    </td>
+
+                                    <td [title]="rowData.quotePeopleEmail">
+                                        <!-- <input pInputText
+                                               *ngIf="hasEdit"
+                                               class="form-control"
+                                               (change)="editForm()"
+                                               name="{{ 'quotePeopleEmail' + rowIndex }}"
+                                               type="text"
+                                               placeholder="{{ 'Email người báo giá' | translate }}"
+                                               [(ngModel)]="rowData.quotePeopleEmail"> -->
+                                        <ng-select name="{{ 'quotePeopleEmail' + rowData.id }}"
+                                                   [items]="rowData.quotePeopleEmailItems"
+                                                   [hideSelected]="true"
+                                                   *ngIf="hasEdit"
+                                                   multiple="true"
+                                                   appendTo="body"
+                                                   (change)="editForm()"
+                                                   [addTag]="addTagFn"
+                                                   placeholder="{{ 'Email người báo giá' | translate }}"
+                                                   [ngModel]="rowData.quotePeopleEmailItems"
+                                                   (ngModelChange)="rowData.quotePeopleEmail = $event.join(',')">
+                                        </ng-select>
+
+                                        <span *ngIf="!hasEdit">{{rowData.quotePeopleEmail}}</span>
+                                    </td>
+
+                                    <td [title]="rowData.phoneNumber">
+                                        <input pInputText
+                                               *ngIf="hasEdit"
+                                               class="form-control"
+                                               (change)="editForm()"
+                                               name="{{ 'phoneNumber' + rowData.id }}"
+                                               type="text"
+                                               placeholder="{{ 'SDT người báo giá' | translate }}"
+                                               [(ngModel)]="rowData.phoneNumber">
+                                        <span *ngIf="!hasEdit">{{rowData.phoneNumber}}</span>
+                                    </td>
+
+                                    <td [title]="rowData.status | label: statusQuotationSupplier">
+                                        {{rowData.status | label: statusQuotationSupplier}}
+                                    </td>
+                                    <td [title]="rowData.note">
+                                        {{rowData.note}}
+                                    </td>
+
+                                    <td style="text-align: center;">
+                                        <button pButton
+                                                pRipple
+                                                type="button"
+                                                icon="fas fa-trash-alt"
+                                                (click)="deleteRowQuotationSupplier(rowIndex)"
+                                                class="p-button-rounded p-button-text"
+                                                [disabled]="!hasEdit"></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="footer">
+                                <tr style="background: #f8f9fa;"
+                                    *ngIf="hasEdit">
+
+                                    <td class="text-center"
+                                        style="border: 1px solid #e9ecef;"></td>
+
+                                    <td [title]="addQuotationSupplier.itemName"
+                                        style="border: 1px solid #e9ecef;">
+                                        <select-sync-source name="supplierId"
+                                                            placeholder="{{ 'Nhà cung cấp' | translate }}"
+                                                            header="MENU.CATEGORY.SUPPLIER"
+                                                            bindValue="name"
+                                                            [columns]="headerSuppliers"
+                                                            [width]="'50vw'"
+                                                            searchField="generalFilterControl"
+                                                            [service]="supplierService"
+                                                            (change)="onChangeSupplier($event)"
+                                                            [requestPayload]="supplierRequestPayload"
+                                                            [(ngModel)]="addQuotationSupplier.supplierIdDto"
+                                                            [isOnTable]="true"
+                                                            [disabled]="!hasEdit">
+                                        </select-sync-source>
+                                    </td>
+
+                                    <td [title]="addQuotationSupplier.code">{{addQuotationSupplier.code}}</td>
+
+                                    <td [title]="addQuotationSupplier.quotePeople"
+                                        style="border: 1px solid #e9ecef;">
+                                        <input pInputText
+                                               name="quotePeople"
+                                               class="form-control"
+                                               type="text"
+                                               placeholder="{{ 'Người báo giá' | translate }}"
+                                               [(ngModel)]="addQuotationSupplier.quotePeople">
+                                    </td>
+
+                                    <td [title]="addQuotationSupplier.quotePeopleEmail"
+                                        style="border: 1px solid #e9ecef;">
+                                        <ng-select name="quotePeopleEmail"
+                                                   [items]="addQuotationSupplier.quotePeopleEmailItems"
+                                                   [hideSelected]="true"
+                                                   multiple="true"
+                                                   appendTo="body"
+                                                   [addTag]="addTagFn"
+                                                   placeholder="{{ 'Email người báo giá' | translate }}"
+                                                   [ngModel]="addQuotationSupplier.quotePeopleEmailItems"
+                                                   (ngModelChange)="addQuotationSupplier.quotePeopleEmail = $event.join(',')">
+                                        </ng-select>
+                                        <!-- <input pInputText
+                                               name="quotePeopleEmail"
+                                               class="form-control"
+                                               type="text"
+                                               placeholder="{{ 'Email người báo giá' | translate }}"
+                                               [(ngModel)]="addQuotationSupplier.quotePeopleEmail"> -->
+                                    </td>
+
+                                    <td [title]="addQuotationSupplier.phoneNumber"
+                                        style="border: 1px solid #e9ecef;">
+                                        <input pInputText
+                                               name="phoneNumber"
+                                               class="form-control"
+                                               type="number"
+                                               placeholder="{{ 'SDT ngươi báo giá' | translate }}"
+                                               [(ngModel)]="addQuotationSupplier.phoneNumber">
+                                    </td>
+
+                                    <td class="text-center"
+                                        style="border: 1px solid #e9ecef;"></td>
+
+                                    <td class="text-center"
+                                        style="border: 1px solid #e9ecef;"></td>
+
+                                    <td style="text-align: center;border: 1px solid #e9ecef;">
+                                        <button (click)="addNewRowQuotationSupplier()"
+                                                pButton
+                                                pRipple
+                                                type="button"
+                                                icon="flaticon2-add-1"
+                                                class="p-button-rounded p-button-text">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <div
+                             *ngIf="quotationData.listQuotationSupplier && quotationData.listQuotationSupplier.length === 0 && !hasEdit">
+                            <view-empty></view-empty>
+                        </div>
+                    </div>
+
+                    <br><br>
+                    <!-- Table Add báo giá -->
+                    <h5 class="kt-margin-b-15">
+                        <i class="fab fa-envira"></i> {{'Danh sách sản phẩm'| translate}}
+                    </h5>
+                    <div class="mat-table__wrapper">
+                        <p-table [value]="quotationData.listQuotationItem"
+                                 [columns]="headerQuotationItem"
+                                 dataKey="id"
+                                 editMode="row"
+                                 class="table-no-wrap"
+                                 tableStyleClass="table-no-wrap">
+
+                            <ng-template pTemplate="header"
+                                         let-columns>
+                                <tr class="background-table-header">
+                                    <th *ngFor="let col of columns"
+                                        [width]="col.width"
+                                        class="align-center"
+                                        [ngClass]="col.class">
+                                        {{col.title | translate}} <span class="lbl-required"
+                                              *ngIf="col.isRequired">
+                                        </span>
+                                    </th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body"
+                                         let-rowData
+                                         let-rowIndex="rowIndex"
+                                         let-editing="editing">
+                                <tr [pEditableRow]="rowData">
+                                    <td class="text-center"
+                                        [title]="rowData.indexNo">
+                                        {{ rowData.indexNo }}
+                                    </td>
+
+                                    <td [title]="rowData.itemName">
+                                        <input pInputText
+                                               *ngIf="hasEdit"
+                                               class="form-control"
+                                               name="{{ 'itemName' + rowData.id }}"
+                                               type="text"
+                                               placeholder="{{ 'Nhóm sản phẩm' | translate }}"
+                                               [(ngModel)]="rowData.itemName">
+
+                                        <span *ngIf="!hasEdit">{{rowData.itemName}}</span>
+                                    </td>
+
+                                    <td [title]="rowData.description">
+                                        <textarea pInputText
+                                                  *ngIf="hasEdit"
+                                                  type="text"
+                                                  class="form-control"
+                                                  name="{{ 'description' + rowData.id }}"
+                                                  maxlength="255"
+                                                  placeholder="{{ 'Chi tiết sản phẩm' | translate }}"
+                                                  [(ngModel)]="rowData.description"></textarea>
+
+                                        <span *ngIf="!hasEdit">{{rowData.description}}</span>
+
+                                    </td>
+
+                                    <td [title]="rowData.quantity">
+                                        <input pInputText
+                                               *ngIf="hasEdit"
+                                               class="form-control"
+                                               name="{{ 'quantity' + rowData.id }}"
+                                               type="number"
+                                               placeholder="{{ 'Số lượng' | translate }}"
+                                               [(ngModel)]="rowData.quantity">
+
+                                        <span *ngIf="!hasEdit">{{rowData.quantity}}</span>
+                                    </td>
+
+                                    <td [title]="rowData.unit">
+                                        <input pInputText
+                                               *ngIf="hasEdit"
+                                               class="form-control"
+                                               name="{{ 'unit' + rowData.id }}"
+                                               type="text"
+                                               placeholder="{{ 'Đơn vị' | translate }}"
+                                               [(ngModel)]="rowData.unit">
+                                        <span *ngIf="!hasEdit">{{rowData.unit}}</span>
+                                    </td>
+
+                                    <td [title]="rowData.otherRequest">
+                                        <textarea pInputText
+                                                  type="text"
+                                                  *ngIf="hasEdit"
+                                                  class="form-control"
+                                                  name="{{ 'otherRequest' + rowData.id }}"
+                                                  maxlength="255"
+                                                  placeholder="{{ 'Nhập...' | translate }}"
+                                                  [(ngModel)]="rowData.otherRequest"></textarea>
+
+                                        <span *ngIf="!hasEdit">{{rowData.otherRequest}}</span>
+                                    </td>
+
+                                    <td [title]="rowData.expirationDate"
+                                        class="align-center">
+                                        {{ rowData.expirationDate | date:mainConfig.formatDateList }}
+                                    </td>
+
+                                    <td style="text-align: center;">
+                                        <button pButton
+                                                pRipple
+                                                type="button"
+                                                icon="fas fa-trash-alt"
+                                                (click)="deleteRowQuotationItem(rowIndex)"
+                                                class="p-button-rounded p-button-text"
+                                                [disabled]="!hasEdit"></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="footer">
+                                <tr style="background: #f8f9fa;"
+                                    *ngIf="hasEdit">
+
+                                    <td class="text-center"
+                                        style="border: 1px solid #e9ecef;"></td>
+
+                                    <td [title]="addQuotationItem.itemName"
+                                        style="border: 1px solid #e9ecef;">
+                                        <input pInputText
+                                               type="text"
+                                               class="form-control"
+                                               name="itemName"
+                                               maxlength="255"
+                                               placeholder="{{ 'Nhập...' | translate }}"
+                                               [(ngModel)]="addQuotationItem.itemName">
+                                    </td>
+
+                                    <td [title]="addQuotationItem.description"
+                                        style="border: 1px solid #e9ecef;">
+                                        <textarea pInputText
+                                                  type="text"
+                                                  class="form-control"
+                                                  name="descriptionItem"
+                                                  maxlength="255"
+                                                  placeholder="{{ 'Nhập...' | translate }}"
+                                                  [(ngModel)]="addQuotationItem.description"></textarea>
+                                    </td>
+
+                                    <td [title]="addQuotationItem.quantity"
+                                        style="border: 1px solid #e9ecef;">
+                                        <input pInputText
+                                               name="quantity"
+                                               class="form-control"
+                                               type="number"
+                                               placeholder="{{ 'Số lượng' | translate }}"
+                                               [(ngModel)]="addQuotationItem.quantity">
+                                    </td>
+
+                                    <td [title]="addQuotationItem.unit"
+                                        style="border: 1px solid #e9ecef;">
+                                        <input pInputText
+                                               name="unit"
+                                               class="form-control"
+                                               type="text"
+                                               placeholder="{{ 'Đơn vị' | translate }}"
+                                               [(ngModel)]="addQuotationItem.unit">
+                                    </td>
+
+                                    <td [title]="addQuotationItem.otherRequest"
+                                        style="border: 1px solid #e9ecef;">
+                                        <textarea pInputText
+                                                  type="text"
+                                                  class="form-control"
+                                                  name="otherRequest"
+                                                  maxlength="255"
+                                                  placeholder="{{ 'Nhập...' | translate }}"
+                                                  [(ngModel)]="addQuotationItem.otherRequest"></textarea>
+                                    </td>
+
+                                    <td [title]="addQuotationItem.expirationDate"
+                                        style="border: 1px solid #e9ecef;">
+                                        <input pInputText
+                                               class="form-control"
+                                               type="date"
+                                               name="expirationDate"
+                                               [(ngModel)]="addQuotationItem.expirationDate">
+                                    </td>
+
+                                    <td style="text-align: center;border: 1px solid #e9ecef;">
+                                        <button (click)="addNewRowQuotationItem()"
+                                                pButton
+                                                pRipple
+                                                type="button"
+                                                icon="flaticon2-add-1"
+                                                class="p-button-rounded p-button-text">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <div
+                             *ngIf="quotationData.listQuotationItem && quotationData.listQuotationItem.length === 0 && !hasEdit">
+                            <view-empty></view-empty>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <div class="mt-5"
+                 *ngIf="hasEdit">
+                <button class="btn btn-sm btn-success mr-2"
+                        title="{{ 'COMMON.SAVE' | translate }}"
+                        (click)="onBtnSaveClick()">
+                    <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                </button>
+
+                <button class="btn btn-sm btn-secondary mr-2"
+                        title="{{ 'COMMON.CANCEL' | translate }}"
+                        (click)="onBtnCancelClick()">
+                    <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+                </button>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-view-enter-quote-dialog #viewEnterQuoteDialogComponent></app-view-enter-quote-dialog>

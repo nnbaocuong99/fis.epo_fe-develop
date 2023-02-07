@@ -1,0 +1,159 @@
+<kt-portlet>
+    <kt-portlet-header icon="far fa-address-card"
+                       [title]="'Báo giá' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="quotationService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+
+                <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+
+
+
+            </app-toolbar>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="quotationService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator #paginator
+                                   [pageSize]="5"
+                                   [pageSizeOptions]="[5, 10, 30, 50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     [(contextMenuSelection)]="selectedRowData"
+                     [contextMenu]="btnContextMenu"
+                     class="table-no-wrap"
+                     tableStyleClass="table-no-wrap">
+                <ng-template pTemplate="header">
+                    <tr *ngFor="let row of headers"
+                        class="background-table-header">
+                        <th *ngFor="let col of row"
+                            [rowSpan]="col.rowSpan ? col.rowSpan : 1"
+                            [colSpan]="col.colSpan ? col.colSpan : 1"
+                            [width]="col.width"
+                            [ngClass]="col.class"
+                            class="align-center th-color">
+                            {{ col.title | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr [pContextMenuRow]="rowData">
+                        <td class="align-center"
+                            [title]="request.pageSize * request.pageIndex + rowIndex + 1">
+                            {{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+                        </td>
+                        <td class="align-center"
+                            title="{{ rowData.createdAt | date: mainConfig.formatJustDate }}">
+                            {{ rowData.createdAt | date: mainConfig.formatJustDate }}
+                        </td>
+                        <td title="Xem yêu cầu báo giá"
+                            class="header-link"
+                            (click)="onBtnViewClick(rowData.id)">
+                            {{ rowData.requestNumber }}
+                        </td>
+                        <td title="{{ rowData.description }}">
+                            {{ rowData.description }}
+                        </td>
+
+                        <td class="align-center"
+                            title="{{ rowData.quoteDate | date: mainConfig.formatJustDate }}">
+                            {{ rowData.quoteDate | date: mainConfig.formatJustDate }}
+                        </td>
+                        <!-- <td title="Nhập báo giá"
+                            class="header-link"
+                            (click)="onBtnEnterQuoteClick(rowData.id)">
+                            {{ rowData.requestNumber }}
+                        </td> -->
+                        <td title="{{rowData.requestNumber}}">
+                            {{ rowData.requestNumber }}
+                        </td>
+
+                        <td class="align-center"
+                            [ngClass]="{'text-validate': rowData.status !== 2}"
+                            [title]="rowData.status | label: statusQuotation">
+                            {{ rowData.status | label: statusQuotation }}
+                        </td>
+                        <!-- <td>
+                            <button class="btn btn-success"
+                                    (click)="onBtnEnterQuoteClick(rowData.id)">
+                                {{ 'Nhập báo giá' | translate }}
+                            </button>
+                            <button class="btn btn-success"
+                                    *ngIf="rowData.status !== 2"
+                                    (click)="onBtnSenNotificationClick(rowData)">
+                                {{ 'Mời báo giá' | translate }}
+                            </button>
+                        </td> -->
+                        <td>
+                            <div class="action align-center">
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        matTooltip="More actions">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item
+                                            *ngIf="rowData.status !== 2"
+                                            (click)="onBtnSenNotificationClick(rowData)">
+                                        <span>{{'Mời báo giá'| translate}}</span>
+                                    </button>
+                                    <!-- <button mat-menu-item
+                                            (click)="onBtnEnterQuoteClick(rowData.id)">
+                                        <span>{{'Nhập báo giá'| translate}}</span>
+                                    </button> -->
+                                    <button mat-menu-item
+                                            (click)="onBtnViewClick(rowData.id)">
+                                        <span>{{'COMMON.VIEW'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnEditClick(rowData.id)">
+                                        <span>{{'COMMON.EDIT'| translate}}</span>
+                                    </button>
+                                    <button mat-menu-item
+                                            (click)="onBtnDeleteClick(rowData.id)">
+                                        <span>{{'COMMON.DELETE'| translate}}</span>
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

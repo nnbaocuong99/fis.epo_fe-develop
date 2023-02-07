@@ -1,0 +1,111 @@
+<!--  Thảo luận -->
+<div class="mt-5">
+    <h5 class="kt-margin-b-15">
+        <i class="fal fa-comments"></i> {{'Thảo luận với FPT'| translate}}
+    </h5>
+    <div style="background-color: #F2F2F2;padding-top: 0px; padding-bottom: 30px;">
+        <div class="form-row">
+            <div class="col-md-12 mb-3">
+                <textarea type="text"
+                          class="form-control"
+                          style="height: 100px;"
+                          name="content"
+                          maxlength="500"
+                          placeholder="{{ 'Nhập...' | translate }}"
+                          [(ngModel)]="discussWithFPT.content"></textarea>
+            </div>
+        </div>
+        <br>
+        <div class="float-right">
+            <button type="button"
+                    style="padding: 4px;"
+                    class="btn btn-sm btn-success mr-2"
+                    (click)="onBtnSendCommentClick()">
+                <i class="fa fa-check"></i> {{ 'Gửi bình luận' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <br><br>
+    <div *ngFor="let item of listQuotationChatShow">
+        <div class="row">
+            <div class="user-icon">
+                <i class="fal fa-user"></i>
+            </div>
+            <div class="comment-box">
+                <span class="displayName">
+                    {{item.parent.name + ' ' }}</span>
+                <span class="displayHour">{{item.parent.createdAt | date:mainConfig.formatFullDate}}</span>
+                <span class="displayHour header-link"
+                      style="margin-left: auto;"
+                      (click)="replyCommentClick(item)">{{"Reply"}}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="comment-box-content">
+                {{item.parent.content}}
+            </div>
+        </div>
+
+        <div *ngIf="item.children && item.children.length > 0">
+            <div class="row">
+                <label (click)="viewCommentClick(item)"
+                       *ngIf="!item.isHideViewTextComment"
+                       style="margin-left: 71px;font-size: 12px;"
+                       class="header-link">{{"Xem bình luận"}}</label>
+            </div>
+
+            <div *ngFor="let chi of item.children">
+                <div *ngIf="chi.isShowchildren">
+                    <div class="row">
+                        <div class="user-icon-children">
+                            <i class="fal fa-user"></i>
+                        </div>
+                        <div class="comment-box-children">
+                            <span class="displayName">
+                                {{chi.name + ' ' }}</span>
+                            <span class="displayHour">
+                                {{chi.createdAt | date:mainConfig.formatFullDate}}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="comment-box-content-children">
+                            {{chi.content}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Dialog Reply -->
+<p-dialog [(visible)]="isShowDialogReply"
+          [style]="{width: '40vw'}"
+          [baseZIndex]="10001"
+          appendTo="body"
+          (onHide)="onBtnCancelReplyClick()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'Reply'| translate }}
+    </p-header>
+
+    <textarea type="text"
+              class="form-control"
+              style="height: 100px;"
+              name="content"
+              maxlength="500"
+              placeholder="{{ 'Nhập...' | translate }}"
+              [(ngModel)]="discussWithFPT.contentDialog"></textarea>
+    <br>
+
+    <div class="float-right">
+        <button type="button"
+                class="btn btn-sm btn-success mr-2"
+                (click)="onBtnSendCommentClick()">
+            <i class="fa fa-check"></i> {{ 'Gửi bình luận' | translate }}
+        </button>
+        <button class="btn btn-label-dark btn-sm"
+                title="{{ 'COMMON.CANCEL' | translate }}"
+                (click)="onBtnCancelReplyClick()">{{ 'COMMON.CANCEL' | translate }}</button>
+    </div>
+</p-dialog>

@@ -1,0 +1,53 @@
+<p-dialog header="Tỉ giá"
+          [(visible)]="dialogRef.isDisplay"
+          styleClass="p-dialog-md"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [modal]="true"
+          appendTo="body"
+          [style]="{width: '50vw'}">
+    <form autocomplete="off"
+          #form="ngForm"
+          id="search-contract"
+          style="min-height: 200px;">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>{{ 'EXCHANGE_RATE_CURRENCY.TYPE' | translate }}</label>
+                <ng-select [items]="exchangeRateTypeData"
+                           bindLabel="name"
+                           bindValue="name"
+                           name="type"
+                           (change)="onChangeType()"
+                           [(ngModel)]="exchangeRateData.type"
+                           placeholder="{{ 'EXCHANGE_RATE_CURRENCY.TYPE' | translate }}">
+                </ng-select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>{{ 'EXCHANGE_RATE_CURRENCY.DATE' | translate }}</label>
+                <input-date class="{{class}}"
+                            name="date"
+                            (change)="onChangeDate()"
+                            [(ngModel)]="exchangeRateData.date">
+                </input-date>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>{{ 'EXCHANGE_RATE_CURRENCY.CONVERSION_RATE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="conversionRate"
+                       placeholder="{{ 'EXCHANGE_RATE_CURRENCY.CONVERSION_RATE' | translate }}"
+                       [(ngModel)]="exchangeRateData.conversionRate"
+                       [disabled]="isDisabledConversionRate"
+                       numberMask
+                       validateTooltip
+                       [validateForm]="form">
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-sm btn-label-brand mt-3"
+                (click)="onSelectRow()">{{ 'COMMON.SELECT' | translate }}</button>
+        <button class="btn btn-sm btn-label-dark mt-3"
+                (click)="dialogRef.hide()">{{ 'COMMON.CLOSE' | translate }}</button>
+    </ng-template>
+</p-dialog>

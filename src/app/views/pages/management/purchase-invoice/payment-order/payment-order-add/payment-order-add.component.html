@@ -1,0 +1,705 @@
+<kt-portlet>
+	<kt-portlet-header [class]="'kt-portlet__head--lg'"
+					   [icon]="'fal fa-info-circle'"
+					   [title]=" titleForm | translate"
+					   [viewLoading$]="expenseService.isLoading$">
+		<ng-container ktPortletTools>
+			<a class="btn btn-secondary kt-margin-r-10"
+			   mat-raised-button
+			   (click)="goBack()">
+				<i class="la la-arrow-left"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+			</a>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<!-- Thêm mới đề nghị thanh toán -->
+		<ngb-tabset [justify]="'start'"
+					(tabChange)="setFragmentToRoute($event)"
+					[activeId]="0">
+			<ngb-tab *ngFor="let tab of tabs"
+					 [id]="tab.value">
+				<ng-template ngbTabTitle>
+					<h5>{{ tab.label | translate }}</h5>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+
+		<!-- Thanh toán -->
+		<div class="kt-grid__item"
+			 *ngIf="currentTab === 1">
+			<form autocomplete="off"
+				  #form="ngForm"
+				  id="payment-order-edit">
+
+				<div class="row">
+					<div class="col-md-12"
+						 style="position: relative; padding: 15px;">
+						<h5 class="kt-margin-b-15">
+					<i class="fal fa-money-check-edit"></i> {{'Thông tin chung'| translate}}
+				</h5>
+
+						<!-- <div style="position: absolute; right: 15px; top: 5px;">
+							<button class="btn btn-sm btn-label-brand mr-2"
+									*ngIf="paymentOrderData.status !== 1 || !currentExpenseId"
+									title="{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}"
+									(click)="onBtnCopyPiClick()">
+								{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}
+							</button>
+						</div> -->
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="col-md-3 mb-3">
+						<label>{{ 'Ngày gửi' | translate }}</label>
+						<input-date name="submitDate"
+									[(ngModel)]="paymentOrderData.submitDate"></input-date>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Người tạo đề nghị:' | translate }}</label>
+						<ng-select-async name="userId"
+										 bindLabel="userName"
+										 suffixLabel="fullName"
+										 placeholder="{{ 'Chọn người tạo đề nghị...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="userService"
+										 (change)="paymentOrderData.userId = paymentOrderData.createdByDto?.id"
+										 [(ngModel)]="paymentOrderData.createdByDto"
+										 required>
+						</ng-select-async>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Hình thức thanh toán:' | translate }}</label>
+						<ng-select [items]="paymentMethod"
+								   bindLabel="label"
+								   bindValue="value"
+								   name="method"
+								   placeholder="{{ 'Chọn hình thức thanh toán...' | translate }}"
+								   [(ngModel)]="paymentOrderData.method"
+								   required>
+						</ng-select>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Bên nhận:' | translate }}</label>
+						<ng-select [items]="beneficiaryType"
+								   bindLabel="label"
+								   bindValue="value"
+								   name="beneficiaryType"
+								   placeholder="{{ 'Chọn bên nhận...' | translate }}"
+								   [(ngModel)]="paymentOrderData.beneficiaryType"
+								   required>
+						</ng-select>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Đơn vị phê duyệt:' | translate }}</label>
+						<b>{{ paymentOrderData?.organizationIdDto?.Name | translate }}</b>
+						<ng-select-async name="organizationId"
+										 bindLabel="Filter"
+										 suffixLabel="Name"
+										 placeholder="{{ 'Chọn đơn vị phê duyệt...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="organizationEpaymentRequestPayload"
+										 (change)="onChangeOrganizationsData($event)"
+										 [(ngModel)]="paymentOrderData.organizationIdDto"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="organizationId"
+								   [items]="organizationsData"
+								   bindLabel="Search_label"
+								   bindValue="Id"
+								   (change)="onChangeOrganizationsData($event)"
+								   placeholder="{{ 'Chọn đơn vị phê duyệt...' | translate }}"
+								   [ngModel]="paymentOrderData.organizationId"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.Filter + ' - ' + item.Name }}">
+									{{ item.Filter + ' - ' + item.Name }}
+								</span>
+							</ng-template>
+						</ng-select> -->
+
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Kỳ ngân sách:' | translate }}</label>
+						<ng-select [items]="selectedBudgetPeriodYear"
+								   bindLabel="value"
+								   bindValue="value"
+								   name="budgetPeriod"
+								   (change)="onChangeBudgetPeriod($event)"
+								   placeholder="{{ 'Chọn kỳ ngân sách...' | translate }}"
+								   [(ngModel)]="paymentOrderData.budgetPeriod"
+								   required>
+						</ng-select>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Tư cách pháp nhân:' | translate }}</label>
+						<ng-select-async name="legalStandingId"
+										 bindLabel="Code"
+										 suffixLabel="Name"
+										 placeholder="{{ 'Chọn tư cách pháp nhân...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="legalStandingIdEpaymentRequestPayload"
+										 (change)="onChangeLegalStandingsData($event)"
+										 [(ngModel)]="paymentOrderData.legalStandingIdDto"
+										 [disabled]="!paymentOrderData.organizationId"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="legalStandingId"
+								   [items]="legalStandingsData"
+								   bindLabel="Search_label"
+								   bindValue="Id"
+								   (change)="onChangeLegalStandingsData($event)"
+								   placeholder="{{ 'Chọn tư cách pháp nhân...' | translate }}"
+								   [ngModel]="paymentOrderData.legalStandingId"
+								   [disabled]="!paymentOrderData.organizationId"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.Code + ' - ' + item.Name }}">
+									{{ item.Code + ' - ' + item.Name }}
+								</span>
+							</ng-template>
+						</ng-select> -->
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Thời hạn thanh toán:' | translate }}</label>
+						<ng-select-async name="deadline"
+										 bindLabel="Description"
+										 placeholder="{{ 'Chọn thời hạn thanh toán...' | translate }}"
+										 searchField="Filter"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="categoryAsyncsEpaymentRequestPayload"
+										 (change)="onChangeCategoryAsyncsData($event)"
+										 [(ngModel)]="paymentOrderData.deadlineDto"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="deadline"
+								   [items]="categoryAsyncsData"
+								   bindLabel="Description"
+								   bindValue="Code"
+								   (change)="onChangeCategoryAsyncsData($event)"
+								   placeholder="{{ 'Chọn thời hạn thanh toán...' | translate }}"
+								   [ngModel]="paymentOrderData.deadline"
+								   required>
+						</ng-select> -->
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Diễn giải chi phí:' | translate }}</label>
+						<textarea type="text"
+								  class="form-control"
+								  name="title"
+								  maxlength="255"
+								  placeholder="{{ 'Nhập diễn giải chi phí...' | translate }}"
+								  [(ngModel)]="paymentOrderData.title"
+								  required></textarea>
+					</div>
+
+					<div class="col-md-3 mb-3"
+						 *ngIf="paymentOrderData.beneficiaryType === 'SUPPLIER'">
+						<label class="lbl-required">{{ 'Tên nhà cung ứng :' | translate }}</label>
+						<ng-select-async name="supplierName"
+										 bindLabel="name"
+										 suffixLabel="taxCode"
+										 searchField="generalFilter"
+										 placeholder="{{ 'Chọn tên nhà cung ứng...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="supplierService"
+										 (change)="onChangeSupplier($event)"
+										 [(ngModel)]="paymentOrderData.supplierNameDto"
+										 required>
+						</ng-select-async>
+					</div>
+					<div class="col-md-3 mb-3"
+						 *ngIf="paymentOrderData.beneficiaryType === 'SUPPLIER'">
+						<label class="lbl-required">{{ 'Mã số thuế NCC :' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="supplierTax"
+							   placeholder="{{ 'Nhập mã số thuế nhà cung ứng...' | translate }}"
+							   [(ngModel)]="paymentOrderData.supplierTax"
+							   required>
+					</div>
+
+					<!-- <div class="col-md-3 mb-3">
+						<label>{{ 'CC Email (email cách nhau bỏi dấu ;)::' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="email"
+							   placeholder="{{ 'Email...' | translate }}"
+							   [(ngModel)]="paymentOrderData.email">
+					</div> -->
+					<!-- <div *ngIf="paymentOrderData.id"
+						 class="col-md-3 mb-3">
+						<label>{{ 'File đề nghị thanh toán' | translate }}</label>
+						<single-attach-file *ngIf="paymentOrderData.id"
+											module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+						</single-attach-file>
+					</div> -->
+				</div>
+
+				<app-payment-order-item #paymentOrderItem
+										[paymentOrderData]="paymentOrderData"
+										[purchaseinvoice]="purchaseinvoice"
+										[organizationsData]="organizationsData"
+										[form]="form"></app-payment-order-item>
+
+				<div class="form-row">
+					<label>{{ 'PAYMENT_ORDER.NOTE' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="note"
+							  maxlength="255"
+							  placeholder="{{ 'Nhập ghi chú...' | translate }}"
+							  [(ngModel)]="paymentOrderData.note"></textarea>
+				</div>
+			</form>
+		</div>
+
+		<!-- Thanh toán trả trước -->
+		<div class="kt-grid__item"
+			 *ngIf="currentTab === 2">
+			<form autocomplete="off"
+				  #form="ngForm"
+				  id="payment-order-edit">
+				<div class="row">
+					<div class="col-md-12"
+						 style="position: relative; padding: 15px;">
+						<h5 class="kt-margin-b-15">
+					<i class="fal fa-money-check-edit"></i> {{'Thông tin chung'| translate}}
+				</h5>
+
+
+						<!-- <div style="position: absolute; right: 15px; top: 5px;">
+							<button class="btn btn-sm btn-label-brand mr-2"
+									*ngIf="paymentOrderData.status !== 1 || !currentExpenseId"
+									title="{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}"
+									(click)="onBtnCopyPiClick()">
+								{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}
+							</button>
+						</div> -->
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-3 mb-3">
+						<label>{{ 'Ngày gửi' | translate }}</label>
+						<input-date name="submitDate"
+									[(ngModel)]="paymentOrderData.submitDate"></input-date>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Người tạo đề nghị:' | translate }}</label>
+						<ng-select-async name="userId"
+										 bindLabel="userName"
+										 suffixLabel="fullName"
+										 placeholder="{{ 'Chọn người tạo đề nghị...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="userService"
+										 (change)="paymentOrderData.userId = paymentOrderData.createdByDto?.id"
+										 [(ngModel)]="paymentOrderData.createdByDto"
+										 required>
+						</ng-select-async>
+					</div>
+
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Đơn vị phê duyệt:' | translate }}</label>
+						<b>{{ paymentOrderData?.organizationIdDto?.Name | translate }}</b>
+						<ng-select-async name="organizationId"
+										 bindLabel="Filter"
+										 suffixLabel="Name"
+										 placeholder="{{ 'Chọn đơn vị phê duyệt...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="organizationEpaymentRequestPayload"
+										 (change)="onChangeOrganizationsData($event)"
+										 [(ngModel)]="paymentOrderData.organizationIdDto"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="organizationId"
+								   [items]="organizationsData"
+								   bindLabel="Search_label"
+								   bindValue="Id"
+								   (change)="onChangeOrganizationsData($event)"
+								   placeholder="{{ 'Chọn đơn vị phê duyệt...' | translate }}"
+								   [ngModel]="paymentOrderData.organizationId"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.Filter + ' - ' + item.Name }}">
+									{{ item.Filter + ' - ' + item.Name }}
+								</span>
+							</ng-template>
+						</ng-select> -->
+					</div>
+
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Tư cách pháp nhân:' | translate }}</label>
+						<ng-select-async name="legalStandingId"
+										 bindLabel="Code"
+										 suffixLabel="Name"
+										 placeholder="{{ 'Chọn tư cách pháp nhân...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="legalStandingIdEpaymentRequestPayload"
+										 (change)="onChangeLegalStandingsData($event)"
+										 [(ngModel)]="paymentOrderData.legalStandingIdDto"
+										 [disabled]="!paymentOrderData.organizationId"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="legalStandingId"
+								   [items]="legalStandingsData"
+								   bindLabel="Search_label"
+								   bindValue="Id"
+								   (change)="onChangeLegalStandingsData($event)"
+								   placeholder="{{ 'Chọn tư cách pháp nhân...' | translate }}"
+								   [ngModel]="paymentOrderData.legalStandingId"
+								   [disabled]="!paymentOrderData.organizationId"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.Code + ' - ' + item.Name }}">
+									{{ item.Code + ' - ' + item.Name }}
+								</span>
+							</ng-template>
+						</ng-select> -->
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Kỳ ngân sách:' | translate }}</label>
+						<ng-select [items]="selectedBudgetPeriodYear"
+								   bindLabel="value"
+								   bindValue="value"
+								   name="budgetPeriod"
+								   (change)="onChangeBudgetPeriod($event)"
+								   placeholder="{{ 'Chọn kỳ ngân sách...' | translate }}"
+								   [(ngModel)]="paymentOrderData.budgetPeriod"
+								   required>
+						</ng-select>
+					</div>
+					<!-- <div class="col-md-3 mb-3">
+					<label class="lbl-required">{{ 'Ngày hoàn chứng' | translate }}</label>
+					<input-date name="proofDate"
+								[(ngModel)]="paymentOrderData.proofDate"
+								required></input-date>
+				</div> -->
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Tên nhà cung ứng :' | translate }}</label>
+						<ng-select-async name="supplierName"
+										 bindLabel="name"
+										 suffixLabel="taxCode"
+										 searchField="generalFilter"
+										 placeholder="{{ 'Chọn tên nhà cung ứng...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="supplierService"
+										 (change)="onChangeSupplier($event)"
+										 [(ngModel)]="paymentOrderData.supplierNameDto"
+										 required>
+						</ng-select-async>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Mã số thuế NCC :' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="supplierTax"
+							   placeholder="{{ 'Nhập mã số thuế nhà cung ứng...' | translate }}"
+							   [(ngModel)]="paymentOrderData.supplierTax"
+							   required>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Diễn giải chi phí:' | translate }}</label>
+						<textarea type="text"
+								  class="form-control"
+								  name="title"
+								  maxlength="255"
+								  placeholder="{{ 'Nhập diễn giải chi phí...' | translate }}"
+								  [(ngModel)]="paymentOrderData.title"
+								  required></textarea>
+					</div>
+					<!-- <div class="col-md-3 mb-3">
+						<label>{{ 'CC Email (email cách nhau bỏi dấu ;)::' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="email"
+							   placeholder="{{ 'Email...' | translate }}"
+							   [(ngModel)]="paymentOrderData.email">
+					</div> -->
+					<!-- <div *ngIf="paymentOrderData.id"
+						 class="col-md-3 mb-3">
+						<label>{{ 'File đề nghị thanh toán' | translate }}</label>
+						<single-attach-file *ngIf="paymentOrderData.id"
+											module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+						</single-attach-file>
+					</div> -->
+				</div>
+
+				<app-payment-order-prepay #paymentOrderPrepay
+										  [paymentOrderData]="paymentOrderData"
+										  [purchaseOrderData]="purchaseOrderData"
+										  [purchaseinvoice]="purchaseinvoice"
+										  [form]="form"></app-payment-order-prepay>
+				<br>
+
+				<div class="form-row">
+					<label>{{ 'PAYMENT_ORDER.NOTE' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="note"
+							  maxlength="255"
+							  placeholder="{{ 'Nhập ghi chú...' | translate }}"
+							  [(ngModel)]="paymentOrderData.note"></textarea>
+				</div>
+
+			</form>
+		</div>
+
+		<!-- Tạm ứng -->
+		<div class="kt-grid__item"
+			 *ngIf="currentTab === 3">
+			<form autocomplete="off"
+				  #form="ngForm"
+				  id="payment-order-edit">
+				<div class="row">
+					<div class="col-md-12"
+						 style="position: relative; padding: 15px;">
+						<h5 class="kt-margin-b-15">
+					<i class="fal fa-money-check-edit"></i> {{'Thông tin chung'| translate}}
+				</h5>
+
+						<!-- <div style="position: absolute; right: 15px; top: 5px;">
+							<button class="btn btn-sm btn-label-brand mr-2"
+									*ngIf="paymentOrderData.status !== 1 || !currentExpenseId"
+									title="{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}"
+									(click)="onBtnCopyPiClick()">
+								{{ 'PURCHASE_INVOICE.COPY_FROM_PI'| translate }}
+							</button>
+						</div> -->
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="col-md-3 mb-3">
+						<label>{{ 'Ngày gửi' | translate }}</label>
+						<input-date name="submitDate"
+									[(ngModel)]="paymentOrderData.submitDate"></input-date>
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Người tạo đề nghị:' | translate }}</label>
+						<ng-select-async name="userId"
+										 bindLabel="userName"
+										 suffixLabel="fullName"
+										 placeholder="{{ 'Chọn người tạo đề nghị...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="userService"
+										 (change)="paymentOrderData.userId = paymentOrderData.createdByDto?.id"
+										 [(ngModel)]="paymentOrderData.createdByDto"
+										 required>
+						</ng-select-async>
+					</div>
+
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Đơn vị phê duyệt:' | translate }}</label>
+						<b>{{ paymentOrderData?.organizationIdDto?.Name | translate }}</b>
+						<ng-select-async name="organizationId"
+										 bindLabel="Filter"
+										 suffixLabel="Name"
+										 placeholder="{{ 'Chọn đơn vị phê duyệt...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="organizationEpaymentRequestPayload"
+										 (change)="onChangeOrganizationsData($event)"
+										 [(ngModel)]="paymentOrderData.organizationIdDto"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="organizationId"
+								   [items]="organizationsData"
+								   bindLabel="Search_label"
+								   bindValue="Id"
+								   (change)="onChangeOrganizationsData($event)"
+								   placeholder="{{ 'Chọn đơn vị phê duyệt...' | translate }}"
+								   [ngModel]="paymentOrderData.organizationId"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.Filter + ' - ' + item.Name }}">
+									{{ item.Filter + ' - ' + item.Name }}
+								</span>
+							</ng-template>
+						</ng-select> -->
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Tư cách pháp nhân:' | translate }}</label>
+						<ng-select-async name="legalStandingId"
+										 bindLabel="Code"
+										 suffixLabel="Name"
+										 placeholder="{{ 'Chọn tư cách pháp nhân...' | translate }}"
+										 [multiple]="false"
+										 [closeOnSelect]="true"
+										 [service]="dataEpaymentService"
+										 [requestPayload]="legalStandingIdEpaymentRequestPayload"
+										 (change)="onChangeLegalStandingsData($event)"
+										 [(ngModel)]="paymentOrderData.legalStandingIdDto"
+										 [disabled]="!paymentOrderData.organizationId"
+										 required>
+						</ng-select-async>
+						<!-- <ng-select name="legalStandingId"
+								   [items]="legalStandingsData"
+								   bindLabel="Search_label"
+								   bindValue="Id"
+								   (change)="onChangeLegalStandingsData($event)"
+								   placeholder="{{ 'Chọn tư cách pháp nhân...' | translate }}"
+								   [ngModel]="paymentOrderData.legalStandingId"
+								   [disabled]="!paymentOrderData.organizationId"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.Code + ' - ' + item.Name }}">
+									{{ item.Code + ' - ' + item.Name }}
+								</span>
+							</ng-template>
+						</ng-select> -->
+					</div>
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Kỳ ngân sách:' | translate }}</label>
+						<ng-select [items]="selectedBudgetPeriodYear"
+								   bindLabel="value"
+								   bindValue="value"
+								   name="budgetPeriod"
+								   (change)="onChangeBudgetPeriod($event)"
+								   placeholder="{{ 'Chọn kỳ ngân sách...' | translate }}"
+								   [(ngModel)]="paymentOrderData.budgetPeriod"
+								   required>
+						</ng-select>
+					</div>
+
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Hình thức tạm ứng:' | translate }}</label>
+						<ng-select [items]="paymentMethod"
+								   bindLabel="label"
+								   bindValue="value"
+								   name="method"
+								   placeholder="{{ 'Chọn hình thức thanh toán...' | translate }}"
+								   [(ngModel)]="paymentOrderData.method"
+								   required>
+							<ng-template ng-option-tmp
+										 let-item="item">
+								<span title="{{ item.label}}"
+									  *ngIf="item.value !== 'CONTRAENTRY'">
+									{{ item.label}}
+								</span>
+							</ng-template>
+						</ng-select>
+					</div>
+					<!-- <div class="col-md-3 mb-3">
+					<label class="lbl-required">{{ 'Ngày hoàn ứng' | translate }}</label>
+					<input-date name="reimbursementDate"
+								[(ngModel)]="paymentOrderData.reimbursementDate"
+								required></input-date>
+				</div> -->
+					<!-- <div class="col-md-3 mb-3">
+						<label>{{ 'CC Email (email cách nhau bỏi dấu ;)::' | translate }}</label>
+						<input type="text"
+							   class="form-control"
+							   name="email"
+							   placeholder="{{ 'Email...' | translate }}"
+							   [(ngModel)]="paymentOrderData.email">
+					</div> -->
+					<div class="col-md-3 mb-3">
+						<label class="lbl-required">{{ 'Diễn giải chi phí:' | translate }}</label>
+						<textarea type="text"
+								  class="form-control"
+								  name="title"
+								  maxlength="255"
+								  placeholder="{{ 'Nhập diễn giải chi phí...' | translate }}"
+								  [(ngModel)]="paymentOrderData.title"
+								  required></textarea>
+					</div>
+					<!-- <div class="col-md-3 mb-3">
+					<label class="lbl-required">{{ 'Mã người tạm ứng:' | translate }}</label>
+					<input type="text"
+						   class="form-control"
+						   name="personCode"
+						   [(ngModel)]="paymentOrderData.personCode"
+						   disabled>
+				</div> -->
+					<!-- <div *ngIf="paymentOrderData.id"
+						 class="col-md-3 mb-3">
+						<label>{{ 'File đề nghị thanh toán' | translate }}</label>
+						<single-attach-file *ngIf="paymentOrderData.id"
+											module="Attachment\PaymentOrder\{{paymentOrderData.id}}">
+						</single-attach-file>
+					</div> -->
+
+				</div>
+
+				<app-payment-order-prepay #paymentOrderPrepay
+										  [form]="form"
+										  [paymentOrderData]="paymentOrderData"
+										  [purchaseOrderData]="purchaseOrderData"
+										  [purchaseinvoice]="purchaseinvoice"
+										  [type]="2"></app-payment-order-prepay>
+
+				<div class="form-row">
+					<label>{{ 'PAYMENT_ORDER.NOTE' | translate }}</label>
+					<textarea type="text"
+							  class="form-control"
+							  name="note"
+							  maxlength="255"
+							  placeholder="{{ 'Nhập ghi chú...' | translate }}"
+							  [(ngModel)]="paymentOrderData.note"></textarea>
+				</div>
+
+			</form>
+		</div>
+
+		<br>
+		<br>
+		<div *ngIf="!paymentOrderData.epayId">
+			<!-- Ẩn button saveform tại tab thuế nhà thầu -->
+			<button class="btn btn-sm btn-success mr-2"
+					title="{{ 'COMMON.SAVE' | translate }}"
+					(click)="onBtnSaveClick()">
+				<i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+			</button>
+			<!-- Create ticket Draft -->
+			<button class="btn btn-sm btn-success mr-2"
+					title="{{ 'Create ticket Draft' | translate }}"
+					*ngIf="!currentExpenseId"
+					(click)="onBtnCreateDraftEpaymentTicketClick(1)">
+				<i class="fal fa-save"></i> {{ 'Create ticket Draft ePayment' | translate }}
+			</button>
+			<button class="btn btn-sm btn-secondary mr-2"
+					title="{{ 'COMMON.CANCEL' | translate }}"
+					(click)="onBtnCancelClick()">
+				<i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+			</button>
+
+			<div class="float-right"
+				 *ngIf="currentExpenseId && paymentOrderData.status === 1 && !paymentOrderData.hidebtnCreateDraftEpayment">
+				<button class="btn btn-sm btn-brand mr-2"
+						title="{{ 'Create ticket Draft' | translate }}"
+						(click)="onBtnCreateDraftEpaymentTicketClick(2)">
+					{{ 'Create ticket Draft ePayment' | translate }}
+				</button>
+			</div>
+		</div>
+
+	</kt-portlet-body>
+</kt-portlet>
+
+<!-- Form copy từ Pi -->
+<app-payment-order-purchase-invoice [dialogRef]="dialogRefPi"
+									*ngIf="isShowCopyInv"
+									(save)="loadItemFromPi($event)">
+</app-payment-order-purchase-invoice>

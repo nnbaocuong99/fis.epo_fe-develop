@@ -1,0 +1,62 @@
+.upload-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 0;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    background-color: white;
+    height: 340px;
+    cursor: pointer;
+}
+
+.square-dotted-border {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    flex-shrink: 0;
+    overflow: hidden;
+    align-items: stretch;
+    height: 200px;
+    width: 200px;
+    border-width: 3px;
+    border-radius: 5px;
+    border-style: dashed;
+    border-color: rgb(0, 0, 0);
+    opacity: 0.07;
+}
+
+.add-icon-large {
+    position: relative;
+    overflow: visible;
+    background-color: transparent;
+    flex-grow: 1;
+    flex-shrink: 1;
+    align-self: center;
+    height: 96px;
+    width: 96px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url('../../../../../assets/media/icons/add.svg');
+    background-size: contain;
+    border-style: none;
+    display: flex;
+}
+
+.table-upload td {
+    border-bottom: 1px solid #e7ecf1;
+    border-top: none !important;
+    white-space: nowrap;
+}
+
+.line-through {
+    text-decoration: line-through;
+}
+
+.btn-icon {
+    cursor: pointer;
+}

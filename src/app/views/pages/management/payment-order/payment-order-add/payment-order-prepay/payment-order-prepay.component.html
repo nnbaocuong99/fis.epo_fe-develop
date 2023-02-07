@@ -1,0 +1,786 @@
+<div *ngIf="type === 1">
+    <h5 class="kt-margin-t-15 kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{'Thông tin khoản thanh toán trả trước'| translate}}
+    </h5>
+    <div class="mat-table__wrapper">
+        <p-table [value]="paymentData"
+                 [columns]="paymentHeaders"
+                 class="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr *ngFor="let row of paymentHeaders"
+                    style=" background-color: #0069b4;">
+                    <th *ngFor="let col of row"
+                        style="color: #fff;"
+                        [rowSpan]="col.rowSpan ? col.rowSpan : 1"
+                        [colSpan]="col.colSpan ? col.colSpan : 1"
+                        [width]="col.width"
+                        [ngClass]="col.class"
+                        class="align-center">
+                        {{ col.title | translate }}
+                        <span class="lbl-required"
+                              *ngIf="col.isRequired">
+                        </span>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td class="align-center"
+                        rowspan="2"
+                        [title]="rowData.indexNo">
+                        <p>{{ rowData.indexNo }}</p>
+                        <p *ngIf="paymentData.length > 1 && hasEdit">
+                            <a href="javascript:;"
+                               (click)="onBtnDeleteClick(rowData)"> <i class="fas fa-trash-alt"
+                                   style="cursor: pointer;"
+                                   [title]="'COMMON.DELETE' | translate"></i></a>
+                        </p>
+                    </td>
+
+                    <td rowspan="2"
+                        title="{{rowData.title}}">
+                        <textarea type="text"
+                                  class="form-control"
+                                  *ngIf="hasEdit"
+                                  name="{{ 'title' + rowIndex }}"
+                                  maxlength="255"
+                                  (change)="onRowEditInit()"
+                                  placeholder="{{ 'Nhập diễn giải chi tiết...' | translate }}"
+                                  [(ngModel)]="rowData.title"></textarea>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.organizationName}}">
+                        <ng-select name="{{ 'organizationId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="organizationsData"
+                                   bindLabel="Search_label"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (change)="onChangeOrganizationsData($event, rowData)"
+                                   placeholder="Chọn đơn vị chịu thuế..."
+                                   [ngModel]="rowData.organizationId"
+                                   required>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                <span title="{{ item.Filter + ' - ' + item.Name }}">
+                                    {{ item.Filter + ' - ' + item.Name }}
+                                </span>
+                            </ng-template>
+                        </ng-select>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'organizationId' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.organizationName }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.parentProjectName}}">
+                        <ng-select name="{{ 'parentProjectId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="projectParentData"
+                                   bindLabel="Code"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (focus)="getMasterDataControl('Projects', rowData)"
+                                   (change)="onChangeParentProject($event, rowData)"
+                                   placeholder="Chọn dự án cha"
+                                   [ngModel]="rowData.parentProjectId"
+                                   [disabled]="!rowData.organizationId">
+                        </ng-select>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'parentProjectId' + rowIndex }}">
+                        </validate-message>
+
+                        <span *ngIf="!hasEdit">{{ rowData.parentProjectName }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.authorizedPayment}}"
+                        class="align-center">
+                        <mat-checkbox name="{{ 'authorizedPayment' + rowIndex }}"
+                                      class="example-margin"
+                                      (change)="onChangeAuthorizedPayment(rowData, $event)"
+                                      [(ngModel)]="rowData.authorizedPayment"
+                                      [disabled]="!hasEdit"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'authorizedPayment' + rowIndex }}">
+                        </validate-message>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.contractDate | date:mainConfig.formatDateList}}">
+                        <input-date name="{{ 'contractDate' + rowIndex }}"
+                                    *ngIf="hasEdit"
+                                    (change)="onRowEditInit()"
+                                    [(ngModel)]="rowData.contractDate"></input-date>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'contractDate' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.contractDate | date:mainConfig.formatDateList }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.exchangeCurrency}}">
+                        <select-sync-source *ngIf="hasEdit"
+                                            name="{{ 'exchangeCurrency' + rowIndex }}"
+                                            placeholder="{{ 'PURCHASE_PLAN.ITEM.CURRENCY' | translate }}"
+                                            header="PURCHASE_PLAN.ITEM.CURRENCY"
+                                            bindValue="code"
+                                            [columns]="headerCurrency"
+                                            [service]="currencyService"
+                                            [requestPayload]="currencyRequestPayload"
+                                            (change)="onChangeCurrency($event, rowData)"
+                                            [width]="'40vw'"
+                                            [(ngModel)]="rowData.exchangeCurrency"
+                                            [isOnTable]="true">
+                        </select-sync-source>
+                        <span *ngIf="!hasEdit">{{ rowData.exchangeCurrency }}</span>
+                    </td>
+
+                    <td rowspan="2"
+                        title="{{rowData.contractAmount}}">
+                        <input pInputText
+                               type="text"
+                               class="form-control align-right"
+                               name="{{ 'contractAmount' + rowIndex }}"
+                               numberMask
+                               *ngIf="hasEdit"
+                               placeholder="Nhập giá trị hợp đồng..."
+                               validateTooltip
+                               [validateForm]="form"
+                               (change)="onChangeContractAmount(rowData,$event)"
+                               [(ngModel)]="rowData.contractAmount">
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'contractAmount' + rowIndex }}">
+                        </validate-message>
+                        <div *ngIf="!hasEdit"
+                             class="align-right"> {{convertCurrencyMask(rowData.contractAmount)}}
+                        </div>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{convertCurrencyMask(rowData.price)}}">
+                        <input pInputText
+                               type="text"
+                               class="form-control align-right"
+                               name="{{ 'price' + rowIndex }}"
+                               numberMask
+                               *ngIf="hasEdit"
+                               placeholder="Nhập số tiền..."
+                               validateTooltip
+                               [validateForm]="form"
+                               (change)="onChangePrice(rowData,$event)"
+                               [(ngModel)]="rowData.price">
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'price' + rowIndex }}">
+                        </validate-message>
+                        <div *ngIf="!hasEdit"
+                             class="align-right">
+                            {{convertCurrencyMask(rowData.price)}}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="1"
+                        title="{{rowData.projectName}}">
+                        <ng-select name="{{ 'projectId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="projectChilData"
+                                   bindLabel="Code"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (focus)="getMasterDataControl('Projects', rowData, rowData.parentProjectId)"
+                                   (change)="onChangeProject($event, rowData)"
+                                   placeholder="Chọn dự án con..."
+                                   [ngModel]="rowData.projectId"
+                                   [disabled]="!rowData.parentProjectId">
+                        </ng-select>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'projectId' + rowIndex }}">
+                        </validate-message>
+
+                        <span *ngIf="!hasEdit">{{ rowData.projectName }}</span>
+                    </td>
+                    <td rowspan="1"
+                        title="{{rowData.projectBudgetName}}">
+                        <ng-select name="{{ 'projectBudgetId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="budgetTypeData"
+                                   bindLabel="MasterBudgetEntity.Code"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (focus)="getMasterDataControl('ProjectBudgets', rowData)"
+                                   (change)="onChangeProjectBudget($event, rowData)"
+                                   placeholder="Chọn loại ngân sách..."
+                                   [ngModel]="rowData.projectBudgetId"
+                                   [disabled]="!rowData.projectId"
+                                   disabled>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                <span title="{{ item.MasterBudgetEntity.Code + ' - ' + item.MasterBudgetEntity.Name }}">
+                                    {{ item.MasterBudgetEntity.Code + ' - ' + item.MasterBudgetEntity.Name }}
+                                </span>
+                            </ng-template>
+                        </ng-select>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'projectBudgetId' + rowIndex }}">
+                        </validate-message>
+
+                        <span *ngIf="!hasEdit">{{ rowData.projectBudgetName }}</span>
+                    </td>
+                    <td rowspan="1"
+                        title="{{rowData.account}}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control"
+                               (change)="onRowEditInit()"
+                               placeholder="Accounting Account..."
+                               name="{{ 'account' + rowIndex }}"
+                               [(ngModel)]="rowData.account"
+                               disabled>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'account' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.account }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.contractNumber}}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control"
+                               (change)="onRowEditInit()"
+                               placeholder="Nhập số hợp đồng..."
+                               name="{{ 'contractNumber' + rowIndex }}"
+                               [(ngModel)]="rowData.contractNumber">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'contractNumber' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.contractNumber }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.exchangeRate}}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control"
+                               placeholder="Tỷ giá..."
+                               (change)="onRowEditInit()"
+                               name="{{ 'exchangeRate' + rowIndex }}"
+                               [(ngModel)]="rowData.exchangeRate"
+                               disabled>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'exchangeRate' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.exchangeRate }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{ convertCurrencyMask(rowData.convertedPrice) }}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control align-right"
+                               name="{{ 'convertedPrice' + rowIndex }}"
+                               numberMask
+                               placeholder="Số tiền trả trước..."
+                               validateTooltip
+                               [validateForm]="form"
+                               (change)="onChangeConvertedPrice(rowData,$event)"
+                               [(ngModel)]="rowData.convertedPrice"
+                               disabled>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'convertedPrice' + rowIndex }}">
+                        </validate-message>
+                        <div *ngIf="!hasEdit"
+                             class="align-right">{{ convertCurrencyMask(rowData.convertedPrice) }}</div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr>
+                    <td colSpan="8"
+                        style="border: 1px solid #e9ecef;">
+                        <div class="form-row"
+                             style="margin: 0 5px;">
+                            <div class="col-6"
+                                 style="font-size: 12px!important;padding-left: 0!important;">
+                                <a href="javascript:;"
+                                   *ngIf="hasEdit"
+                                   (click)="addItemNew()">
+                                    <i class="fa fa-plus"></i> Thêm dòng mới
+                                </a>
+                            </div>
+                            <div class="col-6"
+                                 style="font-size: 12px!important;text-align: right!important;padding-right: 0!important;">
+                                <b>Tổng:</b>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="border: 1px solid #e9ecef;">
+                        <span class="span-custom align-right">
+                            {{ paymentOrderData.convertedTotal ?
+                            convertCurrencyMask(paymentOrderData.convertedTotal) : 0 }}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <br>
+        <!-- Thông tin chuyển khoản -->
+        <!-- <h5 class="kt-margin-t-15 kt-margin-b-15">
+            <i class="fal fa-money-check-edit"></i> {{'Thông tin chuyển khoản'| translate}}
+            <small>(Bạn không cần chọn đúng chi nhánh, trừ Ngân hàng Agribank và Kho bạc nhà nước Việt Nam):</small>
+        </h5>
+        <p-table [value]="transferData"
+                 [columns]="transferHeaders"
+                 class="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr *ngFor="let row of transferHeaders"
+                    style=" background-color: #0069b4;">
+                    <th *ngFor="let col of row"
+                        style="color: #fff;"
+                        [width]="col.width"
+                        class="align-center">
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td class="align-center"
+                        [title]="rowData.indexNo">
+                        <p>{{ rowData.indexNo }}</p>
+                    </td>
+    
+                    <td title="{{rowData.title}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'title' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Chọn số tài khoản...' | translate }}"
+                               [(ngModel)]="rowData.title">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+    
+                    <td title="{{rowData.title}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'title' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Nhập tên tài khoản...(Không dấu)' | translate }}"
+                               [(ngModel)]="rowData.title">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+    
+                    <td title="{{rowData.title}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'title' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Chọn ngân hàng...' | translate }}"
+                               [(ngModel)]="rowData.title">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+                    <td title="{{rowData.title}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'title' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Chọn chi nhánh...' | translate }}"
+                               [(ngModel)]="rowData.title">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+                    <td title="{{rowData.title}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'title' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Ghi chú...(Bắt buộc với ngân hàng ngoại tệ)' | translate }}"
+                               [(ngModel)]="rowData.title">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+                    <td title="{{rowData.currency}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'currency' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Chọn loại tiền' | translate }}"
+                               [(ngModel)]="rowData.currency">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.currency }}</span>
+                    </td>
+                    <td title="{{rowData.title}}">
+                        <input type="text"
+                               class="form-control"
+                               *ngIf="hasEdit"
+                               name="{{ 'title' + rowIndex }}"
+                               maxlength="255"
+                               placeholder="{{ 'Nhập số tiền' | translate }}"
+                               [(ngModel)]="rowData.title">
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr>
+                    <td colSpan="7"
+                        style="border: 1px solid #e9ecef; font-size: 12px!important;text-align: right!important;padding-right: 0!important;">
+                        <b>Tổng tiền:</b>
+                    </td>
+                    <td style="border: 1px solid #e9ecef;"><span class="span-custom">0</span></td>
+                </tr>
+            </ng-template>
+        </p-table> -->
+    </div>
+</div>
+<div *ngIf="type === 2">
+    <h5 class="kt-margin-t-15 kt-margin-b-15">
+        <i class="fal fa-money-check-edit"></i> {{'Khoản tạm ứng'| translate}}
+    </h5>
+    <div class="mat-table__wrapper">
+        <p-table [value]="paymentData"
+                 [columns]="advanceHeaders"
+                 class="table-no-wrap">
+            <ng-template pTemplate="header">
+                <tr *ngFor="let row of advanceHeaders"
+                    style=" background-color: #0069b4;">
+                    <th *ngFor="let col of row"
+                        style="color: #fff;"
+                        [rowSpan]="col.rowSpan ? col.rowSpan : 1"
+                        [colSpan]="col.colSpan ? col.colSpan : 1"
+                        [width]="col.width"
+                        [ngClass]="col.class"
+                        class="align-center">
+                        {{ col.title | translate }}
+                        <span class="lbl-required"
+                              *ngIf="col.isRequired">
+                        </span>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-rowIndex="rowIndex">
+                <tr>
+                    <td class="align-center"
+                        rowspan="2"
+                        [title]="rowData.indexNo">
+                        <p>{{ rowData.indexNo }}</p>
+                        <p *ngIf="paymentData.length > 1 && hasEdit">
+                            <a href="javascript:;"
+                               (click)="onBtnDeleteClick(rowData)"> <i class="fas fa-trash-alt"
+                                   style="cursor: pointer;"
+                                   [title]="'COMMON.DELETE' | translate"></i></a>
+                        </p>
+                    </td>
+
+                    <td rowspan="2"
+                        title="{{rowData.title}}">
+                        <textarea type="text"
+                                  class="form-control"
+                                  *ngIf="hasEdit"
+                                  name="{{ 'title' + rowIndex }}"
+                                  maxlength="255"
+                                  (change)="onRowEditInit()"
+                                  placeholder="{{ 'Nhập diễn giải chi tiết...' | translate }}"
+                                  [(ngModel)]="rowData.title"></textarea>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'title' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.title }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.organizationName}}">
+                        <ng-select name="{{ 'organizationId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="organizationsData"
+                                   bindLabel="Search_label"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (change)="onChangeOrganizationsData($event, rowData)"
+                                   placeholder="Chọn đơn vị chịu thuế..."
+                                   [ngModel]="rowData.organizationId"
+                                   required>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                <span title="{{ item.Filter + ' - ' + item.Name }}">
+                                    {{ item.Filter + ' - ' + item.Name }}
+                                </span>
+                            </ng-template>
+                        </ng-select>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'organizationId' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.organizationName }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.parentProjectName}}">
+                        <ng-select name="{{ 'parentProjectId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="projectParentData"
+                                   bindLabel="Code"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (focus)="getMasterDataControl('Projects', rowData)"
+                                   (change)="onChangeParentProject($event, rowData)"
+                                   placeholder="Chọn dự án cha"
+                                   [ngModel]="rowData.parentProjectId"
+                                   [disabled]="!rowData.organizationId">
+                        </ng-select>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'parentProjectId' + rowIndex }}">
+                        </validate-message>
+
+                        <span *ngIf="!hasEdit">{{ rowData.parentProjectName }}</span>
+                    </td>
+                    <!-- chi hộ -->
+                    <td rowspan="1"
+                        title="{{rowData.authorizedPayment}}"
+                        class="align-center">
+                        <mat-checkbox name="{{ 'authorizedPayment' + rowIndex }}"
+                                      class="example-margin"
+                                      (change)="onChangeAuthorizedPayment(rowData, $event)"
+                                      [(ngModel)]="rowData.authorizedPayment"
+                                      [disabled]="!hasEdit"
+                                      [color]="'primary'">
+                        </mat-checkbox>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'authorizedPayment' + rowIndex }}">
+                        </validate-message>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.exchangeCurrency}}">
+                        <select-sync-source *ngIf="hasEdit"
+                                            name="{{ 'exchangeCurrency' + rowIndex }}"
+                                            placeholder="{{ 'PURCHASE_PLAN.ITEM.CURRENCY' | translate }}"
+                                            header="PURCHASE_PLAN.ITEM.CURRENCY"
+                                            bindValue="code"
+                                            [columns]="headerCurrency"
+                                            [service]="currencyService"
+                                            [requestPayload]="currencyRequestPayload"
+                                            (change)="onChangeCurrency($event, rowData)"
+                                            [width]="'40vw'"
+                                            [(ngModel)]="rowData.exchangeCurrency"
+                                            [isOnTable]="true">
+                        </select-sync-source>
+                        <span *ngIf="!hasEdit">{{ rowData.exchangeCurrency }}</span>
+                    </td>
+
+
+                    <td rowspan="1"
+                        title="{{convertCurrencyMask(rowData.price)}}">
+                        <input pInputText
+                               type="text"
+                               class="form-control align-right"
+                               name="{{ 'price' + rowIndex }}"
+                               numberMask
+                               *ngIf="hasEdit"
+                               placeholder="Nhập số tiền..."
+                               validateTooltip
+                               [validateForm]="form"
+                               (change)="onChangePrice(rowData,$event)"
+                               [(ngModel)]="rowData.price">
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'price' + rowIndex }}">
+                        </validate-message>
+                        <div *ngIf="!hasEdit"
+                             class="align-right">
+                            {{convertCurrencyMask(rowData.price)}}
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td rowspan="1"
+                        title="{{rowData.projectName}}">
+                        <ng-select name="{{ 'projectId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="projectChilData"
+                                   bindLabel="Code"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (focus)="getMasterDataControl('Projects', rowData, rowData.parentProjectId)"
+                                   (change)="onChangeProject($event, rowData)"
+                                   placeholder="Chọn dự án con..."
+                                   [ngModel]="rowData.projectId"
+                                   [disabled]="!rowData.parentProjectId">
+                        </ng-select>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'projectId' + rowIndex }}">
+                        </validate-message>
+
+                        <span *ngIf="!hasEdit">{{ rowData.projectName }}</span>
+                    </td>
+                    <td rowspan="1"
+                        title="{{rowData.projectBudgetName}}">
+                        <ng-select name="{{ 'projectBudgetId' + rowIndex }}"
+                                   *ngIf="hasEdit"
+                                   [items]="budgetTypeData"
+                                   bindLabel="MasterBudgetEntity.Code"
+                                   bindValue="Id"
+                                   appendTo="body"
+                                   (focus)="getMasterDataControl('ProjectBudgets', rowData)"
+                                   (change)="onChangeProjectBudget($event, rowData)"
+                                   placeholder="Chọn loại ngân sách..."
+                                   [ngModel]="rowData.projectBudgetId"
+                                   [disabled]="!rowData.projectId"
+                                   disabled>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                <span title="{{ item.MasterBudgetEntity.Code + ' - ' + item.MasterBudgetEntity.Name }}">
+                                    {{ item.MasterBudgetEntity.Code + ' - ' + item.MasterBudgetEntity.Name }}
+                                </span>
+                            </ng-template>
+                        </ng-select>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'projectBudgetId' + rowIndex }}">
+                        </validate-message>
+
+                        <span *ngIf="!hasEdit">{{ rowData.projectBudgetName }}</span>
+                    </td>
+                    <td rowspan="1"
+                        title="{{rowData.account}}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control"
+                               (change)="onRowEditInit()"
+                               placeholder="Accounting Account..."
+                               name="{{ 'account' + rowIndex }}"
+                               [(ngModel)]="rowData.account"
+                               disabled>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'account' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.account }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{rowData.exchangeRate}}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control"
+                               placeholder="Tỷ giá..."
+                               (change)="onRowEditInit()"
+                               name="{{ 'exchangeRate' + rowIndex }}"
+                               [(ngModel)]="rowData.exchangeRate"
+                               disabled>
+                        <validate-message [form]="form"
+                                          controlName="{{ 'exchangeRate' + rowIndex }}">
+                        </validate-message>
+                        <span *ngIf="!hasEdit">{{ rowData.exchangeRate }}</span>
+                    </td>
+
+                    <td rowspan="1"
+                        title="{{convertCurrencyMask(rowData.convertedPrice)}}">
+                        <input pInputText
+                               type="text"
+                               *ngIf="hasEdit"
+                               class="form-control align-right"
+                               name="{{ 'convertedPrice' + rowIndex }}"
+                               numberMask
+                               placeholder="Số tiền quy đổi..."
+                               validateTooltip
+                               [validateForm]="form"
+                               (change)="onChangeConvertedPrice(rowData,$event)"
+                               [(ngModel)]="rowData.convertedPrice"
+                               disabled>
+
+                        <validate-message [form]="form"
+                                          controlName="{{ 'convertedPrice' + rowIndex }}">
+                        </validate-message>
+                        <div *ngIf="!hasEdit"
+                             class="align-right">{{ convertCurrencyMask(rowData.convertedPrice) }}</div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr>
+                    <td colSpan="6"
+                        style="border: 1px solid #e9ecef;">
+                        <div class="form-row"
+                             style="margin: 0 5px;">
+                            <div class="col-6"
+                                 style="font-size: 12px!important;padding-left: 0!important;">
+                                <a href="javascript:;"
+                                   *ngIf="hasEdit"
+                                   (click)="addItemNew()">
+                                    <i class="fa fa-plus"></i> Thêm dòng mới
+                                </a>
+                            </div>
+                            <div class="col-6"
+                                 style="font-size: 12px!important;text-align: right!important;padding-right: 0!important;">
+                                <b>Tổng:</b>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="border: 1px solid #e9ecef;">
+                        <span class="span-custom align-right"> {{ paymentOrderData.convertedTotal ?
+                            convertCurrencyMask(paymentOrderData.convertedTotal) : 0 }}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

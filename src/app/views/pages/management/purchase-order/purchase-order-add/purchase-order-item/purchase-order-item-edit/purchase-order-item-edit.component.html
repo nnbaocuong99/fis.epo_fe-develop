@@ -1,0 +1,362 @@
+<crud-dialog [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()"
+             (cancel)="onBtnCancelClick()"
+             appendTo="body">
+       <form autocomplete="off"
+             #form="ngForm"
+             id="role-edit">
+              <div *ngIf="dialogRef.input.updateType === 1">
+                     <div class="form-row">
+                            <div class="col-md-3 mb-3">
+                                   <label>{{ 'PURCHASE_PLAN.ITEM.ITEM_CODE' | translate }}</label>
+                                   <select-sync-source name="itemCode"
+                                                       categoryType="item"
+                                                       placeholder="PURCHASE_PLAN.ITEM.ITEM_CODE"
+                                                       header="MENU.CATEGORY.ITEM"
+                                                       bindValue="code"
+                                                       [columns]="headerItems"
+                                                       [service]="itemService"
+                                                       [requestPayload]="itemRequestPayload"
+                                                       (change)="onChangeItemCode($event)"
+                                                       [width]="'65vw'"
+                                                       [(ngModel)]="dialogRef.input.rowData.itemCodeDto">
+                                   </select-sync-source>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label>{{ 'PURCHASE_PLAN.ITEM.PART_NO' | translate }}</label>
+                                   <input type="text"
+                                          class="form-control"
+                                          name="partNo"
+                                          placeholder="{{ 'PURCHASE_PLAN.ITEM.PART_NO' | translate }}"
+                                          [(ngModel)]="dialogRef.input.rowData.partNo">
+                                   <validate-message [form]="form"
+                                                     controlName="partNo"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.ITEM_NAME' | translate }}</label>
+                                   <input type="text"
+                                          class="form-control"
+                                          name="itemName"
+                                          maxlength="500"
+                                          checkMaxLengthValidator
+                                          [checkLength]="dialogRef.input.rowData.isUpdateSrv"
+                                          validateTooltip
+                                          [validateForm]="form"
+                                          placeholder="{{ 'PURCHASE_PLAN.ITEM.ITEM_NAME' | translate }}"
+                                          [(ngModel)]="dialogRef.input.rowData.itemName"
+                                          required>
+                                   <validate-message [form]="form"
+                                                     controlName="itemName"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label>{{ 'PURCHASE_PLAN.ITEM.ITEM_TYPE' | translate }}<span
+                                                *ngIf="dialogRef.input.add"
+                                                class="lbl-required"></span></label>
+                                   <ng-select [items]="itemTypes"
+                                              bindLabel="label"
+                                              bindValue="label"
+                                              name="itemType"
+                                              placeholder="{{ 'Loại HH/DV' | translate }}"
+                                              [(ngModel)]="dialogRef.input.rowData.itemType"
+                                              [required]="dialogRef.input.add">
+                                   </ng-select>
+                                   <validate-message [form]="form"
+                                                     controlName="itemType"></validate-message>
+                            </div>
+                     </div>
+                     <div class="form-row">
+                            <div class="col-md-3 mb-3">
+                                   <label>{{'PURCHASE_PLAN.ITEM.QUANTITY' | translate }}<span
+                                                *ngIf="dialogRef.input.add"
+                                                class="lbl-required"></span></label>
+                                   <!-- Chỉ trạng thái đã tạo mới cho sửa số lượng -->
+                                   <input type="number"
+                                          min="0"
+                                          class="form-control"
+                                          name="quantity"
+                                          quantityValidator
+                                          [viewFromAppendix]="viewFromAppendix"
+                                          [rowData]="dialogRef.input.rowData"
+                                          placeholder="{{ 'PURCHASE_PLAN.ITEM.QUANTITY' | translate }}"
+                                          [(ngModel)]="dialogRef.input.rowData.quantity"
+                                          [required]="dialogRef.input.add"
+                                          (change)="onChangeQuantity(dialogRef.input.rowData)">
+                                   <validate-message [form]="form"
+                                                     controlName="quantity"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.UNIT' | translate }}</label>
+                                   <input type="text"
+                                          class="form-control"
+                                          name="unit"
+                                          placeholder="{{ 'PURCHASE_PLAN.ITEM.UNIT' | translate }}"
+                                          [(ngModel)]="dialogRef.input.rowData.unit"
+                                          [disabled]="dialogRef.input.rowData.itemId"
+                                          required>
+                                   <validate-message [form]="form"
+                                                     controlName="unit"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">{{ 'PURCHASE_ORDER.ITEM.UNIT_PRICE' | translate
+                                          }}</label>
+                                   <input type="text"
+                                          class="form-control"
+                                          name="price"
+                                          numberMask
+                                          validateTooltip
+                                          [validateForm]="form"
+                                          (change)="onChangePrice(dialogRef.input.rowData.price)"
+                                          [(ngModel)]="dialogRef.input.rowData.price"
+                                          placeholder="{{ 'PURCHASE_ORDER.ITEM.UNIT_PRICE' | translate }}"
+                                          required>
+                                   <validate-message [form]="form"
+                                                     controlName="price"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.EXPECTED_DATE' | translate
+                                          }}</label>
+                                   <input-date name="expectedDate"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               [(ngModel)]="dialogRef.input.rowData.expectedDate"
+                                               datePastValidator
+                                               required>
+                                   </input-date>
+                            </div>
+                            <div *ngIf="!dialogRef.input.isInternal"
+                                 class="col-md-3 mb-3">
+                                   <label>{{ 'Xuất xứ hàng hoá' | translate }}</label>
+                                   <ng-select name="itemOrigin"
+                                              [items]="configListDataItemOrigin"
+                                              bindValue="name"
+                                              bindLabel="name"
+                                              placeholder="{{ 'Xuất xứ hàng hoá' | translate }}"
+                                              [(ngModel)]="dialogRef.input.rowData.itemOrigin">
+                                          <ng-template ng-label-tmp
+                                                       let-item="item">
+                                                 <span title="{{ item.note }}">{{ item.name }}
+                                                        <!-- <span style="font-weight: 500;">{{ item.note }}</span> -->
+                                                 </span>
+                                          </ng-template>
+                                          <ng-template ng-option-tmp
+                                                       let-item="item">
+                                                 <span title="{{ item.note }}">{{ item.name }} <span
+                                                              style="font-weight: 500; font-style: italic;">{{ item.note
+                                                               }}</span>
+                                                 </span>
+                                          </ng-template>
+                                   </ng-select>
+                                   <validate-message [form]="form"
+                                                     controlName="itemOrigin"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">Ngày dự kiến hàng về</label>
+                                   <input-date name="responseDate"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               (blur)="changeResponseDate.emit(dialogRef.input.rowData)"
+                                               [(ngModel)]="dialogRef.input.rowData.responseDate"
+                                               required>
+                                   </input-date>
+                            </div>
+                            <div *ngIf="dialogRef.input.isInternal"
+                                 class="col-md-3 mb-3">
+                                   <label>Thuế</label>
+                                   <select-sync-source name="tax"
+                                                       placeholder="Thuế"
+                                                       header="Danh sách thuế"
+                                                       bindValue="name"
+                                                       [width]="'60vw'"
+                                                       [columns]="headerTaxCode"
+                                                       [service]="taxCodeService"
+                                                       (change)="onChangeTaxCode($event)"
+                                                       [requestPayload]="taxCodeRequestPayload"
+                                                       [(ngModel)]="dialogRef.input.rowData.taxDto">
+                                   </select-sync-source>
+                                   <validate-message [form]="form"
+                                                     controlName="tax"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">
+                                          {{ 'PURCHASE_PLAN.ITEM.PRODUCER_NAME' | translate}}
+                                   </label>
+                                   <ng-select-async name="producerName"
+                                                    bindLabel="name"
+                                                    suffixLabel="acronymName"
+                                                    placeholder="{{ 'PURCHASE_PLAN.ITEM.PRODUCER_NAME' | translate }}"
+                                                    [multiple]="false"
+                                                    [closeOnSelect]="true"
+                                                    [service]="brandService"
+                                                    (change)="onChangeProductName($event)"
+                                                    [(ngModel)]="dialogRef.input.rowData.producerNameDto"
+                                                    required>
+                                   </ng-select-async>
+                                   <validate-message [form]="form"
+                                                     controlName="producerName"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label class="lbl-required">{{ 'PURCHASE_PLAN.ITEM.GUARANTEE' | translate }}</label>
+                                   <input type="number"
+                                          class="form-control"
+                                          name="guarantee"
+                                          min="1"
+                                          placeholder="{{ 'PURCHASE_PLAN.ITEM.GUARANTEE' | translate }}"
+                                          [(ngModel)]="dialogRef.input.rowData.guarantee"
+                                          required>
+                                   <validate-message [form]="form"
+                                                     controlName="guarantee"></validate-message>
+                            </div>
+                            <div *ngIf="dialogRef.input.isInternal"
+                                 class="col-md-3 mb-3">
+                                   <label>{{ 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' | translate }}</label>
+                                   <input type="text"
+                                          class="form-control"
+                                          name="deliveryLocation"
+                                          placeholder="{{ 'PURCHASE_PLAN.ITEM.DELIVERY_LOCATION' | translate }}"
+                                          [(ngModel)]="dialogRef.input.rowData.deliveryLocation">
+                                   <validate-message [form]="form"
+                                                     controlName="deliveryLocation"></validate-message>
+                            </div>
+                            <div *ngIf="!dialogRef.input.isInternal"
+                                 class="col-md-1 mb-3"
+                                 style="display: block;padding: 16px 16px 0px 16px;">
+                                   <label>
+                                          <mat-checkbox name="hasImportLicense"
+                                                        class="example-margin"
+                                                        [ngModel]="dialogRef.input.rowData.hasImportLicense"
+                                                        (ngModelChange)="dialogRef.input.rowData.hasImportLicense = $event ? 1 : 0"
+                                                        [checked]="dialogRef.input.rowData.hasImportLicense == 1"
+                                                        [color]="'primary'"> {{ 'Kiểm tra chất lượng' | translate }}
+                                          </mat-checkbox>
+                                   </label>
+                                   <label>
+                                          <mat-checkbox name="isConformity"
+                                                        class="example-margin"
+                                                        [ngModel]="dialogRef.input.rowData.isConformity"
+                                                        (ngModelChange)="dialogRef.input.rowData.isConformity = $event ? 1 : 0"
+                                                        [checked]="dialogRef.input.rowData.isConformity == 1"
+                                                        [color]="'primary'"> {{ 'Hợp quy' | translate }}
+                                          </mat-checkbox>
+                                   </label>
+                            </div>
+                            <div *ngIf="!dialogRef.input.isInternal"
+                                 class="col-md-2 mb-3">
+                            </div>
+                            <div class="col-md-3 mb-3"
+                                 *ngIf="!dialogRef.input.isInternal || dialogRef.input.rowData.itemType === 'SRV'"
+                                 style="display: block;padding: 16px 16px 0px 16px; ">
+                                   <label style="display: block;"
+                                          *ngIf="!dialogRef.input.isInternal">
+                                          <mat-checkbox name="hasEnergyEfficiency"
+                                                        class="example-margin"
+                                                        [ngModel]="dialogRef.input.rowData.hasEnergyEfficiency"
+                                                        (ngModelChange)="dialogRef.input.rowData.hasEnergyEfficiency = $event ? 1 : 0"
+                                                        [checked]="dialogRef.input.rowData.hasEnergyEfficiency == 1"
+                                                        [color]="'primary'"> {{ 'Hiệu suất năng lượng' | translate }}
+                                          </mat-checkbox>
+                                   </label>
+                                   <label *ngIf="dialogRef.input.rowData.itemType === 'SRV'">
+                                          <mat-checkbox name="isUpdateSrv"
+                                                        class="example-margin"
+                                                        [ngModel]="dialogRef.input.rowData.isUpdateSrv"
+                                                        (change)="ongChangeIsUpdateSrv($event)"
+                                                        (ngModelChange)="dialogRef.input.rowData.isUpdateSrv = $event ? 1 : 0"
+                                                        [checked]="dialogRef.input.rowData.isUpdateSrv == 1"
+                                                        [color]="'primary'"> {{ 'Update SRV' | translate }}
+                                          </mat-checkbox>
+                                   </label>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                   <label>{{ 'Ghi chú' | translate }}</label>
+                                   <textarea type="text"
+                                             class="form-control"
+                                             name="note"
+                                             placeholder="Ghi chú"
+                                             [(ngModel)]="dialogRef.input.rowData.note"></textarea>
+                                   <validate-message [form]="form"
+                                                     controlName="note"></validate-message>
+                            </div>
+                            <div class="col-md-3 mb-3"
+                                 *ngIf="dialogRef.input.rowData.isUpdateSrv && dialogRef.input.rowData.itemType === 'SRV'">
+                                   <label>Tài khoản định khoản</label>
+                                   <select-term-account name="termAccount"
+                                                        [title]="dialogRef.input.rowData.termAccount"
+                                                        placeholder="Tài khoản định khoản"
+                                                        [ouId]="dialogRef.input.rowData.ouCode"
+                                                        [(ngModel)]="dialogRef.input.rowData.termAccount">
+                                   </select-term-account>
+                            </div>
+                            <div class="col-md-3 mb-3"
+                                 *ngIf="dialogRef.input.rowData.isUpdateSrv && dialogRef.input.rowData.itemType === 'SRV'">
+                                   <label>Mốc dự án</label>
+                                   <select-project-milestone name="projectMilestone"
+                                                             [title]="dialogRef.input.rowData.projectMilestone"
+                                                             [projectCode]="dialogRef.input.purchaseOrderData.projectCode"
+                                                             placeholder="Mốc dự án"
+                                                             [(ngModel)]="dialogRef.input.rowData.projectMilestone">
+                                   </select-project-milestone>
+                            </div>
+                     </div>
+              </div>
+              <div *ngIf="dialogRef.input.updateType === 2">
+                     <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                   <label>{{ 'PURCHASE_ORDER.ITEM.EXPECTED_DATE' | translate }}</label>
+                                   <span class="form-control">
+                                          {{ dialogRef.input.rowData.expectedDate | date: mainConfig.formatDateList }}
+                                   </span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                   <label class="lbl-required">
+                                          {{ 'PURCHASE_ORDER.ITEM.EXPECTED_RETURN_DATE' | translate }}</label>
+                                   <input-date name="responseDate"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               required
+                                               (blur)="changeResponseDate.emit(dialogRef.input.rowData)"
+                                               [(ngModel)]="dialogRef.input.rowData.responseDate">
+                                   </input-date>
+                            </div>
+                     </div>
+                     <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                   <label>{{ 'PURCHASE_ORDER.ITEM.EXP_RES_DATE_LEAVE' | translate }}</label>
+                                   <input-date name="expectedResDateLeave"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               [(ngModel)]="dialogRef.input.rowData.expectedResDateLeave">
+                                   </input-date>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                   <label>{{ 'PURCHASE_ORDER.ITEM.ACT_RES_DATE_LEAVE' | translate }}</label>
+                                   <input-date name="actualResDateLeave"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               [(ngModel)]="dialogRef.input.rowData.actualResDateLeave">
+                                   </input-date>
+                            </div>
+                     </div>
+                     <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                   <label>{{ 'PURCHASE_ORDER.ITEM.ACT_RES_DATE_COME' | translate }}</label>
+                                   <input-date name="actualResDateCome"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               [(ngModel)]="dialogRef.input.rowData.actualResDateCome">
+                                   </input-date>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                   <label>{{ 'PURCHASE_ORDER.ITEM.STORAGE_DATE' | translate }}</label>
+                                   <input-date name="storageDate"
+                                               validateTooltip
+                                               [validateForm]="form"
+                                               [(ngModel)]="dialogRef.input.rowData.storageDate">
+                                   </input-date>
+                            </div>
+                     </div>
+                     <span class="font-italic">*Mỗi lần thay đổi thông tin tiến độ hàng về. Hệ thống sẽ gửi thông báo
+                            qua mail tới AM, PM. Xin vui lòng kiểm tra kĩ trước khi thực hiện lưu thay đổi.</span>
+              </div>
+       </form>
+</crud-dialog>

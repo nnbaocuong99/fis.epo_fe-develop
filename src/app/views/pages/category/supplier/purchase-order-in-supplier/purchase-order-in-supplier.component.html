@@ -1,0 +1,102 @@
+<div class="mt-5">
+    <ngb-tabset [justify]="'start'"
+                (tabChange)="setFragmentToRoute($event)"
+                [activeId]="activeIdTab">
+        <ngb-tab *ngFor="let tab of tabs"
+                 [id]="tab.value">
+            <ng-template ngbTabTitle>
+                <span>
+                    {{ tab.label | translate }} <b>
+                        <span [ngClass]="'badge badge-pill ' + tab.class"
+                              *ngIf="tab.count">{{ tab.count }}</span></b>
+                </span>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+
+    <div [ngClass]="{'hide': activeIdTab !== 1}">
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <div class="mat-table__bottom">
+                    <mat-spinner [diameter]="20"
+                                 *ngIf="purchaseOrderService.isLoading$ | async"></mat-spinner>
+                    <mat-paginator #paginator
+                                   [pageSize]="5"
+                                   [pageSizeOptions]="[5, 10, 30, 50]"
+                                   [length]="dataSource.paginatorTotal"
+                                   [showFirstLastButtons]="true"></mat-paginator>
+                </div>
+            </div>
+        </div>
+
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     tableStyleClass="table-no-wrap">
+                <ng-template pTemplate="header">
+                    <tr class="background-table-header">
+                        <th *ngFor="let header of headers"
+                            [width]="header.width"
+                            [ngClass]="header.class"
+                            class="align-center header-height">{{ header.title | translate }}</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr>
+                        <td [title]="request.pageSize * request.pageIndex + rowIndex + 1">
+                            {{ request.pageSize * request.pageIndex + rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.orgApplyAcronym">{{ rowData.orgApplyAcronym }}</td>
+                        <td [title]="rowData.projectCode">{{ rowData.projectCode }}</td>
+                        <td [title]="rowData.groupContractNo">{{ rowData.groupContractNo }}</td>
+                        <td [title]="rowData.code">{{ rowData.code }}</td>
+                        <td [title]="(rowData.areaType | label:areaTypes) | translate">
+                            {{ (rowData.areaType | label:areaTypes) | translate }}
+                        </td>
+                        <td [title]="rowData.orgApplyName">{{ rowData.orgApplyName }}</td>
+                        <td [title]="rowData.totalAmountInvoice">{{ rowData.totalAmountInvoice }}</td>
+                        <td [title]="rowData.totalAmount">{{ rowData.totalAmount }}</td>
+                        <td [title]="rowData.vendorRate">
+                            <p-rating [(ngModel)]="rowData.vendorRate"
+                                      [cancel]="false"
+                                      (ngModelChange)="changeVendorRate($event, rowData)">
+                            </p-rating>
+                        </td>
+                        <td [title]="rowData.qualityMismatch">
+                            <select class="form-control"
+                                    [(ngModel)]="rowData.qualityMismatch"
+                                    (change)="changeQualityMismatch($event.target.value, rowData)">
+                                <option [value]="false">
+                                    {{ 'SUPPLIER.EVALUATE_THE_QUALITY_OF_GOODS.GOOD' | translate }}
+                                </option>
+                                <option [value]="true">
+                                    {{ 'SUPPLIER.EVALUATE_THE_QUALITY_OF_GOODS.NOT_GOOD' | translate }}
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div *ngIf="dataSource.items && dataSource.items.length === 0">
+                <view-empty></view-empty>
+            </div>
+        </div>
+    </div>
+
+    <div [ngClass]="{'hide': activeIdTab !== 2}">
+
+    </div>
+</div>

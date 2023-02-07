@@ -1,0 +1,258 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'BRAND.BRAND_VIEW' | translate"
+                       [viewLoading$]="brandService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goToEdit()">
+                <i class="pi pi-fw pi-pencil"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.EDIT' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="viewHistory()">
+                <i class="fas fa-history"></i>
+                <span class="kt-hidden-mobile">{{ 'PURCHASE_ORDER.VIEW_HISTORY' | translate }}</span>
+            </a>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <ngb-tabset>
+            <!-- tab Thông tin hãng -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{'Thông tin hãng'| translate}}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="kt-grid__item">
+                        <form autocomplete="off"
+                              #form="ngForm"
+                              id="id-form-brand">
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin chung hãng'| translate}}
+                                </h5>
+                                <table class="table table-no-wrap">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.CODE' | translate }}:
+                                                <b>{{ brandData.code }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.NAME_BRAND' | translate }}:
+                                                <b>{{ brandData.name }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Tên hãng viết tắt' | translate }}:
+                                                <b>{{ brandData.acronymName }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.PARADIGM' | translate }}:
+                                                <b>{{ brandData.model }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Năm tài chính - Từ ngày' | translate }}:
+                                                <b> {{ brandData.financialYearFd | date: mainConfig.formatDateList}}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Năm tài chính - Đến ngày' | translate }}:
+                                                <b>{{ brandData.financialYearTd | date: mainConfig.formatDateList}}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.NEW_PRODUCT' | translate }}:
+                                                <b>{{ brandData.newProduct }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.PARTNER_RATING' | translate }}:
+                                                <b>{{ brandData.partnerRating }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.BENEFIT' | translate }}:
+                                                <b>{{ brandData.benefit }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.DEFAULT_DISCOUNT' | translate }}:
+                                                <b>{{ brandData.defaultDiscount }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Chiết khấu đặc biệt' | translate }}:
+                                                <b>{{ brandData.specialDiscount }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.DISTRIBUTOR_RETAILER' | translate }}:
+                                                <b>{{ brandData.distributorOrRetailer | label: brandType }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.PAYMENT_TERMS' | translate}}:
+                                                <b>{{ brandData.termsOfPayment }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.PAYMENT_METHODS' | translate}}:
+                                                <b>{{ brandData.paymentMethods }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Credit Limit' | translate}}:
+                                                <b>{{ brandData.creditLimit }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.POSTPAID' | translate}}:
+                                                <b>{{ brandData.postpaid }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.CONTRACTOR_TAX' | translate}}:
+                                                <b>{{ brandData.fct }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.TRANSPORT_FEE' | translate}}:
+                                                <b>{{ brandData.freightFee }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.POLICY' | translate}}:
+                                                <b>{{ brandData.policy }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.INCENTIVE' | translate}}:
+                                                <b>{{ brandData.incentive }}</b>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.MDF' | translate}}:
+                                                <b>{{ brandData.mdf }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Năm cập nhật' | translate}}:
+                                                <b>{{ 'Năm: ' + brandData.brandYear }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Hiệu lực đối tác - Từ ngày' | translate}}:
+                                                <b>{{ brandData.fromDate | date: mainConfig.formatDateList}}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Đến Ngày' | translate}}:
+                                                <b>{{ brandData.toDate | date: mainConfig.formatDateList}}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'Priority' | translate }}:
+                                                <b>{{ brandData?.priority }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'FIS Partner ID' | translate }}:
+                                                <b>{{ brandData?.fisPartnerId }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Deal Registration' | translate }}:
+                                                <b>{{ brandData?.dealRegistration }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'Case Studies' | translate }}:
+                                                <b>{{ brandData?.caseStudies }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.NOTE' | translate}}:
+                                                <b>{{ brandData.note }}</b>
+                                            </td>
+                                            <td *ngIf="brandData.id"
+                                                style="width: 25%">{{ 'File đính kèm' | translate }}:
+                                                <b class="btn-link"
+                                                   style="cursor: pointer;"
+                                                   (click)="onBtnDownloadClick()">{{ brandFile?.name }}</b>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-partner-hierarchy [brandData]="brandData"
+                                                       [editTable]="false"></app-partner-hierarchy>
+                            </div>
+                            <br>
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-brand-revenue [editTable]="false"></app-brand-revenue>
+                            </div>
+                            <br>
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-brand-marketing-fund-info #brandMarketingFundInfo
+                                                               [editTable]="false"></app-brand-marketing-fund-info>
+                            </div>
+                            <br>
+                            <div style="border-style: hidden; padding: 6px">
+                                <app-brand-membership-requirement [editTable]="false">
+                                </app-brand-membership-requirement>
+                            </div>
+
+                            <div style="border-style: hidden; padding: 6px">
+                                <h5 class="kt-margin-t-15 kt-margin-b-15">
+                                    <i class="fab fa-envira"></i> {{'Thông tin chi tiết bảo hành'| translate}}
+                                </h5>
+                                <table class="table table-no-wrap">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.WARRANTY_VALIDITY' | translate }}:
+                                                <b>{{ brandData.warrantyValidity }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.BACKDATE' | translate }}:
+                                                <b>{{ brandData.backDate }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.MAINTENANCE_AND_SUPPORT' | translate }}:
+                                                <b>{{ brandData.maintenanceAndSupport }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.RELATED_DOCUMENTS' | translate }}:
+                                                <b>{{ brandData.relatedDocuments }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%">{{ 'BRAND.RENEWAL' | translate }}:
+                                                <b>{{ brandData.renewal }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.REINSTATEMENT' | translate }}:
+                                                <b>{{ brandData.reinstatement }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.REFERENCE_LINK' | translate }}:
+                                                <b>{{ brandData.referenceLink }}</b>
+                                            </td>
+                                            <td style="width: 25%">{{ 'BRAND.NOTE' | translate }}:
+                                                <b>{{ brandData.warrantyNotes }}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Thông tin liên hệ -->
+                            <app-contact-info [editTable]="false"></app-contact-info>
+                        </form>
+                    </div>
+
+                </ng-template>
+            </ngb-tab>
+            <!-- tab Phân cấp đổi tác -->
+            <!-- <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'Phân cấp đổi tác'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <app-partner-hierarchy [brandData]="brandData"
+                                           [editTable]="false"
+                                           [file]="partnerHierarchyFile"></app-partner-hierarchy>
+                </ng-template>
+            </ngb-tab> -->
+            <!-- tab thông tin hồ sơ  -->
+            <ngb-tab>
+                <ng-template ngbTabTitle>
+                    <h5>{{ 'Hồ sơ'| translate }}</h5>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <!-- Thông tin hồ sơ -->
+                    <attach-document mainModule="BRAND_ATTACHMENT"
+                                     fileModule="Attachment\Brand\{{currentBrandId}}"
+                                     recordId="{{currentBrandId}}"
+                                     [formTitle]="'Danh mục hồ sơ hãng'"
+                                     [multiple]="true"
+                                     [hideOptional]="true">
+                    </attach-document>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-brand-history #brandHistory></app-brand-history>

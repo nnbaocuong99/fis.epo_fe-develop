@@ -1,0 +1,38 @@
+<crud-dialog [dialogRef]="dialogRef"
+             [form]="form"
+             (save)="onBtnSaveClick()">
+    <form autocomplete="off"
+          #form="ngForm"
+          id="select-sync-source-add">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>{{ 'COMMON.CRUD.CODE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="code"
+                       placeholder="{{ 'COMMON.CRUD.CODE' | translate }}"
+                       [(ngModel)]="dataSource.code"
+                       required>
+                <validate-message [form]="form"
+                                  controlName="code"></validate-message>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label>{{ 'COMMON.CRUD.NAME' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="name"
+                       placeholder="{{ 'COMMON.CRUD.NAME' | translate }}"
+                       [(ngModel)]="dataSource.name"
+                       required>
+                <validate-message [form]="form"
+                                  controlName="name"></validate-message>
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-success btn-label-brand mt-3"
+                (click)="onBtnSaveClick()">{{ 'COMMON.SELECT' | translate }}</button>
+        <button class="btn btn-success btn-label-dark mt-3"
+                (click)="dialogRef.hide()">{{ 'COMMON.CLOSE' | translate }}</button>
+    </ng-template>
+</crud-dialog>

@@ -1,0 +1,78 @@
+<kt-portlet>
+	<kt-portlet-header *ngIf="!formData.hideHeader"
+					   [class]="'kt-portlet__head--lg'"
+					   [icon]="formData.icon"
+					   [title]="formData.title | translate"
+					   [viewLoading$]="viewLoading$">
+		<ng-container ktPortletTools>
+			<a (click)="cancel.emit()"
+			   class="btn btn-secondary kt-margin-r-10"
+			   mat-raised-button
+			   *ngIf="formData.isCancel">
+				<i class="la la-arrow-left"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+			</a>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<ng-content></ng-content>
+		<div *ngIf="!formData.hideHeader && !formData.isHideFooter">
+			<button class="btn btn-sm btn-warning float-left mr-2"
+					title="{{ 'COMMON.DELETE' | translate }}(Ctrl + Delete)"
+					*ngIf="formData.isDelete"
+					(click)="onBtnDeleteClick()">{{ 'COMMON.DELETE' | translate }}</button>
+			<button *ngIf="isSave"
+					class="btn btn-sm btn-success mr-2"
+					title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+					(click)="onBtnSaveClick()">{{ 'COMMON.SAVE' | translate }}</button>
+			<!-- Tạm thời ẩn button lưu nháp -->
+			<button class="btn btn-sm btn-success mr-2"
+					*ngIf="isSaveDraft"
+					title="{{ 'COMMON.SAVE_AS_DRAFT' | translate }}"
+					(click)="onBtnSaveAsDraftClick()">
+				<i class="fal fa-save"></i> {{ 'COMMON.SAVE_AS_DRAFT' | translate }}</button>.
+
+			<button class="btn btn-sm btn-secondary mr-2"
+					title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+					*ngIf="formData.isCancel"
+					(click)="onBtnCancelClick()">{{ 'COMMON.CANCEL' | translate }}</button>
+		</div>
+		<div class="kt-margin-t-30"
+			 *ngIf="formData.hideHeader">
+			<button class="btn btn-secondary kt-margin-r-15"
+					title="{{ 'COMMON.CANCEL' | translate }}(Esc)"
+					(click)="onBtnCancelClick()"
+					mat-raised-button>
+				<i class="la la-arrow-left"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.PREVIOUS' | translate }}</span>
+			</button>
+			<button *ngIf="isSaveDraft"
+					class="btn btn-primary bg-success kt-margin-r-15"
+					title="{{ 'COMMON.SAVE_AS_DRAFT' | translate }}"
+					(click)="onBtnSaveAsDraftClick()"
+					mat-raised-button
+					color="primary">
+				<!-- <i class="la la-arrow-right"></i> -->
+				<i class="fal fa-save"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.SAVE_AS_DRAFT' | translate }}</span>
+			</button>
+			<button class="btn btn-primary kt-margin-r-15"
+					title="{{ 'COMMON.SAVE' | translate }}(Ctrl + S)"
+					(click)="onBtnSaveClick()"
+					mat-raised-button
+					color="primary">
+				<i class="la la-arrow-right"></i>
+				<span class="kt-hidden-mobile">{{ 'COMMON.NEXT' | translate }}</span>
+			</button>
+
+		</div>
+	</kt-portlet-body>
+</kt-portlet>
+
+<p-confirmDialog #dlgConfirm
+				 header="Confirmation"
+				 appendTo="body"
+				 [baseZIndex]="10001"
+				 [key]="key"
+				 position="top"
+				 icon="pi pi-exclamation-triangle"></p-confirmDialog>

@@ -1,0 +1,111 @@
+<div class="input-group">
+    <input type="search"
+           class="form-control"
+           placeholder="{{ placeholder | translate }}"
+           [(ngModel)]="value"
+           placement="bottom-right"
+           ngbTooltip="{{ value }}"
+           (ngModelChange)="onModelChangeInput($event)"
+           (keydown)="$event.preventDefault()"
+           (paste)="$event.preventDefault()"
+           [disabled]="disabled"
+           [required]="required">
+    <div class="input-group-append">
+        <button class="input-group-text input-group-right attach-button"
+                (click)="onFunctionClick()">
+            <i class="fal fa-ellipsis-v"></i>
+        </button>
+    </div>
+</div>
+
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '65%', minWidth: '50%'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="9000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="onBtnCancelClick()">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'USER.SELECT_AF_GROUP' | translate }}
+    </p-header>
+
+    <div class="mb-3">
+        <p-treeTable [value]="afGroupService.treeData"
+                     [(selection)]="selectedItems"
+                     (onNodeSelect)="nodeSelect($event)"
+                     (onNodeUnselect)="nodeUnselect($event)"
+                     selectionMode="checkbox"
+                     dataKey="id">
+            <ng-template pTemplate="header">
+                <tr class="background-table-header">
+                    <th [width]="'250px'">
+                        {{ 'Code' | translate }}
+                    </th>
+                    <th [width]="'200px'">
+                        {{ 'Name' | translate }}
+                    </th>
+                    <th [width]="'200px'">
+                        {{ 'SubDepartment name' | translate }}
+                    </th>
+                    <th *ngIf="!choose"
+                        [width]="'250px'">
+                        {{ 'Roles' | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowNode
+                         let-rowData="rowData">
+                <tr [pEditableRow]="rowData"
+                    (click)="idShowTool = rowData.id">
+                    <td [title]="rowData.code">
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                        <p-treeTableCheckbox [value]="rowNode"></p-treeTableCheckbox>
+                        <span>{{ rowData.code }}</span> <span style="color: #2196f3;">
+                            {{ rowData.countSelected ? ('(' + rowData.countSelected + ')') : '' }}</span>
+                    </td>
+                    <td [title]="rowData.name">{{ rowData.name }}</td>
+                    <td [title]="rowData.subDepartmentName">{{ rowData.subDepartmentName }}</td>
+                    <td *ngIf="!choose"
+                        [title]="rowData.roles">
+                        <ng-select-async *ngIf="rowNode.parent && idShowTool === rowData.id"
+                                         name="role"
+                                         bindLabel="code"
+                                         suffixLabel="name"
+                                         placeholder="{{ 'USER.ROLE' | translate }}"
+                                         [multiple]="true"
+                                         [closeOnSelect]="true"
+                                         [service]="roleService"
+                                         [(ngModel)]="rowData.rolesDto"
+                                         (ngModelChange)="onChangeRoles(rowData, $event)">
+                        </ng-select-async>
+                        <span *ngIf="rowNode.parent && idShowTool !== rowData.id">{{ rowData.roles }}</span>
+                    </td>
+            </ng-template>
+        </p-treeTable>
+    </div>
+    <p-footer>
+        <div class="mt-3">
+            <button *ngIf="!choose"
+                    class="btn btn-sm btn-warning mr-2 float-left"
+                    title="{{ 'COMMON.UNSELECT_ALL' | translate }}"
+                    (click)="onBtnUnselectAllClick()">
+                <i class="fas fa-backspace"></i> {{ 'COMMON.UNSELECT_ALL' | translate }}
+            </button>
+            <button class="btn btn-sm btn-primary mr-2"
+                    title="{{ 'COMMON.SELECT' | translate }}"
+                    (click)="onBtnChooseClick()">
+                <i class="fal fa-save"></i> {{ 'COMMON.CHOOSE' | translate }}
+                {{ selectedItems.length !== 0 ? '(' + selectedItems.length + ')' : '' }}
+            </button>
+            <button class="btn btn-sm btn-default mr-2"
+                    title="{{ 'COMMON.CANCEL' | translate }}"
+                    (click)="onBtnCancelClick()">
+                <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+            </button>
+        </div>
+    </p-footer>
+</p-dialog>

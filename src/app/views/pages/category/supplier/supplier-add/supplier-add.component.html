@@ -1,0 +1,711 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'SUPPLIER.SUPPLIER_INFO' | translate"
+                       [viewLoading$]="supplierService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="kt-grid__item">
+
+            <form autocomplete="off"
+                  #form="ngForm"
+                  id="id-form-supplier">
+
+                <h5 class="kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'SUPPLIER.GENERAL_INFO'| translate}}
+                </h5>
+
+                <div class="form-row">
+
+                    <div class="col-md-2 mb-3">
+                        <label class="lbl-required">{{ 'SUPPLIER.TYPE' | translate }}</label>
+                        <ng-select [items]="arrType"
+                                   bindLabel="label"
+                                   bindValue="value"
+                                   name="type"
+                                   placeholder="{{ 'SUPPLIER.TYPE' | translate }}"
+                                   [(ngModel)]="supplierData.type"
+                                   required>
+                            <ng-template ng-label-tmp
+                                         let-item="item">
+                                {{ item.label | translate }}
+                            </ng-template>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                {{ item.label | translate }}
+                            </ng-template>
+                        </ng-select>
+                        <validate-message [form]="form"
+                                          controlName="type"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label class="lbl-required">{{ 'SUPPLIER.NAME' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="name"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.NAME' | translate }}"
+                               [(ngModel)]="supplierData.name"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="name"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.ACRONYM_NAME' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="acronymName"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.ACRONYM_NAME' | translate }}"
+                               [(ngModel)]="supplierData.acronymName">
+                        <validate-message [form]="form"
+                                          controlName="acronymName"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label class="lbl-required">{{ 'SUPPLIER.CODE_TAX_CODE' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="code"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.CODE_TAX_CODE' | translate }}"
+                               [(ngModel)]="supplierData.code"
+                               supplierCodeExistValidator
+                               [id]="supplierData.id"
+                               (ngModelChange)="supplierData.taxCode = supplierData.code"
+                               required>
+                        <validate-message [form]="form"
+                                          controlName="code"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'Email' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="email"
+                               maxlength="255"
+                               placeholder="{{ 'Email' | translate }}"
+                               [(ngModel)]="supplierData.email"
+                               emailTypeValidator
+                               supplierEmailExistValidator
+                               [id]="supplierData.id">
+                        <validate-message [form]="form"
+                                          controlName="email"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.INVOICE_ADDRESS' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="invoiceAddress"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.INVOICE_ADDRESS' | translate }}"
+                               [(ngModel)]="supplierData.invoiceAddress">
+                        <validate-message [form]="form"
+                                          controlName="invoiceAddress"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.TRADING_ADDRESS' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="tradingAddress"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.TRADING_ADDRESS' | translate }}"
+                               [(ngModel)]="supplierData.tradingAddress">
+                        <validate-message [form]="form"
+                                          controlName="tradingAddress"></validate-message>
+                    </div>
+
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.PEOPLE_REPRESENT' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="peopleRepresent"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.PEOPLE_REPRESENT' | translate }}"
+                               [(ngModel)]="supplierData.peopleRepresent">
+                        <validate-message [form]="form"
+                                          controlName="peopleRepresent"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.POSITION_PEOPLE_REPRESENT' | translate }}</label>
+                        <input type="text"
+                               class="form-control"
+                               name="positionPeopleRepresent"
+                               maxlength="255"
+                               placeholder="{{ 'SUPPLIER.POSITION_PEOPLE_REPRESENT' | translate }}"
+                               [(ngModel)]="supplierData.positionPeopleRepresent">
+                        <validate-message [form]="form"
+                                          controlName="positionPeopleRepresent"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.DISTRIBUTING_GOODS' | translate }}</label>
+                        <app-ng-select-add-tag name="distributingGoods"
+                                               [service]="configListService"
+                                               [request]="requestConfigList"
+                                               bindLabel="name"
+                                               bindValue="name"
+                                               placeholder="{{ 'SUPPLIER.DISTRIBUTING_GOODS' | translate }}"
+                                               [(ngModel)]="supplierData.distributingGoodsDto"
+                                               (change)="onChangeDistributingGoods()">
+                        </app-ng-select-add-tag>
+                        <validate-message [form]="form"
+                                          controlName="distributingGoods"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.DEPOSIT_RATE' | translate }}</label>
+                        <input type="number"
+                               class="form-control"
+                               name="depositRate"
+                               (change)="onChangeDepositRate()"
+                               (keydown.Tab)="onChangeDepositRate()"
+                               (keydown.Enter)="onChangeDepositRate()"
+                               placeholder="{{ 'SUPPLIER.DEPOSIT_RATE' | translate }}"
+                               [(ngModel)]="supplierData.depositRate">
+                        <validate-message [form]="form"
+                                          controlName="depositRate"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.QUANTITY_REST_DEPOSIT_DATE' | translate }}</label>
+                        <input type="number"
+                               class="form-control"
+                               name="quantityRestDepositDate"
+                               (change)="onChangeQuantityRestDepositDate()"
+                               (keydown.Tab)="onChangeQuantityRestDepositDate()"
+                               (keydown.Enter)="onChangeQuantityRestDepositDate()"
+                               placeholder="{{ 'SUPPLIER.QUANTITY_REST_DEPOSIT_DATE' | translate }}"
+                               [(ngModel)]="supplierData.quantityRestDepositDate">
+                        <validate-message [form]="form"
+                                          controlName="quantityRestDepositDate"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>{{ 'SUPPLIER.COMMISSION_POLICY' | translate }}</label>
+                        <ng-select [items]="arrCommissionPolicy"
+                                   bindLabel="label"
+                                   bindValue="value"
+                                   name="commissionPolicy"
+                                   placeholder="{{ 'SUPPLIER.COMMISSION_POLICY' | translate }}"
+                                   [(ngModel)]="supplierData.commissionPolicy"
+                                   (change)="onChangeCommissionPolicy($event)">
+                            <ng-template ng-label-tmp
+                                         let-item="item">
+                                {{ item.label | translate }}
+                            </ng-template>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                {{ item.label | translate }}
+                            </ng-template>
+                        </ng-select>
+                        <validate-message [form]="form"
+                                          controlName="commissionPolicy"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3"
+                         *ngIf="supplierData.commissionPolicy === 1">
+                        <label>{{ 'SUPPLIER.COMMISSION_POLICY_DESCRIPTION' | translate }}</label>
+                        <textarea type="text"
+                                  class="form-control"
+                                  name="commissionPolicyDescription"
+                                  maxlength="255"
+                                  placeholder="{{ 'SUPPLIER.COMMISSION_POLICY_DESCRIPTION' | translate }}"
+                                  [(ngModel)]="supplierData.commissionPolicyDescription">
+                        </textarea>
+                        <validate-message [form]="form"
+                                          controlName="commissionPolicyDescription"></validate-message>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label class="lbl-required">{{ 'SUPPLIER.STATUS' | translate }}</label>
+                        <ng-select [items]="arrStatus"
+                                   bindLabel="label"
+                                   bindValue="value"
+                                   name="isActive"
+                                   placeholder="{{ 'SUPPLIER.STATUS' | translate }}"
+                                   [(ngModel)]="supplierData.isActive"
+                                   [disabled]="supplierData.vendorId"
+                                   required>
+                            <ng-template ng-label-tmp
+                                         let-item="item">
+                                {{ item.label | translate }}
+                            </ng-template>
+                            <ng-template ng-option-tmp
+                                         let-item="item">
+                                {{ item.label | translate }}
+                            </ng-template>
+                        </ng-select>
+                        <validate-message [form]="form"
+                                          controlName="isActive">
+                        </validate-message>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ 'Các dự án với khách hàng khác' | translate }}</label>
+                        <textarea type="text"
+                                  class="form-control"
+                                  name="projectOtherCus"
+                                  placeholder="{{ 'Các dự án với khách hàng khác' | translate }}"
+                                  [(ngModel)]="supplierData.projectOtherCus"></textarea>
+                        <validate-message [form]="form"
+                                          controlName="projectOtherCus"></validate-message>
+                    </div>
+
+                    <div *ngIf="supplierData.id"
+                         class="col-md-4 mb-3">
+                        <label>{{ 'SUPPLIER.ATTACHED_FILES' | translate }}</label>
+                        <single-attach-file module="Attachment\Supplier\{{supplierData.id}}">
+                        </single-attach-file>
+                    </div>
+
+                </div>
+
+                <h5 class="kt-margin-t-15 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'SUPPLIER.BANK_INFO.TITLE'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="supplierData.listSupplierBank"
+                             [columns]="arrHeaderBank"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.name">
+                                    <input pInputText
+                                           name="{{ 'bankName' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.name"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.accountNumber">
+                                    <input pInputText
+                                           name="{{ 'accountNumber' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.accountNumber"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.receiverName">
+                                    <input pInputText
+                                           name="{{ 'receiverName' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.receiverName"
+                                           required>
+                                </td>
+                                <td [title]="rowData.main"
+                                    class="text-center">
+                                    <mat-checkbox name="{{ 'main' + rowData.id }}"
+                                                  class="example-margin"
+                                                  [ngModel]="rowData.main"
+                                                  (ngModelChange)="rowData.main = $event ? 1 : 0"
+                                                  [checked]="rowData.main == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowBank(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="supplierData.listSupplierBank.length + 1">
+                                    {{ supplierData.listSupplierBank.length + 1 }}
+                                </td>
+                                <td [title]="addItemBank.name">
+                                    <input pInputText
+                                           name="bankName"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBank.name">
+                                </td>
+                                <td [title]="addItemBank.accountNumber">
+                                    <input pInputText
+                                           name="bankAccountNumber"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBank.accountNumber">
+                                </td>
+                                <td [title]="addItemBank.receiverName">
+                                    <input pInputText
+                                           name="bankReceiverName"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemBank.receiverName">
+                                </td>
+                                <td [title]="addItemBank.main"
+                                    class="text-center">
+                                    <mat-checkbox name="bankMain"
+                                                  class="example-margin"
+                                                  [ngModel]="addItemBank.main"
+                                                  (ngModelChange)="addItemBank.main = $event ? 1 : 0"
+                                                  [checked]="addItemBank.main == 1"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button (click)="addNewRowBank()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'SUPPLIER.GUARANTEE_CENTER_INFO.TITLE'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="supplierData.listSupplierGuaranteeCenter"
+                             [columns]="arrHeaderGuaranteeCenter"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.name">
+                                    <input pInputText
+                                           name="{{ 'name' + rowData.id }}"
+                                           type="text"
+                                           maxlength="5000"
+                                           [(ngModel)]="rowData.name"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.address">
+                                    <input pInputText
+                                           name="{{ 'guaranteeCenterAddress' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.address"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.phoneNumber">
+                                    <input pInputText
+                                           name="{{ 'guaranteeCenterPhoneNumber' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.phoneNumber"
+                                           required>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowGuaranteeCenter(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="supplierData.listSupplierGuaranteeCenter + 1">
+                                    {{ supplierData.listSupplierGuaranteeCenter.length + 1 }}
+                                </td>
+                                <td [title]="addItemGuaranteeCenter.name">
+                                    <input pInputText
+                                           name="nameCenter"
+                                           type="text"
+                                           maxlength="5000"
+                                           [(ngModel)]="addItemGuaranteeCenter.name">
+                                </td>
+                                <td [title]="addItemGuaranteeCenter.address">
+                                    <input pInputText
+                                           name="guaranteeCenterAddress"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemGuaranteeCenter.address">
+                                </td>
+                                <td [title]="addItemGuaranteeCenter.phoneNumber">
+                                    <input pInputText
+                                           name="guaranteeCenterPhoneNumber"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemGuaranteeCenter.phoneNumber">
+                                </td>
+                                <td style="text-align: center;">
+                                    <button (click)="addNewRowGuaranteeCenter()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'SUPPLIER.SALES_INFO.TITLE'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="supplierData.listSupplierSales"
+                             [columns]="arrHeaderSales"
+                             dataKey="id"
+                             editMode="row"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <span class="lbl-required"
+                                          *ngIf="col.isRequired">
+                                    </span>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex"
+                                     let-editing="editing">
+                            <tr [pEditableRow]="rowData">
+                                <td class="text-center"
+                                    [title]="rowIndex + 1">
+                                    {{ rowIndex + 1 }}
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.position">
+                                    <config-list-control name="{{ 'position' + rowData.id }}"
+                                                         type="SUPPLIER_POSITION"
+                                                         header="{{ 'SUPPLIER.SALES_INFO.POSITION' | translate }}"
+                                                         [items]="configListDataPositon"
+                                                         [hasEdit]="true"
+                                                         (change)="onRowEditInit(rowData)"
+                                                         [(ngModel)]="rowData.position">
+                                    </config-list-control>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.name">
+                                    <input pInputText
+                                           name="{{ 'name' + rowData.id }}"
+                                           type="text"
+                                           maxlength="255"
+                                           (change)="onRowEditInit(rowData)"
+                                           [(ngModel)]="rowData.name"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.phoneNumber">
+                                    <input pInputText
+                                           name="{{ 'phoneNumber' + rowData.id }}"
+                                           type="text"
+                                           (change)="onRowEditInit(rowData)"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.phoneNumber"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.email">
+                                    <input pInputText
+                                           name="{{ 'email' + rowData.id }}"
+                                           type="text"
+                                           (change)="onRowEditInit(rowData)"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.email"
+                                           required>
+                                </td>
+                                <td pInitEditableRow
+                                    [title]="rowData.note">
+                                    <input pInputText
+                                           name="{{ 'note' + rowData.id }}"
+                                           type="text"
+                                           (change)="onRowEditInit(rowData)"
+                                           maxlength="255"
+                                           [(ngModel)]="rowData.note">
+                                </td>
+                                <td style="text-align: center;">
+                                    <button pButton
+                                            pRipple
+                                            type="button"
+                                            icon="fas fa-trash-alt"
+                                            (click)="deleteRowSales(rowIndex)"
+                                            class="p-button-rounded p-button-text"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td class="text-center"
+                                    [title]="supplierData.listSupplierSales.length + 1">
+                                    {{ supplierData.listSupplierSales.length + 1 }}
+                                </td>
+                                <td>
+                                    <config-list-control name="position"
+                                                         type="SUPPLIER_POSITION"
+                                                         header="{{ 'SUPPLIER.SALES_INFO.POSITION' | translate }}"
+                                                         [items]="configListDataPositon"
+                                                         [hasEdit]="true"
+                                                         [(ngModel)]="addItemSales.position">
+                                    </config-list-control>
+                                </td>
+                                <td [title]="addItemSales.name">
+                                    <input pInputText
+                                           name="salesName"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemSales.name">
+                                </td>
+                                <td [title]="addItemSales.phoneNumber">
+                                    <input pInputText
+                                           name="salesPhoneNumber"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemSales.phoneNumber">
+                                </td>
+                                <td [title]="addItemSales.email">
+                                    <input pInputText
+                                           name="salesEmail"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemSales.email">
+                                </td>
+                                <td [title]="addItemSales.note">
+                                    <input pInputText
+                                           name="salesNote"
+                                           type="text"
+                                           maxlength="255"
+                                           [(ngModel)]="addItemSales.note">
+                                </td>
+                                <td style="text-align: center;">
+                                    <button (click)="addNewRowSales()"
+                                            pButton
+                                            pRipple
+                                            type="button"
+                                            icon="flaticon2-add-1"
+                                            class="p-button-rounded p-button-text">
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </ng-template>
+                    </p-table>
+                </div>
+            </form>
+
+            <app-purchase-order-in-supplier *ngIf="supplierData.vendorId"
+                                            [vendorId]="supplierData.vendorId"
+                                            (change)="changeListPo($event)">
+            </app-purchase-order-in-supplier>
+
+            <div class="mt-5">
+                <button class="btn btn-sm btn-success mr-2"
+                        title="{{ 'COMMON.SAVE' | translate }}"
+                        (click)="onBtnSaveClick()">
+                    <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                </button>
+
+                <button class="btn btn-sm btn-secondary mr-2"
+                        title="{{ 'COMMON.CANCEL' | translate }}"
+                        (click)="onBtnCancelClick()">
+                    <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+                </button>
+
+                <button *ngIf="supplierData.id"
+                        class="btn btn-sm btn-secondary float-right ml-3"
+                        title="{{ 'SUPPLIER.VIEW_HISTORY' | translate }}"
+                        (click)="viewHistory()">
+                    <i class="fas fa-history"></i>
+                    {{ 'SUPPLIER.VIEW_HISTORY' | translate }}
+                </button>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>
+
+<app-supplier-history #supplierHistory></app-supplier-history>

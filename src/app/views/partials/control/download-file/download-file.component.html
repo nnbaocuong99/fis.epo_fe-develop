@@ -1,0 +1,41 @@
+<!-- Button download -->
+<button type="button"
+        class="btn btn-sm btn-brand"
+        (click)="showDownloadFile()"><i [ngClass]="icon ? icon : 'fa fa-download'"></i>{{ label }}</button>
+
+<!-- Spinner show when loading -->
+<mat-spinner [diameter]="20"
+             *ngIf="fileService.isLoading$ | async"></mat-spinner>
+
+<!-- Dialog to view files download -->
+<p-dialog [(visible)]="dialogRef.isDisplay"
+          [modal]="true"
+          [responsive]="true"
+          [style]="{width: '782px', minWidth: '200px'}"
+          [minY]="70"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [focusOnShow]="false"
+          appendTo="body"
+          (onHide)="close()">
+    <p-header>
+        <i class="fal fa-cloud-download"></i> {{ title }}
+    </p-header>
+    <table *ngIf="listTemplateFile.length > 0"
+           class="table table-download-hover">
+        <tr *ngFor="let file of listTemplateFile; index as i">
+            <td [style.width]="'50%'"
+                class="td-small"><i class="fas fa-file file-icon"></i> {{ file.name }}</td>
+            <td [style.width]="'35%'">{{ file.note }}</td>
+            <td [style.width]="'10%'"
+                class="align-right">{{ getVolume(file.size) }}</td>
+            <td [style.width]="'5%'"
+                class="align-right">
+                <i *ngIf="file.id"
+                   style="font-size: 20px;cursor: pointer;"
+                   class="fal fa-arrow-alt-to-bottom"
+                   (click)="onBtnDownloadFile(file.id, file.name)"></i>
+            </td>
+        </tr>
+    </table>
+</p-dialog>

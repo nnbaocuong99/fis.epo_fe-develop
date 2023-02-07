@@ -1,0 +1,245 @@
+<kt-portlet>
+    <kt-portlet-header icon="fal fa-shopping-cart"
+                       [title]="'Danh sách Tax Invoice' | translate"
+                       [class]="'kt-portlet__head--lg'"
+                       [viewLoading$]="taxInvoiceService.isLoading$">
+        <ng-container ktPortletTools>
+            <app-toolbar [model]="toolbarModel"
+                         [widthFromSearch]="850">
+                <form autocomplete="off"
+                      #form="ngForm">
+                    <h5 style="margin-bottom: 15px;">{{ 'COMMON.FILTER' | translate }} </h5>
+                    <div class="form-row">
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'TAX_INVOICE.SUPPLIER_NAME' | translate }}</label>
+                            <ng-select-async name="vendorId"
+                                             bindLabel="name"
+                                             suffixLabel="code"
+                                             searchField="generalFilter"
+                                             placeholder="{{ 'TAX_INVOICE.SUPPLIER_NAME' | translate }}"
+                                             [multiple]="false"
+                                             [closeOnSelect]="true"
+                                             [service]="supplierService"
+                                             (change)="onChangeSupplier($event)"
+                                             [(ngModel)]="request.vendorIdDto">
+                            </ng-select-async>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'TAX_INVOICE.PO_CODE' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="poCode"
+                                   placeholder="{{ 'TAX_INVOICE.PO_CODE' | translate }}"
+                                   [(ngModel)]="request.poCode">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'PURCHASE_INVOICE.CREATOR' | translate }}</label>
+                            <ng-select-async name="createdBy"
+                                             bindLabel="userName"
+                                             suffixLabel="fullName"
+                                             placeholder="{{ 'PURCHASE_INVOICE.CREATOR' | translate }}"
+                                             [multiple]="false"
+                                             [closeOnSelect]="true"
+                                             [service]="userService"
+                                             (change)="request.createdByName = createdByNameDto?.userName"
+                                             [(ngModel)]="createdByNameDto">
+                            </ng-select-async>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'TAX_INVOICE.FROM_DATE' | translate }}</label>
+                            <input-date name="fromDate"
+                                        [(ngModel)]="request.fromDate"></input-date>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'TAX_INVOICE.TO_DATE' | translate }}</label>
+                            <input-date name="toDate"
+                                        [(ngModel)]="request.toDate"></input-date>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'TAX_INVOICE.TAX_INVOICE_NUMBER' | translate }}</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="code"
+                                   placeholder="{{ 'TAX_INVOICE.TAX_INVOICE_NUMBER' | translate }}"
+                                   [(ngModel)]="request.code">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>{{ 'TAX_INVOICE.STATUS' | translate }}</label>
+                            <select class="form-control"
+                                    name="status"
+                                    [(ngModel)]="request.status">
+                                <option [ngValue]="undefined"
+                                        selected>{{ 'COMMON.ALL' | translate }}</option>
+                                <option *ngFor="let item of statusTaxInvoice"
+                                        [value]="item.value">{{item.label | translate }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-row">
+                        <button type="submit"
+                                class="btn btn-sm btn-label-brand ml-2"
+                                (click)="onBtnSearchClick()">{{ 'COMMON.GO' | translate }}</button>
+                        <button type="reset"
+                                (click)="onBtnResetSearchClick()"
+                                class="btn btn-sm btn-label-brand ml-2">{{ 'COMMON.RESET' | translate }}</button>
+                    </div>
+                </form>
+            </app-toolbar>
+
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+        <div class="row kt-margin-b-15">
+            <div class="col-md-6">
+                <mat-form-field class="input-general-filter">
+                    <input matInput
+                           #searchInput
+                           (keydown.enter)="initData()"
+                           [(ngModel)]="request.generalFilter"
+                           placeholder="Search ..."
+                           class="mat-form-field mat-form-field-fluid">
+                    <mat-hint align="start">
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="mat-table__bottom">
+                <button class="btn btn-sm btn-label-brand"
+                        style="position: absolute;left: 0px;"
+                        (click)="onBtnMatchClick()"
+                        title="'Matching' | translate">
+                    {{ 'Matching' | translate }}</button>
+                <mat-spinner [diameter]="20"
+                             *ngIf="taxInvoiceService.isLoading$ | async"></mat-spinner>
+                <mat-paginator [pageSize]="5"
+                               [pageSizeOptions]="[3,5,10,30,50]"
+                               [length]="dataSource.paginatorTotal"
+                               [showFirstLastButtons]="true"></mat-paginator>
+            </div>
+        </div>
+        <br>
+        <div class="mat-table__wrapper">
+            <p-table [value]="dataSource.items"
+                     tableStyleClass="table-no-wrap"
+                     scrollHeight="600px"
+                     [(contextMenuSelection)]="selectedRowData"
+                     [contextMenu]="btnContextMenu"
+                     dataKey="id">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th [width]="'45px'"></th>
+                        <th *ngFor="let col of headerTable"
+                            [width]="col.width"
+                            [ngClass]="col.class">{{ col.title | translate }}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             let-rowData
+                             let-rowIndex="rowIndex">
+                    <tr [pContextMenuRow]="rowData">
+                        <td>
+                            <mat-radio-button class="example-radio-button"
+                                              (click)="onClickTaxInvoiceItemClick(rowData)"></mat-radio-button>
+                        </td>
+                        <td [title]="paginator.pageIndex * 10 + rowIndex + 1">
+                            {{ paginator.pageIndex * 10 + rowIndex + 1 }}
+                        </td>
+                        <td [title]="rowData.supplierName">{{ rowData.supplierName }}</td>
+                        <td [title]="rowData.poCode"
+                            class="header-link">
+                            <a [routerLink]="[ '../../purchase-order/list/view/', rowData.poId]"
+                               target="_blank">
+                                {{ rowData.poCode }}</a>
+                        </td>
+                        <td [title]="rowData.code"
+                            class="header-link"
+                            (click)="onBtnViewDialog(rowData)">
+                            {{ rowData.code }}
+                        </td>
+                        <td [title]="rowData.date | date: mainConfig.formatDateList">
+                            {{ rowData.date | date: mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.currency">{{ rowData.currency }}</td>
+                        <td class="align-right"
+                            [title]="rowData.value | currencyMask">{{ rowData.value | currencyMask }}</td>
+                        <td [title]="rowData.maturityDate | date: mainConfig.formatDateList">
+                            {{ rowData.maturityDate | date: mainConfig.formatDateList }}</td>
+                        <td [title]="rowData.maturityWeek">{{ rowData.maturityWeek }}</td>
+                        <td [title]="(rowData.status | label:statusTaxInvoice) | translate">
+                            {{ (rowData.status | label:statusTaxInvoice) | translate }}</td>
+                        <td class="align-right"
+                            [title]="rowData.valuePaid | currencyMask">{{ rowData.valuePaid | currencyMask }}</td>
+                        <td class="align-right"
+                            [title]="rowData.valueUnpaid | currencyMask">{{ rowData.valueUnpaid | currencyMask }}</td>
+                        <td [title]="rowData.creatorName">{{ rowData.creatorName }}</td>
+                        <td [title]="rowData.note">{{ rowData.note }}</td>
+                        <td class="action">
+                            <button mat-icon-button
+                                    [matMenuTriggerFor]="menu"
+                                    matTooltip="More actions">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                                <button mat-menu-item
+                                        (click)="onBtnViewDialog(rowData)">
+                                    <span>{{'COMMON.VIEW'| translate}}</span>
+                                </button>
+                                <button mat-menu-item
+                                        (click)="onBtnEditClick(rowData.id)">
+                                    <span>{{'COMMON.EDIT'| translate}}</span>
+                                </button>
+                                <button mat-menu-item
+                                        (click)="onBtnDeleteClick(rowData.id)">
+                                    <span>{{'COMMON.DELETE'| translate}}</span>
+                                </button>
+                                <button mat-menu-item
+                                        (click)="onBtnCloneClick(rowData)">
+                                    <span>{{'COMMON.CLONE'| translate}}</span>
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body"
+                             *ngIf="dataSource.items?.length === 0">
+                    <tr>
+                        <td colspan="12">
+                            {{ 'COMMON.EMPTY_DATA'| translate }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <p *ngIf="dataSource.items?.length == 0"
+               style="text-align: center;"><i class="fa fa-exclamation-triangle"
+                   aria-hidden="true"></i> {{ 'COMMON.LOAD_DATA' | translate }}</p>
+        </div>
+    </kt-portlet-body>
+</kt-portlet>
+<!-- Xem -->
+<app-tax-invoice-view [dialogRef]="dialogRef"></app-tax-invoice-view>
+
+<!-- Download template file -->
+<download-file style="display: none;"
+               label="Template file"
+               module="Template\TaxInvoice"
+               #downloadFileTemplateComponent></download-file>
+
+<!-- Upload file template -->
+<upload-file #importFile
+             [multiple]="false"
+             [accept]="'.xlsx'"
+             (onupload)="onBtnUploadClick()"></upload-file>
+
+
+<!-- Match Tax invoice vs COM -->
+<app-tax-invoice-map-commercial *ngIf="isShowMatchItem"
+                                [dialogRef]="dialogRefMatch"
+                                (success)="onSuccess()"></app-tax-invoice-map-commercial>
+
+<p-contextMenu #btnContextMenu
+               appendTo="body"
+               [model]="btnItems"
+               (onShow)="onShowContextMenu()"></p-contextMenu>

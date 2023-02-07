@@ -1,0 +1,32 @@
+.title-search {
+    cursor: pointer;
+    width: fit-content;
+    color: #0c4da2;
+    font-size: 16px;
+}
+
+.button-icon {
+    width: 2rem;
+    height: 2rem;
+    background: none !important;
+    border: none;
+}
+
+.button-icon:hover {
+    width: 2rem;
+    height: 2rem;
+    background-color: #e9ecef !important;
+    border-radius: 50%;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.error-classify {
+    border-left: 2px ridge red !important;
+}
+
+.btn:disabled {
+    cursor: not-allowed !important;
+}

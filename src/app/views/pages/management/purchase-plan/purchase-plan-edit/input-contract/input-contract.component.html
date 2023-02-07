@@ -1,0 +1,57 @@
+<p-dialog header="Tìm kiếm hợp đồng"
+          [(visible)]="dialogRef.isDisplay"
+          styleClass="p-dialog-md"
+          [maximizable]="true"
+          [baseZIndex]="10000"
+          [style]="{width: '90vw'}"
+          [modal]="true"
+          appendTo="body"
+          (onShow)="onDlgShow(contractComp)">
+    <form autocomplete="off"
+          #form="ngForm"
+          id="search-contract">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="prType"
+                       (change)="onChangeInput(contractComp)"
+                       placeholder="{{ 'PURCHASE_REQUEST.CONTRACT_NO' | translate }}"
+                       [(ngModel)]="request.contractNumber">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.PM_AM_ACC' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="buyerCode"
+                       (change)="onChangeInput(contractComp)"
+                       placeholder="{{ 'PURCHASE_REQUEST.PM_AM_ACC' | translate }}"
+                       [(ngModel)]="request.pmAcc">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label>{{ 'PURCHASE_REQUEST.ACCOUNTING_CODE' | translate }}</label>
+                <input type="text"
+                       class="form-control"
+                       name="prNo"
+                       (change)="onChangeInput(contractComp)"
+                       placeholder="{{ 'PURCHASE_REQUEST.ACCOUNTING_CODE' | translate }}"
+                       [(ngModel)]="request.accountingCode">
+            </div>
+            <div class="col-md-3 mb-3">
+                <br>
+                <button class="btn btn-sm btn-primary mt-3"
+                        (click)="onSearchContract(contractComp)">
+                    <i class="fal fa-file-search"></i>
+                    {{ 'COMMON.SEARCH' | translate }}</button>
+            </div>
+        </div>
+    </form>
+    <app-list-contract #contractComp></app-list-contract>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-sm btn-label-brand mt-3"
+                (click)="onSelectContract(contractComp)">{{ 'COMMON.SELECT' | translate }}</button>
+        <button class="btn btn-sm btn-label-dark mt-3"
+                (click)="onCloseDialog()">{{ 'COMMON.CLOSE' | translate }}</button>
+    </ng-template>
+</p-dialog>

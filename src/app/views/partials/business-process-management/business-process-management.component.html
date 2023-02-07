@@ -1,0 +1,701 @@
+<div *ngIf="objectData?.sproTicketId">
+    <div #wizard
+         class="kt-grid kt-wizard-v1 kt-wizard-v1--white"
+         id="kt_wizard_v1"
+         data-ktwizard-state="step-first">
+        <div class="kt-grid__item">
+            <h5 class="kt-margin-b-15">
+                <i class="fab fa-envira"></i> {{ 'SPRO.ORDER_STATUS' | translate}}
+            </h5>
+            <br>
+            <div [ngSwitch]="ticketInfo?.status">
+                <div *ngSwitchCase="'Canceled'">
+                    <h5 class="cancel"
+                        *ngIf="ticketInfo?.status === 'Canceled'">{{ 'SPRO.TICKET_CANCEL' | translate}}
+                    </h5>
+                </div>
+                <div *ngSwitchCase="'Closed'">
+                    <p-rating [(ngModel)]="rating"
+                              [cancel]="false"
+                              [readonly]="ticketInfo?.status ==='Closed'">
+                    </p-rating>
+                </div>
+            </div>
+            <div class="kt-wizard-v1__nav">
+                <div class="kt-wizard-v1__nav-items">
+                    <div class="kt-wizard-v1__nav-items">
+                        <a class="process kt-wizard-v1__nav-item"
+                           *ngFor="let item of relatives; index as i;"
+                           href="javascript:;"
+                           (click)="onStepClick(item, i)"
+                           data-ktwizard-type="step"
+                           [title]="item?.summary ? item?.summary : 'SPRO.TICKET_INFORMATION' | translate"
+                           [attr.data-ktwizard-state]="( i === 0 || ticketInfo?.status === 'Closed' || item?.status === 'Finished') ? 'current': ''">
+                            <div class="kt-wizard-v1__nav-body">
+                                <div class="kt-wizard-v1__nav-label"
+                                     [ngClass]="{'process': (relationships[i]?.status === 'working'), 'pending': relationships[i]?.status === 'pending'}">
+                                    {{i+1}}. {{item?.summary ? item?.summary : 'SPRO.TICKET_INFORMATION' | translate}}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <a style="cursor: pointer; color: blue;"
+                   (click)="goToLink(urlOriginBaOnline + '/secure/ViewTicket.jspa?id=' + objectData?.sproTicketId)">
+                    <u>{{ 'SPRO.VIEW_DETAIL' | translate}}</u>
+                </a>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+
+<!-- Dialog phase Ticket -->
+<p-dialog [(visible)]="isShowTicketDetail"
+          [modal]="true"
+          [resizable]="true"
+          appendTo="body"
+          [style]="{width: '80%'}">
+
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'SPRO.TICKET_INFORMATION' | translate }}
+    </p-header>
+
+    <!-- Ticket Information -->
+    <div>
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i>
+            <span (click)="isShowTicketInformation = !isShowTicketInformation"
+                  class="fa-btn">{{
+                'SPRO.TICKET_INFORMATION' | translate}}</span>
+        </h5>
+        <div [ngClass]="isShowTicketInformation?'':'hide'">
+            <div class="form-row mb-3">
+                <div class="col-md-2 title">{{ ('SPRO.TITLE' | translate) }} : </div>
+                <div class="col-md-10">{{ ticketInfo.title }}</div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-2 title">{{ 'SPRO.REQUEST_TYPE' | translate}} : </div>
+                <div class="col-md-10">{{ ticketInfo.processName }}</div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-2 title">{{ 'SPRO.OWNER' | translate}} : </div>
+                <div class="col-md-10">{{ ticketInfo.ticketOwnerDisp }}</div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.STATUS' | translate}} : </div>
+                    <div class="col-md-7">{{ ticketInfo.status }}</div>
+                </div>
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.LOCATION' | translate}} : </div>
+                    <div class="col-md-7">{{ ticketInfo.locationId | label: sites }}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.CREATED' | translate}} : </div>
+                    <div class="col-md-7">{{ ticketInfo.createdTime | date: mainConfig.formatFullDate }}</div>
+                </div>
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.RECEIVED' | translate}} : </div>
+                    <div class="col-md-7">{{ ticketInfo.receivedTimeTicks | date: mainConfig.formatFullDate }}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.RESPONSED' | translate}} : </div>
+                    <div class="col-md-7">{{ ticketInfo.responseTime | date: mainConfig.formatFullDate }}</div>
+                </div>
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.ESTIMATED_FINISH' | translate}} : </div>
+                    <div class="col-md-7">{{ ticketInfo.estimateToResponse | date: mainConfig.formatFullDate }}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row"
+                     *ngFor="let item of ticketDetails?.individual;">
+                    <div class="col-md-5">
+                        <label class="title">{{ item.name + ' : ' }}</label>
+                    </div>
+                    <div class="col-md-7"
+                         *ngIf="item.type !== 'upload'">
+                        <label>{{ item.text }}</label>
+                    </div>
+                    <div class="col-md-7"
+                         *ngIf="item.type === 'upload'">
+                        <a class="file-link"
+                           href="{{ item.text }}"
+                           [title]="item.text">{{ getFileNameFromUrl(item.text) }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br>
+    <!-- Phase Information -->
+    <div *ngIf="step !== 0">
+        <h5 class="kt-margin-b-15 fa-btn">
+            <i class="fab fa-envira"></i>
+            <span (click)="isShowPhaseInformation = !isShowPhaseInformation"
+                  class="fa-btn">{{ 'SPRO.PHASE_INFORMATION'
+                | translate}}</span>
+        </h5>
+        <div [ngClass]="isShowPhaseInformation? '': 'hide'">
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.NAME' | translate}} : </div>
+                    <div class="col-md-7">{{ phaseInfor?.name }}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.STATUS' | translate}} :</div>
+                    <div class="col-md-7">{{ phaseInfor?.status }}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.OWNER' | translate}} : </div>
+                    <div class="col-md-7">{{ phaseInfor?.ownerDisplay }}</div>
+                </div>
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.RECEIVED' | translate}} :</div>
+                    <div class="col-md-7">{{ phaseInfor?.receivedTime | date: mainConfig.formatFullDate }}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.RESPONSED' | translate}} :</div>
+                    <div class="col-md-7">{{ phaseInfor?.estimateToResponse | date: mainConfig.formatFullDate }}</div>
+                </div>
+                <div class="col-md-6 form-row">
+                    <div class="col-md-5 title">{{ 'SPRO.ESTIMATED_FINISH' | translate}} :</div>
+                    <div class="col-md-7">{{ phaseInfor?.estimateToFinish | date: mainConfig.formatFullDate }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- Phase Input Information -->
+    <div *ngIf="step !== 0">
+        <h5 class="kt-margin-b-15 fa-btn">
+            <i class="fab fa-envira"></i>
+            <span (click)="isShowPhaseInputInformation = !isShowPhaseInputInformation"
+                  class="fa-btn">{{
+                'SPRO.INPUT_INFORMATION' | translate}}</span>
+        </h5>
+        <div [ngClass]="isShowPhaseInputInformation?'':'hide'">
+            <ngb-tabset [justify]="'start'">
+                <ngb-tab *ngFor="let tab of phaseInput"
+                         [id]="tab.id">
+                    <ng-template ngbTabTitle>
+                        <span>
+                            {{ ('SPRO.FROM' | translate) + ' ' + (tab.fromItemName | translate) }}
+                        </span>
+                    </ng-template>
+                    <ng-template ngbTabContent>
+                        <div class="form-row">
+                            <div class="col-md-6 mb-3"
+                                 *ngFor="let item of tab?.detail?.individual;">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label class="title">{{ item.name + ' : ' }}</label>
+                                    </div>
+                                    <div class="col-md-7"
+                                         *ngIf="item.type !== 'upload'">
+                                        <label>{{ item.text }}</label>
+                                    </div>
+                                    <div class="col-md-7"
+                                         *ngIf="item.type === 'upload'">
+                                        <a class="file-link"
+                                           href="{{ item.text }}"
+                                           [title]="item.text">{{
+                                            getFileNameFromUrl(item.text) }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-tab>
+            </ngb-tabset>
+        </div>
+    </div>
+    <!-- Phase cancel -->
+    <div *ngIf="step === 0 && ticketInfo?.status !== 'Closed'">
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i>
+            <span (click)="isShowPhaseCancel = !isShowPhaseCancel"
+                  class="fa-btn">{{ 'SPRO.CANCEL_TICKET' | translate }}
+            </span>
+        </h5>
+        <div [ngClass]="isShowPhaseCancel?'':'hide'">
+            <div class="form-row">
+                <div class="col-md-12 mb-3">
+                    <label class="lbl-required">{{ 'SPRO.REASON' | translate }}</label>
+                    <textarea type="text"
+                              class="form-control"
+                              name="comment"
+                              placeholder="{{ 'SPRO.REASON' | translate }}"
+                              [(ngModel)]="reason"
+                              required></textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-12">
+                    <button class="btn btn-sm btn-danger"
+                            (click)="onBtnCancelTicketClick()">
+                        {{ 'SPRO.CANCEL_TICKET' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Output Information -->
+    <div *ngIf="step !== 0">
+        <h5 class="kt-margin-b-15">
+            <i class="fab fa-envira"></i>
+            <span (click)="isShowPhaseOutputInformation = !isShowPhaseOutputInformation"
+                  class="fa-btn">{{ 'SPRO.OUTPUT_INFORMATION' | translate }}
+            </span>
+        </h5>
+        <div [ngClass]="isShowPhaseOutputInformation?'':'hide'">
+            <!-- Phase Approve -->
+            <ngb-tabset [justify]="'start'">
+                <ngb-tab *ngFor="let tab of phaseOutput"
+                         [id]="tab.id">
+                    <ng-template ngbTabTitle>
+                        <span>
+                            {{ ('SPRO.TO' | translate) + ' ' + (tab.fromItemName | translate) }}
+                        </span>
+                    </ng-template>
+                    <ng-template ngbTabContent>
+                        <div class="content-action">
+                            <div
+                                 *ngIf="tab.detail && (tab.viewOnly === 0 && tab.status !== 'finished' && (tab?.status !== 'waiting' || (tab.status === 'waiting' && tab.type !== 'default')))">
+                                <div *ngFor="let item of tab.detail.individual;">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-3">
+                                            <label>{{item.name}}</label>
+                                            <div [ngSwitch]="item.type">
+                                                <div *ngSwitchCase="'textarea'">
+                                                    <textarea type="text"
+                                                              class="form-control"
+                                                              name="{{item.name}}"
+                                                              placeholder="{{item.name}}"
+                                                              [(ngModel)]="item.value"
+                                                              required="{{item?.conditions?.required}}"></textarea>
+                                                </div>
+                                                <div *ngSwitchCase="'select'">
+                                                    <ng-select [items]="item?.conditions?.data"
+                                                               bindLabel="text"
+                                                               name="{{item.name}}"
+                                                               bindValue="value"
+                                                               placeholder="{{item.name}}"
+                                                               [(ngModel)]="item.value"
+                                                               required="{{item?.conditions?.required}}">
+                                                    </ng-select>
+                                                </div>
+                                                <div *ngSwitchCase="'upload'">
+                                                    <input #file
+                                                           id="{{ controlId }}"
+                                                           name="input-file"
+                                                           class="form-control"
+                                                           value="item.value"
+                                                           (change)="onFilesInputChanged(file.files, item, 'Comment')"
+                                                           type="file">
+                                                </div>
+                                                <div *ngSwitchCase="'link'">
+                                                    <span class="form-control">
+                                                        <a *ngIf="item.value"
+                                                           class="header-link"
+                                                           href="{{ item.value }}"
+                                                           target="_blank">
+                                                            <b>{{ item.value }}</b>
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                                <div *ngSwitchDefault>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           name="{{item.name}}"
+                                                           placeholder="{{item.name}}"
+                                                           [(ngModel)]="item.value"
+                                                           required="{{item?.conditions?.required}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                 *ngIf="tab.detail && (tab.viewOnly === 1 || (tab.status === 'waiting' && tab.type === 'default') || tab.status === 'finished')">
+                                <div *ngFor="let item of tab.detail.individual;">
+                                    <div class="form-row col-md-12 mb-3">
+                                        <div class="col-md-3">
+                                            <label>{{ item.name + ' : '}}</label>
+                                        </div>
+                                        <div class="col-md-7"
+                                             *ngIf="item.type !== 'upload'">
+                                            <span>{{ item.text }}</span>
+                                        </div>
+                                        <div class="col-md-7"
+                                             *ngIf="item.type === 'upload'">
+                                            <a class="file-link"
+                                               href="{{ item.text }}"
+                                               [title]="item.text">{{
+                                                getFileNameFromUrl(item.text) }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row"
+                             *ngIf="phaseInfor?.status === 'Responding' && tab?.type === 'approval' && tab.viewOnly === 0">
+                            <div class="col-md-12">
+                                <button class="btn btn-sm btn-primary mr-2"
+                                        (click)="onBtnApproveClick()">{{
+                                    'SPRO.APPROVE' | translate }}</button>
+                                <button class="btn btn-sm btn-primary mr-2"
+                                        (click)="onBtnRequestUpdateClick()">{{
+                                    'SPRO.REQUEST_UPDATE' | translate
+                                    }}</button>
+                                <button class="btn btn-sm btn-danger mr-2"
+                                        (click)="onBtnCancelTicketClick()">{{
+                                    'SPRO.CANCEL_TICKET' | translate
+                                    }}</button>
+                            </div>
+                        </div>
+                        <div class="form-row"
+                             *ngIf="(phaseInfor?.status === 'Responding' || phaseInfor?.status === 'Implementing') && tab?.type === 'default' && tab.viewOnly === 0">
+                            <div class="col-md-12"
+                                 *ngIf="tab?.status !== 'working'">
+                                <button class="btn btn-sm btn-primary mr-2"
+                                        (click)="onBtnStartClick()">{{ 'SPRO.START'
+                                    | translate }}</button>
+                            </div>
+                            <div class="col-md-12"
+                                 *ngIf="tab?.status === 'working'">
+                                <button class="btn btn-sm btn-primary mr-2"
+                                        (click)="onBtnFinishClick()">{{
+                                    'SPRO.FINISH' | translate }}</button>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab title="{{ 'SPRO.CHANGE_IMPLEMENTER' | translate }}"
+                         *ngIf="phaseInfor?.status !== 'Finished' && phaseOutput.length > 0">
+                    <ng-template ngbTabContent>
+                        <div class="content-action">
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    <label>{{ 'SPRO.NEW_IMPLEMENTER' | translate }}</label>
+                                    <ng-select-async name="createdBy"
+                                                     bindLabel="email"
+                                                     suffixLabel="fullName"
+                                                     suffixValue="fullName"
+                                                     placeholder="{{ 'SPRO.CHOOSE_IMPLEMENTER' | translate }}"
+                                                     [multiple]="false"
+                                                     [service]="userService"
+                                                     [(ngModel)]="implementer"
+                                                     required>
+                                    </ng-select-async>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label>{{ 'SPRO.REASON' | translate }}</label>
+                                    <textarea type="text"
+                                              class="form-control"
+                                              name="comment"
+                                              placeholder="{{ 'SPRO.REASON' | translate }}"
+                                              [(ngModel)]="reason"
+                                              required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <button class="btn btn-sm btn-primary"
+                                        (click)="onBtnChangeImplenterClick()">{{
+                                    'SPRO.BTN_CHANGE' | translate
+                                    }}</button>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-tab>
+            </ngb-tabset>
+        </div>
+
+        <!-- Phase Confirm -->
+        <!-- Phase confirm có phaseInput, phase Implementer không có phaseInput -->
+        <div *ngIf="phaseOutput.length === 0 && phaseInput">
+            <div *ngIf="phaseInfor?.status === 'Responding'">
+                <p-rating [(ngModel)]="rating"
+                          [cancel]="false"
+                          [readonly]="ticketInfo?.status ==='Closed'"
+                          (onRate)="onRate($event)"></p-rating>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- Dialog tạo ticket -->
+<p-dialog [(visible)]="isShowCreateTicketTemplate"
+          [modal]="true"
+          [baseZIndex]="10002"
+          [draggable]="true"
+          [maximizable]="true"
+          [closable]="true"
+          [style]="{width: '80%'}"
+          (onShow)="onShowDialogCreateTicket()"
+          (onHide)="onCloseDialogCreateTicket()"
+          appendTo="body">
+    <p-header>
+        <i class="fal fa-info-circle"></i> {{ 'SPRO.CREATE_DRAFT_TICKET' | translate }}
+    </p-header>
+
+    <form autocomplete="off"
+          #formTicket="ngForm"
+          id="form-create-ticket"
+          style="min-height: 250px;">
+
+        <div class="form-row">
+            <div class="col-md-7 mb-5">
+                <h5 class="lbl-required"
+                    style="color: #646c9a;">
+                    <i class="fab fa-envira"></i> {{ titleOptionProcess }}
+                </h5>
+                <ng-select-async title="{{ titleOptionProcess }}"
+                                 name="processId"
+                                 bindLabel="processName"
+                                 placeholder="{{ titleOptionProcess }}"
+                                 [multiple]="false"
+                                 [closeOnSelect]="true"
+                                 [service]="mappingSproService"
+                                 [requestPayload]="{ module: module }"
+                                 (change)="onChangeProcess($event)"
+                                 [(ngModel)]="processTicketData.processNameDto"
+                                 required>
+                </ng-select-async>
+            </div>
+        </div>
+
+        <div *ngIf="processTicketData && processTicketData.processId">
+
+            <h5 class="align-center"><b>{{ processTicketData.processName }}</b></h5>
+            <div class="align-center mb-5"><i>{{ processTicketData.description }}</i></div>
+
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    <label class="lbl-required">{{ 'SPRO.REQUEST_SUBJECT' | translate }}</label>
+                    <input type="text"
+                           *ngIf="isShowCreateTicketTemplate"
+                           class="form-control"
+                           name="requestSubject"
+                           placeholder="{{ 'SPRO.REQUEST_SUBJECT' | translate }}"
+                           [(ngModel)]="requestSubject"
+                           validateTooltip
+                           [validateForm]="formTicket"
+                           required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    <label class="lbl-required">Site</label>
+                    <ng-select [items]="sites"
+                               *ngIf="isShowCreateTicketTemplate"
+                               bindLabel="label"
+                               name="site"
+                               bindValue="value"
+                               placeholder="Select your location"
+                               validateTooltip
+                               [validateForm]="formTicket"
+                               [(ngModel)]="site"
+                               required>
+                    </ng-select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div [ngClass]="item.display === false ? 'hide' : (item.type === 'splitter' ? 'full-width': 'col-md-6') "
+                     *ngFor="let item of ticketTemplate?.individual">
+                    <label *ngIf="item.display != false && item.type != 'splitter'"
+                           [ngClass]="item?.conditions?.required && item?.controlType !== 'checkbox'? 'lbl-required' : ''">{{item.name}}</label>
+                    <div [ngSwitch]="item.controlType"
+                         *ngIf="item.display != false">
+                        <div *ngSwitchCase="'textarea'">
+                            <textarea type="text"
+                                      class="form-control"
+                                      name="{{item.name}}"
+                                      placeholder="{{item.name}}"
+                                      [(ngModel)]="item.value"
+                                      validateTooltip
+                                      [validateForm]="formTicket"
+                                      required="{{item?.conditions?.required}}"
+                                      [disabled]="item?.disabled"
+                                      (ngModelChange)="onModelChangeItem(item)"></textarea>
+                        </div>
+                        <div *ngSwitchCase="'select'">
+                            <ng-select [items]="item?.conditions?.data"
+                                       bindLabel="text"
+                                       name="{{item.name}}"
+                                       bindValue="value"
+                                       placeholder="{{item.name}}"
+                                       validateTooltip
+                                       [validateForm]="formTicket"
+                                       [(ngModel)]="item.value"
+                                       required="{{item?.conditions?.required}}"
+                                       (ngModelChange)="onModelChangeItem(item)"
+                                       [disabled]="item?.disabled">
+                            </ng-select>
+                        </div>
+                        <div *ngSwitchCase="'finance'">
+                            <input type="text"
+                                   class="form-control"
+                                   name="{{item.name}}"
+                                   numberMask
+                                   placeholder="{{item.name}}"
+                                   [(ngModel)]="item.value"
+                                   validateTooltip
+                                   [validateForm]="formTicket"
+                                   required="{{item?.conditions?.required}}"
+                                   [disabled]="item?.disabled"
+                                   (ngModelChange)="onModelChangeItem(item)">
+                        </div>
+                        <div *ngSwitchCase="'upload'">
+                            <!-- Đính kèm hợp đồng lấy từ PO -->
+                            <input #file
+                                   *ngIf="item.id !== sproIdAttach"
+                                   id="{{ controlId }}"
+                                   name="{{ controlId }}"
+                                   class="form-control"
+                                   value="item.value"
+                                   multiple
+                                   (change)="onFilesInputChanged(file.files, item, 'Ticket')"
+                                   type="file"
+                                   required="{{item?.conditions?.required}}"
+                                   (ngModelChange)="onModelChangeItem(item)">
+                            <input type="text"
+                                   *ngIf="item.id === sproIdAttach"
+                                   class="form-control"
+                                   name="{{item.name}}"
+                                   style="color: #23527c; font-weight: bold;"
+                                   placeholder="{{item.name}}"
+                                   validateTooltip
+                                   [validateForm]="formTicket"
+                                   [(ngModel)]="item.fileName"
+                                   required="{{item?.conditions?.required}}"
+                                   disabled>
+                        </div>
+                        <div *ngSwitchCase="'picker'">
+                            <ng-select-async name="{{item.name}}"
+                                             bindLabel="text"
+                                             validateTooltip
+                                             [validateForm]="formTicket"
+                                             placeholder="{{item.name}}"
+                                             [multiple]="false"
+                                             [actionGet]="'getSearchData'"
+                                             [actionCount]="'countSearchData'"
+                                             [requestPayload]="{type: item.type}"
+                                             [service]="bpmService"
+                                             (change)="item.value = item.userDto?.value"
+                                             [(ngModel)]="item.userDto"
+                                             required="{{item?.conditions?.required}}"
+                                             [disabled]="item?.disabled"
+                                             [searchControl]="true"
+                                             (change)="onChangeCombobox(item)">
+                            </ng-select-async>
+                        </div>
+                        <div *ngSwitchCase="'combobox'">
+                            <ng-select-async name="{{item.name}}"
+                                             bindLabel="text"
+                                             validateTooltip
+                                             [validateForm]="formTicket"
+                                             placeholder="{{item.name}}"
+                                             [multiple]="false"
+                                             [actionGet]="'getComboboxData'"
+                                             [actionCount]="'countComboboxData'"
+                                             [requestPayload]="item.requestPayload ? item.requestPayload : {type: item.type}"
+                                             [service]="bpmService"
+                                             (change)="item.value = item.masterDto?.value"
+                                             [(ngModel)]="item.masterDto"
+                                             required="{{item?.conditions?.required}}"
+                                             [disabled]="item?.disabled"
+                                             (change)="onChangeCombobox(item)">
+                            </ng-select-async>
+                        </div>
+                        <div *ngSwitchCase="'checkbox'">
+                            <mat-checkbox name="{{item.name}}"
+                                          class="example-margin"
+                                          [(ngModel)]="item.value"
+                                          [color]="'primary'"
+                                          (ngModelChange)="onModelChangeItem(item)">
+                            </mat-checkbox>
+                        </div>
+                        <div *ngSwitchCase="'splitter'"
+                             class="splitter-item"
+                             itemtype="splitter">
+                            {{ item.name}}
+                        </div>
+                        <div *ngSwitchCase="'link'">
+                            <span class="form-control">
+                                <a *ngIf="item.value"
+                                   class="header-link"
+                                   href="{{ item.value }}"
+                                   target="_blank">
+                                    <b>{{ item.value }}</b>
+                                </a>
+                            </span>
+                        </div>
+                        <div *ngSwitchDefault>
+                            <input type="text"
+                                   class="form-control"
+                                   name="{{item.name}}"
+                                   placeholder="{{item.name}}"
+                                   validateTooltip
+                                   [validateForm]="formTicket"
+                                   [(ngModel)]="item.value"
+                                   required="{{item?.conditions?.required}}"
+                                   [disabled]="item?.disabled"
+                                   (ngModelChange)="onModelChangeItem(item)">
+                        </div>
+                    </div>
+
+                    <div *ngIf="item.display != false && item?.staticContent"
+                         [innerHTML]="item?.staticContent | safe: 'html'"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    <label>{{ 'SPRO.INFORM' | translate }}</label>
+                    <ng-select-async name="userInform"
+                                     bindLabel="email"
+                                     suffixLabel="fullName"
+                                     suffixValue="fullName"
+                                     validateTooltip
+                                     [validateForm]="formTicket"
+                                     placeholder="{{ 'SPRO.INFORM_PLACEHOLDER' | translate }}"
+                                     [multiple]="true"
+                                     [service]="userService"
+                                     [(ngModel)]="userInform.userDto"
+                                     (ngModelChange)="onChangeUserInform($event)">
+                    </ng-select-async>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button class="btn btn-brand btn-sm"
+                title="Submit"
+                (click)="onBtnSubmitTicketClick()">
+            <i class="fal fa-save"></i> {{ 'SPRO.CREATE_DRAFT_TICKET' | translate }}
+        </button>
+        <button class="btn btn-secondary btn-sm"
+                title="{{ 'COMMON.CLOSE' | translate }}"
+                (click)="onCloseDialogCreateTicket()">
+            {{ 'COMMON.CLOSE' | translate }}
+        </button>
+    </ng-template>
+</p-dialog>

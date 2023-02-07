@@ -1,0 +1,22 @@
+export const HEADER = [
+    { width: '40px', title: 'COMMON.NO', field: 'indexNo' },
+    { width: '100px', title: 'BRAND.CODE', field: 'code' },
+    { width: '120px', title: 'BRAND.NAME_BRAND', field: 'name' },
+    { width: '100px', title: 'BRAND.REVENUE_HEADER_LIST', field: 'revenueTotal' },
+    { width: '100px', title: 'Priority', field: 'priority' },
+    // { width: '100px', title: 'FIS Partner level', field: 'fisPartnerLevel' },
+    { width: '100px', title: 'FIS Partner ID', field: 'fisPartnerId' },
+    { width: '100px', title: 'Deal Registration', field: 'dealRegistration' },
+    { width: '100px', title: 'Case Studies', field: 'caseStudies' },
+    { width: '100px', title: 'Core solutions', field: 'coreSolutions' },
+    { width: '100px', title: 'Distributor', field: 'distributor' },
+    { width: '100px', title: 'Pamer (Vùng)', field: 'pamer' },
+    { width: '100px', title: 'BRAND.CREATOR', field: 'createdByName' },
+    // { width: '100px', title: 'BRAND.LEVEL', field: 'level' },
+    // { width: '100px', title: 'BRAND.CLASSIFY', field: 'distributorOrRetailer' },
+    // { width: '100px', title: 'BRAND.RATING', field: 'partnerRating' },
+    // { width: '100px', title: 'BRAND.PAYMENT_METHODS', field: 'paymentMethods' },
+    // { width: '100px', title: 'BRAND.CREATOR', field: 'createdByName' },
+    // { width: '100px', title: 'BRAND.EVALUATE', field: 'evaluate' },
+    { width: '50px', header: '', maxWidth: '50px', class: 'action', field: 'action' }
+];

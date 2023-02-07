@@ -1,0 +1,206 @@
+<form #formContact="ngForm"
+      id="revenue">
+    <h5 class="kt-margin-b-15">
+        <i class="fab fa-envira"></i> {{'Doanh số (USD)'| translate}}
+    </h5>
+    <div class="table-responsive">
+        <p-table [value]="dataSource.items"
+                 tableStyleClass="table-no-wrap"
+                 dataKey="id"
+                 [columns]="header">
+            <ng-template pTemplate="header">
+                <tr style="background: #f8f9fa;"
+                    class="align-center"
+                    *ngIf="editTable">
+                    <th colSpan="5">
+                        <div class="form-row">
+                            <div style="width: 15%; padding-left: 27px; padding-top: 8px;">
+                                <label>{{'Doanh số (USD)'| translate}}</label>
+                            </div>
+                            <div style="width: 20%;">
+                                <config-list-control name="revenue"
+                                                     type="BRAND_REVENUE"
+                                                     header="Doanh thu"
+                                                     [items]="configListDataRevenue"
+                                                     [hasEdit]="true"
+                                                     (getChange)="onSearchRevenue($event)"
+                                                     [(ngModel)]="revenue">
+                                </config-list-control>
+                            </div>
+                        </div>
+
+                    </th>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <th *ngFor="let col of header"
+                        [width]="col.width"
+                        [ngClass]="col.isRequired ? (col.class + ' lbl-required') : col.class">
+                        {{ col.title | translate }}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body"
+                         let-rowData
+                         let-columns="columns"
+                         let-rowIndex="rowIndex"
+                         let-editing="editing">
+                <tr [pEditableRow]="rowData"
+                    *ngIf="!rowData.hideRow">
+                    <td class="align-center">
+                        {{ rowIndex + 1}}
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.quarterly }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <ng-select name="{{rowIndex + 1 + 'quarterly'}}"
+                                           [items]="quarterlyData"
+                                           [hideSelected]="true"
+                                           bindLabel="label"
+                                           bindValue="label"
+                                           appendTo="body"
+                                           placeholder="{{ 'Nhập' | translate }}"
+                                           [(ngModel)]="rowData.quarterly"
+                                           (change)="onRowEditInit(rowData)">
+                                </ng-select>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.quarterly}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        class="align-right"
+                        title="{{ rowData.quarterlyRevenue ? convertCurrencyMask(rowData.quarterlyRevenue) : 0}}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control align-right"
+                                       name="{{rowIndex + 1 + 'quarterlyRevenue'}}"
+                                       numberMask
+                                       validateTooltip
+                                       [validateForm]="form"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.quarterlyRevenue"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.quarterlyRevenue ? convertCurrencyMask(rowData.quarterlyRevenue) : 0}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td pEditableColumn
+                        [pEditableColumnDisabled]="!editTable"
+                        title="{{ rowData.note }}">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText
+                                       type="text"
+                                       class="form-control"
+                                       name="{{rowIndex + 1 + 'note'}}"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="rowData.note"
+                                       (change)="onRowEditInit(rowData)">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowData.note}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+
+                    <td class="action align-center"
+                        *ngIf="editTable">
+                        <button class="button-icon"
+                                (click)="onBtnDeleteClick(rowData)">
+                            <i class="fas fa-trash-alt"
+                               style="cursor: pointer;"
+                               [title]="'COMMON.DELETE' | translate"></i>
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"
+                         let-columns>
+                <tr *ngIf="editTable"
+                    [pEditableRow]="addItem"
+                    class="td-editable"
+                    style="background: #f8f9fa;">
+
+                    <td *ngFor="let col of columns"
+                        style="border: 1px solid #e9ecef;">
+
+                        <div *ngIf="col.field === 'quarterly'"
+                             class="p-text-right th-border"
+                             [title]="addItem.quarterly">
+                            <ng-select name="quarterly"
+                                       [items]="quarterlyData"
+                                       [hideSelected]="true"
+                                       bindLabel="label"
+                                       bindValue="label"
+                                       appendTo="body"
+                                       placeholder="{{ 'Nhập' | translate }}"
+                                       [(ngModel)]="addItem.quarterly">
+                            </ng-select>
+                        </div>
+                        <div *ngIf="col.field === 'quarterlyRevenue'"
+                             class="p-text-right th-border"
+                             [title]="addItem.quarterlyRevenue">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="quarterlyRevenue"
+                                   numberMask
+                                   validateTooltip
+                                   [validateForm]="form"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItem.quarterlyRevenue">
+                        </div>
+
+                        <div *ngIf="col.field === 'note'"
+                             class="p-text-right th-border"
+                             [title]="addItem.note">
+                            <input pInputText
+                                   type="text"
+                                   class="form-control"
+                                   name="note"
+                                   placeholder="{{ 'Nhập' | translate }}"
+                                   [(ngModel)]="addItem.note">
+                        </div>
+
+                        <div *ngIf="col.field === 'action'"
+                             class="align-center">
+                            <button (click)="addNewRow()"
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    pSaveEditableRow
+                                    icon="flaticon2-add-1"
+                                    class="p-button-rounded p-button-text">
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="background: #f8f9fa;"
+                    *ngIf="dataSource.items && dataSource.items.length > 0">
+                    <td colSpan="2"
+                        style="border: 1px solid #e9ecef;"
+                        class="align-right">Tổng:</td>
+                    <td style="border: 1px solid #e9ecef;"
+                        title="{{ totalAmount ? convertCurrencyMask(totalAmount) : 0}}"
+                        class="align-right">{{ totalAmount ? convertCurrencyMask(totalAmount) : 0}}</td>
+                    <td colSpan="2"
+                        style="border: 1px solid #e9ecef;"
+                        *ngIf="editTable"></td>
+                    <td *ngIf="!editTable"
+                        style="border: 1px solid #e9ecef;"></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</form>

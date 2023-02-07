@@ -1,0 +1,207 @@
+<kt-portlet>
+    <kt-portlet-header [class]="'kt-portlet__head--lg'"
+                       [icon]="'fal fa-info-circle'"
+                       [title]="'MAPPING_SPRO.HEADER_DETAIL' | translate"
+                       [viewLoading$]="mappingSproService.isLoading$">
+        <ng-container ktPortletTools>
+            <a class="btn btn-secondary kt-margin-r-10"
+               mat-raised-button
+               (click)="goBack()">
+                <i class="la la-arrow-left"></i>
+                <span class="kt-hidden-mobile">{{ 'COMMON.BACK' | translate }}</span>
+            </a>
+        </ng-container>
+    </kt-portlet-header>
+    <kt-portlet-body>
+
+        <div class="kt-grid__item">
+
+            <form autocomplete="off"
+                  #form="ngForm"
+                  id="mapping-spro-edit">
+
+                <div class="form-row">
+                    <div class="col-md-3 mb-3">
+                        <label>{{ 'MAPPING_SPRO.MODULE' | translate }}</label>
+                        <ng-select [items]="modules"
+                                   bindLabel="label"
+                                   bindValue="value"
+                                   name="modules"
+                                   placeholder="{{ 'MAPPING_SPRO.MODULE' | translate }}"
+                                   (change)="onChangeModule($event)"
+                                   [(ngModel)]="mappingSproData.module">
+                        </ng-select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label>{{ 'MAPPING_SPRO.PROCESS_NAME' | translate }}</label>
+                        <ng-select [title]="mappingSproData.processName"
+                                   [items]="processDatas$ | async"
+                                   bindLabel="processName"
+                                   bindValue="processId"
+                                   name="process"
+                                   [loading]="isLoadingProcess"
+                                   (ngModelChange)="onChangeProcess($event)"
+                                   placeholder="{{ 'MAPPING_SPRO.PROCESS_NAME' | translate }}"
+                                   [ngModel]="mappingSproData.processId">
+                        </ng-select>
+                    </div>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'MAPPING_SPRO.LIST_PARAM'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="params"
+                             [columns]="headers"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                    <mat-checkbox *ngIf="col.title=='MAPPING_SPRO.REQUIRED'"
+                                                  name="required"
+                                                  class="ml-2"
+                                                  [checked]="isRequired"
+                                                  (change)="changeRequired($event)">
+                                    </mat-checkbox>
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex">
+                            <tr>
+                                <td class="text-center">{{ rowIndex + 1 }}</td>
+                                <td class="text-center">{{ rowData.id }}</td>
+                                <td>{{ rowData.name }}</td>
+                                <td>{{ rowData.controlType }}</td>
+                                <td class="text-center">
+                                    {{ rowData.conditions ? rowData.conditions['min-length'] : null }}
+                                </td>
+                                <td class="text-center">
+                                    {{ rowData.conditions ? rowData.conditions['max-length'] : null }}
+                                </td>
+                                <td class="text-center">{{ rowData.conditions?.required }}</td>
+                                <td>
+                                    <ng-select [items]="properties"
+                                               bindLabel="name"
+                                               bindValue="name"
+                                               name="epoField{{rowIndex}}"
+                                               [(ngModel)]="rowData.epoField"
+                                               [addTag]="addTagFn"
+                                               appendTo="body">
+                                    </ng-select>
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control"
+                                           name="link{{rowIndex}}"
+                                           placeholder="{{ 'Link' | translate }}"
+                                           [(ngModel)]="rowData.link">
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="push{{rowIndex}}"
+                                                  class="example-margin"
+                                                  [ngModel]="rowData.push"
+                                                  (ngModelChange)="rowData.push = $event ? true : false"
+                                                  [checked]="rowData.push == true"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    <div *ngIf="params && params.length === 0">
+                        <view-empty></view-empty>
+                    </div>
+                </div>
+
+                <h5 class="kt-margin-t-30 kt-margin-b-15">
+                    <i class="fab fa-envira"></i> {{'MAPPING_SPRO.LIST_PARAM_ITEM'| translate}}
+                </h5>
+                <div class="mat-table__wrapper">
+                    <p-table [value]="items"
+                             [columns]="headerItems"
+                             class="table-no-wrap"
+                             tableStyleClass="table-no-wrap">
+
+                        <ng-template pTemplate="header"
+                                     let-columns>
+                            <tr class="background-table-header">
+                                <th *ngFor="let col of columns"
+                                    [width]="col.width"
+                                    class="align-center"
+                                    [ngClass]="col.class">
+                                    {{col.title | translate}}
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body"
+                                     let-rowData
+                                     let-rowIndex="rowIndex">
+                            <tr>
+                                <td class="text-center">{{ rowIndex + 1 }}</td>
+                                <td class="text-center">{{ rowData.id }}</td>
+                                <td>{{ rowData.name }}</td>
+                                <td>{{ rowData.controlType }}</td>
+                                <td class="text-center">
+                                    {{ rowData.conditions ? rowData.conditions['min-length'] : null }}
+                                </td>
+                                <td class="text-center">
+                                    {{ rowData.conditions ? rowData.conditions['max-length'] : null }}
+                                </td>
+                                <td class="text-center">{{ rowData.conditions?.required }}</td>
+                                <td>
+                                    <ng-select [items]="propertiesItem"
+                                               bindLabel="name"
+                                               bindValue="name"
+                                               name="epoFieldItem{{rowIndex}}"
+                                               [(ngModel)]="rowData.epoField"
+                                               [addTag]="addTagFn"
+                                               appendTo="body">
+                                    </ng-select>
+                                </td>
+                                <td class="text-center">
+                                    <mat-checkbox name="pushItem{{rowIndex}}"
+                                                  class="example-margin"
+                                                  [ngModel]="rowData.push"
+                                                  (ngModelChange)="rowData.push = $event ? true : false"
+                                                  [checked]="rowData.push == true"
+                                                  [color]="'primary'">
+                                    </mat-checkbox>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    <div *ngIf="items && items.length === 0">
+                        <view-empty></view-empty>
+                    </div>
+                </div>
+
+            </form>
+
+            <div class="mt-5">
+                <button class="btn btn-sm btn-success mr-2"
+                        title="{{ 'COMMON.SAVE' | translate }}"
+                        (click)="onBtnSaveClick()">
+                    <i class="fal fa-save"></i> {{ 'COMMON.SAVE' | translate }}
+                </button>
+
+                <button class="btn btn-sm btn-secondary mr-2"
+                        title="{{ 'COMMON.CANCEL' | translate }}"
+                        (click)="onBtnCancelClick()">
+                    <i class="fal fa-times"></i> {{ 'COMMON.CANCEL' | translate }}
+                </button>
+            </div>
+        </div>
+
+    </kt-portlet-body>
+</kt-portlet>

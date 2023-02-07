@@ -1,0 +1,10 @@
+.float-header {
+    position: fixed;
+    top: 65px;
+    z-index: 99999999;
+}
+
+/* Track */
+.scroll-table-track::-webkit-scrollbar-track {
+	background-color: #f2f3f8;
+}

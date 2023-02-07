@@ -1,0 +1,10 @@
+<div [style.visibility]="element && showScrollTable() ? 'inherit' : 'hidden'"
+	 class="scroll-table"
+	 [ngStyle]="{ left: getPosition().left + 'px' }">
+	<div class="scroll-table-track"
+		 [ngStyle]="{ width: getClientWidth() }"
+		 style="overflow: auto;"
+		 (scroll)="onScroll($event)">
+		<div [ngStyle]="{ width: getFullWidth() }">&nbsp;</div>
+	</div>
+</div>
